@@ -1,84 +1,39 @@
 "use client";
 
-import { motion } from "motion/react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { EASE, INTRO_DURATION, cssBezier } from "@/lib/motion";
-import { Reveal, FadeUp } from "@/components/motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { EASE, INTRO_DURATION } from "@/lib/motion";
+import { FadeUp } from "@/components/motion";
+import { PillLink } from "@/components/ui/pill-link";
 
 // Synced to INTRO_DURATION — hero elements appear as the intro overlay fades.
-// Reveal / FadeUp are shared primitives (@/components/motion); the hero drives
-// them on mount, so each call passes an absolute `delay` of BASE_DELAY + offset.
+// FadeUp is a shared primitive (@/components/motion); the hero drives it on
+// mount, so each call passes an absolute `delay` of BASE_DELAY + offset.
 const BASE_DELAY = INTRO_DURATION;
 
-/* ── Decorative plus / cross cluster ────────────────────────── */
-function PlusCluster({
-  x,
-  y,
-  size = "sm",
-  delay = 0,
-}: {
-  x: string;
-  y: string;
-  size?: "sm" | "md";
-  delay?: number;
-}) {
-  const gap = size === "md" ? 14 : 9;
-  const fs  = size === "md" ? 14 : 10;
-  const pts: [number, number][] = [
-    [0,           0],
-    [gap,         0],
-    [gap * 2,     0],
-    [gap * 0.5,   gap],
-    [gap * 1.5,   gap],
-    [0,           gap * 2],
-    [gap,         gap * 2],
-  ];
-  return (
-    <motion.div
-      aria-hidden="true"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.8, ease: EASE.expo, delay: BASE_DELAY + delay }}
-      className="absolute pointer-events-none select-none"
-      style={{ left: x, top: y, zIndex: 1 }}
-    >
-      {pts.map(([ox, oy], i) => (
-        <span
-          key={i}
-          className="absolute"
-          style={{
-            left:       ox,
-            top:        oy,
-            fontSize:   fs,
-            color:      "#242424",
-            fontWeight: 300,
-            lineHeight: 1,
-            fontFamily: "monospace",
-          }}
-        >
-          +
-        </span>
-      ))}
-    </motion.div>
-  );
-}
-
 /* ── Vertical "KODA" letter column ───────────────────────────────
-   Crossfades with the intro overlay's KODA using matching
-   duration + ease (easeInOut 0.35 s), creating a seamless handoff. */
+   SHARED ELEMENT, nie crossfade. Ta KODA jest piksel-w-piksel pod
+   napisem KODA z overlayu intro (ta sama pozycja/rozmiar/kolor/parallax),
+   więc gdy overlay znika (Phase 4 fade + unmount), po prostu ją ODSŁANIA.
+   ZERO własnego fade-in → brak migotania/podwójnego pojawienia się przy
+   handoffie. Stąd opacity zostaje na 1 przez cały czas (i tak jest zakryta
+   przez overlay z-[200] do końca intro). */
 function KodaColumn() {
+  // Parallax: scroll w dół → kolumna KODA jedzie w górę (litera A wysuwa się
+  // bardziej do widoku). Ratio ~0.4, jak baunfire. y=0 przy scrollY=0, więc
+  // handoff z intro (piksel-w-piksel) pozostaje nienaruszony.
+  const { scrollY } = useScroll();
+  const reduce = useReducedMotion();
+  const y = useTransform(scrollY, [0, 600], [0, reduce ? 0 : -240]);
+
   return (
     <motion.div
       aria-hidden="true"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.35, ease: "easeInOut", delay: BASE_DELAY }}
-      className="absolute top-0 pointer-events-none select-none"
+      className="absolute top-0 hidden select-none pointer-events-none lg:block"
       style={{
         right:  "19%",
         width:  "clamp(160px, 21vw, 340px)",
         height: "130%",
+        y,
       }}
     >
       {(["K", "O", "D", "A"] as const).map((letter) => (
@@ -202,28 +157,28 @@ export function Hero() {
         }}
       />
 
-      {/* ── Plus clusters ────────────────────────────────────── */}
-      <PlusCluster x="62%" y="20%" size="md" delay={0.4} />
-      <PlusCluster x="56%" y="60%" size="sm" delay={0.5} />
-      <PlusCluster x="79%" y="74%" size="sm" delay={0.45} />
-
       {/* ── KODA letter column (crossfades with overlay KODA) ── */}
       <KodaColumn />
 
       {/* ── SCROLL indicator ─────────────────────────────────── */}
       <ScrollIndicator />
 
-      {/* ══ Main content ══════════════════════════════════════ */}
-      <div
-        className="container-koda relative z-10 flex flex-col flex-1"
-        style={{ paddingTop: "130px" }}
-      >
+      {/* ══ Main content ══════════════════════════════════════
+          z-[210] = NAD intro-overlayem (z-200). Tekst jest opacity 0 do
+          swojego delay'a, więc podczas białej fazy intro jest niewidoczny;
+          gdy zaczyna wjeżdżać (delay ~BASE-0.4), linia tła już zamalowała
+          lewą stronę na ciemno → elementy pojawiają się NA ciemnym, JESZCZE
+          w trakcie sweepu (overlap intro↔content, jak baunfire). Tło hero
+          (z-0) zostaje POD overlayem i jest odsłaniane jego zanikiem. */}
+      <div className="container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[84px] md:pt-[130px]">
         <div
           className="flex flex-col justify-center flex-1"
           style={{ paddingBottom: "clamp(50px, 7vh, 90px)" }}
         >
-          {/* Label */}
-          <Reveal delay={BASE_DELAY + 0.05}>
+          {/* Label — WJEŻDŻA Z LEWEJ (slide poziomy + fade). Prowadzi kaskadę,
+              startuje najwcześniej (2.0s) — gdy linia tła zamalowała już lewą
+              stronę, więc pojawia się na ciemnym jeszcze w trakcie sweepu. */}
+          <FadeUp delay={BASE_DELAY - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
             <div className="flex items-center gap-5 mb-9">
               <span className="label-koda">K O D A &nbsp; S T U D I O</span>
               <div
@@ -234,31 +189,45 @@ export function Hero() {
                 }}
               />
             </div>
-          </Reveal>
+          </FadeUp>
 
-          {/* ── Large heading + description + CTA ─────────────── */}
-          <div style={{ maxWidth: "clamp(280px, 54%, 620px)" }}>
+          {/* ── Large heading + description + CTA ───────────────
+              Full width on phones/tablets (decorative KODA is hidden there);
+              constrained to ~54% on lg+ to leave room for the KODA column. */}
+          <div className="w-full lg:w-[54%] lg:max-w-[620px]">
 
-            <FadeUp delay={BASE_DELAY + 0.15}>
-              <h1
-                style={{
-                  fontFamily:    "var(--font-heading)",
-                  fontWeight:    800,
-                  fontSize:      "clamp(2.4rem, 5.8vw, 5.2rem)",
-                  lineHeight:    1.0,
-                  letterSpacing: "-0.03em",
-                  color:         "#ffffff",
-                }}
+            {/* h1 — DWIE LINIE wjeżdżają OSOBNO z dołu (stagger 0.1s). Inny
+                ruch niż label (pion vs poziom) + per-linia = premium reveal. */}
+            <h1
+              style={{
+                fontFamily:    "var(--font-heading)",
+                fontWeight:    800,
+                fontSize:      "clamp(2.4rem, 5.8vw, 5.2rem)",
+                lineHeight:    1.0,
+                letterSpacing: "-0.03em",
+                color:         "#ffffff",
+              }}
+            >
+              <motion.span
+                style={{ display: "block" }}
+                initial={{ opacity: 0, y: 52 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE_DELAY - 0.28 }}
               >
                 Robimy strony,
-                <br />
-                <span style={{ color: "rgba(255,255,255,0.52)" }}>
-                  które sprzedają.
-                </span>
-              </h1>
-            </FadeUp>
+              </motion.span>
+              <motion.span
+                style={{ display: "block", color: "rgba(255,255,255,0.52)" }}
+                initial={{ opacity: 0, y: 52 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE_DELAY - 0.18 }}
+              >
+                które sprzedają.
+              </motion.span>
+            </h1>
 
-            <FadeUp delay={BASE_DELAY + 0.28} className="mt-8">
+            {/* Opis — łagodny rise + fade (mniejszy dystans, EASE.expo) */}
+            <FadeUp delay={BASE_DELAY - 0.06} duration={0.6} ease={EASE.expo} y={22} className="mt-8">
               <p
                 className="text-white/45 leading-relaxed"
                 style={{ fontSize: "clamp(0.875rem, 1.1vw, 1rem)" }}
@@ -268,28 +237,10 @@ export function Hero() {
               </p>
             </FadeUp>
 
-            <FadeUp delay={BASE_DELAY + 0.42} className="mt-10">
-              <Link
-                href="/kontakt"
-                className={cn(
-                  "group inline-flex items-center gap-5 rounded-full px-8 py-4",
-                  "text-[11px] font-heading font-bold tracking-[0.18em] uppercase",
-                  "text-white/60 hover:text-white transition-all duration-500",
-                )}
-                style={{
-                  backgroundColor:          "#1a1a1a",
-                  border:                   "1px solid rgba(255,255,255,0.07)",
-                  transitionTimingFunction:  cssBezier(EASE.expo),
-                }}
-              >
-                Porozmawiajmy
-                <span
-                  className="text-xl font-light leading-none transition-transform duration-500 group-hover:rotate-45"
-                  style={{ transitionTimingFunction: cssBezier(EASE.expo) }}
-                >
-                  +
-                </span>
-              </Link>
+            {/* CTA — POP: scale 0.9→1 + lekki rise, BACK (overshoot) = motoryka
+                przycisku, wyraźnie inna niż wjazdy tekstu. Domyka kaskadę. */}
+            <FadeUp delay={BASE_DELAY + 0.08} duration={0.6} ease={EASE.back} y={16} scale={0.9} className="mt-10">
+              <PillLink href="/kontakt">Porozmawiajmy</PillLink>
             </FadeUp>
           </div>
         </div>

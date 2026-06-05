@@ -22,6 +22,7 @@
   --ease-expo:           cubic-bezier(0.19, 1, 0.22, 1);
   --ease-quick:          cubic-bezier(0.835, -0.005, 0.06, 1);
   --ease-smooth:         cubic-bezier(0.63, 0.03, 0.21, 1);
+  --ease-back:           cubic-bezier(0.34, 1.4, 0.64, 1);
 
   /* Durations */
   --duration-fast:       150ms;
@@ -44,6 +45,19 @@
 @theme inline {
   --font-heading: var(--font-syne), "Syne", sans-serif;
   --font-body:    var(--font-inter), "Inter", sans-serif;
+}
+
+/* ── Z-index scale — SINGLE SOURCE OF TRUTH for layering ─────────────
+   The whole stacking order lives here so the intro ↔ hero ↔ menu ↔ header
+   relationship is explicit and never drifts into magic numbers scattered
+   across components. Use in JSX via Tailwind arbitrary values:
+   `className="z-[var(--z-header)]"`. Within a section, bg = z-0, content = z-10. */
+:root {
+  --z-scrollbar:     60;  /* custom scroll-progress bar (right edge)            */
+  --z-intro:        200;  /* intro overlay (covers hero bg during the entrance) */
+  --z-hero-content: 210;  /* hero text — ABOVE the intro so it reveals mid-sweep */
+  --z-menu:         280;  /* full-screen expanding menu overlay                  */
+  --z-header:       300;  /* header logo + menu button (above menu so X works)   */
 }
 
 /* ── Keyframe animations ─────────────────────────────────────────── */
@@ -78,6 +92,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    scrollbar-width: none;     /* Firefox — natywny scrollbar ukryty */
+    -ms-overflow-style: none;  /* legacy Edge */
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -121,10 +137,8 @@
     color:            var(--color-white);
   }
 
-  ::-webkit-scrollbar          { width: 6px; }
-  ::-webkit-scrollbar-track    { background: var(--color-dark); }
-  ::-webkit-scrollbar-thumb    { background: var(--color-dark-3); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-pink); }
+  /* Natywny scrollbar ukryty — zastępuje go <ScrollProgress> (pasek po prawej). */
+  ::-webkit-scrollbar { width: 0; height: 0; }
 
   :focus-visible {
     outline:        2px solid var(--color-pink);
@@ -144,6 +158,10 @@
     margin-top: clamp(80px, 12vw, 140px);
   }
 }
+
+/* Portfolio column scroll-parallax jest sterowany w JS (work.tsx → useEffect
+   w Work()): passive scroll listener + bezpośredni transform. Bulletproof i
+   działa w każdej przeglądarce. */
 
 .container-koda {
   width:         100%;

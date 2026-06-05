@@ -1,15 +1,17 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   motion,
   useMotionValue,
   useSpring,
   useTransform,
+  useReducedMotion,
 } from "motion/react";
 import { EASE, cssBezier } from "@/lib/motion";
-import { FadeUp, Reveal } from "@/components/motion";
+import { FadeUp } from "@/components/motion";
+import { PillLink } from "@/components/ui/pill-link";
 
 // ── Project data ──────────────────────────────────────────────────────
 const FEATURED = [
@@ -149,20 +151,30 @@ function MockWebsite({ accent }: { accent: string }) {
   );
 }
 
-// ── 3-D tilt card ─────────────────────────────────────────────────────
+/* ── 3-D tilt card ──────────────────────────────────────────────────────
+   Hover: karta przechyla się PRECYZYJNIE w stronę kursora (tight spring) +
+   światło (glare) podąża dokładnie pod kursorem = wrażenie głębi i precyzji.
+   Wjazd: fade + rise (TYLKO opacity+translate = czysty GPU composite, bez jank). */
 function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
   const [hovered, setHovered] = useState(false);
 
+  // Pozycja kursora w karcie, znormalizowana do −0.5..0.5.
   const mX = useMotionValue(0);
   const mY = useMotionValue(0);
 
-  const spring   = { stiffness: 180, damping: 22 };
-  const rotateY  = useSpring(useTransform(mX, [-0.5, 0.5], [-8, 8]),  spring);
-  const rotateX  = useSpring(useTransform(mY, [-0.5, 0.5], [6, -6]),  spring);
+  // Tight, responsywny spring — wysoka czułość, minimalny overshoot (dokładność).
+  const TILT = { stiffness: 260, damping: 26, mass: 0.4 };
+  const rotateY = useSpring(useTransform(mX, [-0.5, 0.5], reduce ? [0, 0] : [-9, 9]), TILT);
+  const rotateX = useSpring(useTransform(mY, [-0.5, 0.5], reduce ? [0, 0] : [7, -7]), TILT);
 
   const scaleVal = useMotionValue(1);
-  const scale    = useSpring(scaleVal, { stiffness: 220, damping: 28 });
+  const scale    = useSpring(scaleVal, { stiffness: 220, damping: 26 });
+
+  // Glare — blob świetlny przesuwany transformem (GPU, bez repaintu) ku kursorowi.
+  const gx = useTransform(mX, [-0.5, 0.5], ["-22%", "22%"]);
+  const gy = useTransform(mY, [-0.5, 0.5], ["-22%", "22%"]);
 
   const onMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -174,11 +186,7 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
     [mX, mY],
   );
 
-  const onEnter = useCallback(() => {
-    setHovered(true);
-    scaleVal.set(1.025);
-  }, [scaleVal]);
-
+  const onEnter = useCallback(() => { setHovered(true); scaleVal.set(1.03); }, [scaleVal]);
   const onLeave = useCallback(() => {
     setHovered(false);
     mX.set(0);
@@ -187,12 +195,12 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
   }, [mX, mY, scaleVal]);
 
   return (
-    <FadeUp inView delay={delay}>
+    <FadeUp inView delay={delay} y={48} duration={0.9} ease={EASE.expo}>
       <Link href={`/realizacje/${project.id}`} className="block">
-        {/* Perspective root — measures cursor position */}
+        {/* Perspective root — mierzy pozycję kursora */}
         <div
           ref={wrapperRef}
-          style={{ perspective: "900px" }}
+          style={{ perspective: "1000px" }}
           onMouseMove={onMove}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
@@ -228,24 +236,45 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
                 />
 
                 {/* Ambient glow orb */}
+                {/* Ambient glow — softness baked into the gradient (NO filter:blur;
+                    blur forces costly re-raster on every animated frame = jank). */}
                 <div
                   className="absolute pointer-events-none"
                   aria-hidden={true}
                   style={{
-                    width:        "70%",
-                    height:       "48%",
-                    top:          "7%",
-                    left:         "15%",
+                    width:        "82%",
+                    height:       "56%",
+                    top:          "4%",
+                    left:         "9%",
                     borderRadius: "50%",
-                    background:   `radial-gradient(ellipse, rgba(${project.rgb},0.30) 0%, transparent 70%)`,
-                    filter:       "blur(22px)",
-                    opacity:      hovered ? 1 : 0.68,
+                    background:   `radial-gradient(ellipse at center, rgba(${project.rgb},0.26) 0%, rgba(${project.rgb},0.10) 38%, transparent 72%)`,
+                    opacity:      hovered ? 1 : 0.7,
                     transition:   `opacity 500ms ${cssBezier(EASE.expo)}`,
                   }}
                 />
 
                 {/* Decorative website screenshot */}
                 <MockWebsite accent={project.glow} />
+
+                {/* Cursor-following glare (light catches the surface under the pointer) */}
+                <motion.div
+                  className="absolute inset-0 overflow-hidden pointer-events-none"
+                  aria-hidden={true}
+                  style={{
+                    opacity:    hovered ? 1 : 0,
+                    transition: `opacity 450ms ${cssBezier(EASE.expo)}`,
+                  }}
+                >
+                  <motion.div
+                    style={{
+                      position:   "absolute",
+                      inset:      "-25%",
+                      x:          gx,
+                      y:          gy,
+                      background: "radial-gradient(circle at center, rgba(255,255,255,0.18) 0%, transparent 55%)",
+                    }}
+                  />
+                </motion.div>
 
                 {/* Legibility gradient at bottom */}
                 <div
@@ -307,28 +336,72 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
 
 // ══════════════════════════════════════════════════════════════════════
 export function Work() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const colARef = useRef<HTMLDivElement>(null);
+  const colBRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-parallax kolumn — RĘCZNY, bulletproof: passive scroll listener +
+  // bezpośredni transform (translate3d = GPU). Działa w KAŻDEJ przeglądarce,
+  // 1:1 ze scrollem = płynne i przewidywalne. Tylko md+ (mobile: kolumny się
+  // stackują → bez parallaxu, by nie było pionowych dziur). reduced-motion → off.
+  useEffect(() => {
+    const section = sectionRef.current;
+    const a = colARef.current;
+    const b = colBRef.current;
+    if (!section || !a || !b) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const update = () => {
+      if (window.innerWidth < 768) {
+        a.style.transform = "";
+        b.style.transform = "";
+        return;
+      }
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // p: 0 = sekcja wjeżdża od dołu, 1 = wyjeżdża górą; c: −0.5..0.5 (środek = 0)
+      const p = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
+      const c = p - 0.5;
+      a.style.transform = `translate3d(0, ${(-c * 150).toFixed(1)}px, 0)`; // ±75
+      b.style.transform = `translate3d(0, ${(-c * 60).toFixed(1)}px, 0)`;  // ±30
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       data-header-theme="light"
       className="relative overflow-hidden"
       style={{ backgroundColor: "#f7f7f7" }}
     >
       <div className="container-koda section-y">
 
-        {/* ── Section header ───────────────────────────────────── */}
+        {/* ── Section header — per-line clip reveal (płynne wejście tekstu) ── */}
         <div className="mb-[clamp(52px,8vw,108px)]">
-          <Reveal inView>
-            <h2
-              className="text-section-title"
-              style={{ color: "#0c0c0c" }}
-            >
-              Wybrane
-              <br />
-              realizacje
-            </h2>
-          </Reveal>
+          <h2 className="text-section-title" style={{ color: "#0c0c0c" }}>
+            {["Wybrane", "realizacje"].map((line, i) => (
+              <motion.span
+                key={line}
+                className="block"
+                initial={{ clipPath: "inset(0 100% 0 0)" }}
+                whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+                viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+                transition={{ duration: 0.85, ease: EASE.smooth, delay: i * 0.1 }}
+              >
+                {line}
+              </motion.span>
+            ))}
+          </h2>
 
-          <FadeUp inView delay={0.14} className="mt-5">
+          <FadeUp inView delay={0.24} y={20} className="mt-5">
             <p
               style={{
                 fontFamily: "var(--font-body)",
@@ -343,56 +416,43 @@ export function Work() {
           </FadeUp>
         </div>
 
-        {/* ── Two-column staggered grid ────────────────────────── */}
+        {/* ── Two-column staggered grid (kolumny z parallaxem na scroll) ──── */}
         <div
           className="grid grid-cols-1 md:grid-cols-2"
           style={{ gap: "clamp(16px,2.5vw,28px)" }}
         >
-          {/* Left column — normal top alignment */}
+          {/* Left column — dryfuje szybciej (JS parallax, ±75px) */}
           <div
+            ref={colARef}
             className="flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)" }}
+            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform" }}
           >
             <WorkCard project={FEATURED[0]} delay={0}    />
-            <WorkCard project={FEATURED[2]} delay={0.10} />
+            <WorkCard project={FEATURED[2]} delay={0.08} />
           </div>
 
-          {/* Right column — pushed down on md+ (Baunfire stagger) */}
+          {/* Right column — stagger (md+) + dryfuje wolniej (JS parallax, ±30px) */}
           <div
+            ref={colBRef}
             className="work-right-stagger flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)" }}
+            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform" }}
           >
-            <WorkCard project={FEATURED[1]} delay={0.07} />
-            <WorkCard project={FEATURED[3]} delay={0.17} />
+            <WorkCard project={FEATURED[1]} delay={0.05} />
+            <WorkCard project={FEATURED[3]} delay={0.13} />
           </div>
         </div>
 
         {/* ── View-all CTA ─────────────────────────────────────── */}
         <div style={{ marginTop: "clamp(56px,8vw,96px)" }}>
           <FadeUp inView delay={0.08} className="flex justify-center">
-            <Link
+            <PillLink
               href="/realizacje"
-              className="group inline-flex items-center gap-5 rounded-full text-white/60 hover:text-white transition-all duration-500"
-              style={{
-                padding:                  "1rem 2.25rem",
-                backgroundColor:          "#0c0c0c",
-                border:                   "1px solid rgba(12,12,12,0.05)",
-                fontFamily:               "var(--font-heading)",
-                fontSize:                 "11px",
-                fontWeight:               700,
-                letterSpacing:            "0.18em",
-                textTransform:            "uppercase" as const,
-                transitionTimingFunction: cssBezier(EASE.expo),
-              }}
+              bg="#0c0c0c"
+              border="rgba(12,12,12,0.05)"
+              className="px-9 py-4"
             >
               Sprawdź wszystkie realizacje
-              <span
-                className="text-xl font-light leading-none transition-transform duration-500 group-hover:rotate-45"
-                style={{ transitionTimingFunction: cssBezier(EASE.expo) }}
-              >
-                +
-              </span>
-            </Link>
+            </PillLink>
           </FadeUp>
         </div>
 

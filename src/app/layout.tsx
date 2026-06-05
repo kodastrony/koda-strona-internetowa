@@ -2,19 +2,20 @@ import type { Metadata, Viewport } from "next";
 import { Syne, Inter } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { ScrollProgress } from "@/components/layout/scroll-progress";
 import "./globals.css";
 
 const syne = Syne({
   variable: "--font-syne",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["latin", "latin-ext"], // latin-ext = polskie znaki (ą,ę,ł…) w nagłówkach Syne
+  weight: ["700", "800"],          // tylko realnie używane wagi → mniejszy payload, szybsze ładowanie
   display: "swap",
 });
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
+  weight: ["400"], // body używa tylko 400 — 500/600 były nieużywane (mniejszy payload)
   display: "swap",
 });
 
@@ -64,6 +65,7 @@ export default function RootLayout({
     <html lang="pl" className={`${syne.variable} ${inter.variable}`}>
       <body className="bg-dark text-off-white font-body antialiased flex flex-col min-h-svh">
         <Header />
+        <ScrollProgress />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

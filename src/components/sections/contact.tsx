@@ -1,12 +1,24 @@
 "use client";
 
-import { useState, useId } from "react";
-import Link from "next/link";
+import { useId, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { EASE, DURATION, cssBezier } from "@/lib/motion";
-import { Reveal, FadeUp } from "@/components/motion";
+import { FadeUp } from "@/components/motion";
 import { CONTACT } from "@/lib/constants";
+
+/* ════════════════════════════════════════════════════════════════════
+   KONTAKT — minimal na BIAŁYM tle, wypełnione pola + PŁYWAJĄCE etykiety.
+   Etykieta startuje jak placeholder w polu; po focusie/wpisaniu kurczy się
+   i wjeżdża na górę pola (forms-inputs: translateY+scale, 200ms, ease 0.4,0,0.2,1).
+   Proste: 4 pola (imię i nazwisko, e-mail, telefon, opis) + załącznik.
+   ════════════════════════════════════════════════════════════════════ */
+
+const FLOAT_EASE = "cubic-bezier(0.4, 0, 0.2, 1)";
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+const ACCEPT_EXTS = [".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp", ".zip"];
+const ACCEPT_ATTR = ACCEPT_EXTS.join(",");
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* ── Types ───────────────────────────────────────────────────────── */
 interface FieldState {
@@ -14,804 +26,423 @@ interface FieldState {
   error: string | null;
   touched: boolean;
 }
-
+type FieldKey = "name" | "email" | "phone" | "message";
 type FormStatus = "idle" | "loading" | "success" | "error";
 
-/* ── Validation ──────────────────────────────────────────────────── */
-function validateName(v: string) {
-  if (!v.trim()) return "Imię jest wymagane.";
-  if (v.trim().length < 2) return "Imię musi mieć co najmniej 2 znaki.";
-  return null;
-}
-function validateEmail(v: string) {
-  if (!v.trim()) return "Adres e-mail jest wymagany.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return "Podaj poprawny adres e-mail.";
-  return null;
-}
-function validateMessage(v: string) {
-  if (!v.trim()) return "Wiadomość jest wymagana.";
-  if (v.trim().length < 20) return "Opisz swój projekt w kilku słowach (min. 20 znaków).";
-  return null;
-}
+/* ── Walidacja (prosta) ──────────────────────────────────────────── */
+const VALIDATORS: Record<FieldKey, (v: string) => string | null> = {
+  name: (v) => (!v.trim() ? "Podaj imię i nazwisko." : v.trim().length < 3 ? "To trochę za krótkie." : null),
+  email: (v) => (!v.trim() ? "Podaj adres e-mail." : !EMAIL_RE.test(v) ? "Sprawdź adres e-mail." : null),
+  phone: (v) => (v.trim() && v.replace(/[^\d]/g, "").length < 9 ? "Sprawdź numer telefonu." : null),
+  message: (v) => (!v.trim() ? "Napisz kilka słów o projekcie." : v.trim().length < 10 ? "Dodaj trochę więcej szczegółów." : null),
+};
 
-/* ── Field component ─────────────────────────────────────────────── */
-function Field({
+/* ════════════════════════════════════════════════════════════════════
+   FloatingField — wypełnione pole z pływającą etykietą (input / textarea).
+   ════════════════════════════════════════════════════════════════════ */
+function FloatingField({
   id,
+  name,
   label,
+  field,
+  focused,
+  type = "text",
+  inputMode,
+  autoComplete,
   required,
-  optional,
-  error,
-  children,
+  multiline,
+  disabled,
+  onChange,
+  onFocus,
+  onBlur,
 }: {
   id: string;
+  name: FieldKey;
   label: string;
+  field: FieldState;
+  focused: boolean;
+  type?: string;
+  inputMode?: "email" | "tel" | "text";
+  autoComplete?: string;
   required?: boolean;
-  optional?: boolean;
-  error?: string | null;
-  children: React.ReactNode;
+  multiline?: boolean;
+  disabled?: boolean;
+  onChange: (key: FieldKey, value: string) => void;
+  onFocus: (key: FieldKey) => void;
+  onBlur: (key: FieldKey) => void;
 }) {
+  const invalid = !!(field.touched && field.error);
+  const floated = focused || field.value !== "";
+
+  const fieldCls = cn(
+    "w-full rounded-xl bg-[#f2f2f2] px-4 font-body text-[16px] text-[#0f0f0f] outline-none",
+    "transition-[background-color,box-shadow] duration-200",
+    "disabled:opacity-50 disabled:cursor-not-allowed",
+    multiline ? "min-h-[140px] resize-none pt-7 pb-3" : "h-[58px] pt-6 pb-1",
+    invalid
+      ? "bg-[#fbeef2] shadow-[0_0_0_1.5px_rgba(204,43,94,0.45)]"
+      : "focus:bg-[#ececec] focus:shadow-[0_0_0_2px_rgba(207,67,184,0.4)]",
+  );
+
+  // Pozycja etykiety: spoczynek (jak placeholder) → pływa w górę + kurczy się.
+  const labelStyle: React.CSSProperties = {
+    position: "absolute",
+    left: "16px",
+    pointerEvents: "none",
+    whiteSpace: "nowrap",
+    transformOrigin: "left center",
+    fontFamily: "var(--font-body)",
+    fontSize: "15px",
+    transition: `top 200ms ${FLOAT_EASE}, transform 200ms ${FLOAT_EASE}, color 150ms ease-out`,
+    color: invalid ? "#cc2b5e" : focused ? "#0f0f0f" : "#5f5f5f",
+    ...(floated
+      ? { top: "9px", transform: "translateY(0) scale(0.74)" }
+      : multiline
+        ? { top: "26px", transform: "translateY(0) scale(1)" }
+        : { top: "50%", transform: "translateY(-50%) scale(1)" }),
+  };
+
+  const shared = {
+    id,
+    name,
+    disabled,
+    required,
+    "aria-required": required || undefined,
+    "aria-invalid": invalid,
+    "aria-describedby": invalid ? `${id}-error` : undefined,
+    value: field.value,
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(name, e.target.value),
+    onFocus: () => onFocus(name),
+    onBlur: () => onBlur(name),
+    className: fieldCls,
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={id}
-        className="flex items-center gap-2"
-        style={{
-          fontFamily:    "var(--font-heading)",
-          fontSize:      "10px",
-          fontWeight:    700,
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-          color:         "rgba(255,255,255,0.45)",
-        }}
-      >
-        {label}
-        {required && (
-          <span aria-hidden="true" style={{ color: "#cf43b8" }}>*</span>
+    <div className="flex flex-col gap-1.5">
+      <div className="relative">
+        {multiline ? (
+          <textarea {...shared} rows={4} />
+        ) : (
+          <input {...shared} type={type} inputMode={inputMode} autoComplete={autoComplete} />
         )}
-        {optional && (
-          <span
-            style={{
-              fontSize:      "9px",
-              letterSpacing: "0.12em",
-              color:         "rgba(255,255,255,0.22)",
-            }}
-          >
-            OPCJONALNIE
-          </span>
-        )}
-      </label>
-      {children}
-      {error && (
+        <label htmlFor={id} style={labelStyle}>
+          {label}
+          {required && <span style={{ color: "#cf43b8" }}> *</span>}
+        </label>
+      </div>
+      {invalid && (
         <motion.p
-          initial={{ opacity: 0, y: -4 }}
+          id={`${id}-error`}
+          initial={{ opacity: 0, y: -3 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: EASE.expo }}
           role="alert"
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize:   "12px",
-            color:      "rgba(255, 100, 100, 0.85)",
-            lineHeight: 1.4,
-          }}
+          className="pl-1 font-body text-[12.5px] leading-snug text-[#cc2b5e]"
         >
-          {error}
+          {field.error}
         </motion.p>
       )}
     </div>
   );
 }
 
-/* ── Shared input / textarea styles ──────────────────────────────── */
-function inputStyle(hasError: boolean) {
-  return {
-    fontFamily:      "var(--font-body)",
-    fontSize:        "15px",
-    lineHeight:      "1.5",
-    color:           "#eeeeee",
-    backgroundColor: "#141414",
-    border:          `1px solid ${hasError ? "rgba(255,100,100,0.5)" : "rgba(255,255,255,0.08)"}`,
-    borderRadius:    "8px",
-    padding:         "15px 18px",
-    width:           "100%",
-    outline:         "none",
-    transition:      `border-color 250ms ${cssBezier(EASE.expo)}, box-shadow 250ms ${cssBezier(EASE.expo)}`,
-  } as React.CSSProperties;
-}
-
-/* ── Contact info item ───────────────────────────────────────────── */
-function ContactDetail({ label, value, href }: { label: string; value: string; href?: string }) {
+/* ── Minimalne dołączanie pliku ──────────────────────────────────── */
+function FileAttach({
+  id,
+  file,
+  error,
+  disabled,
+  onPick,
+  onClear,
+}: {
+  id: string;
+  file: File | null;
+  error: string | null;
+  disabled: boolean;
+  onPick: (f: File) => void;
+  onClear: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className="flex flex-col gap-1">
-      <span
-        style={{
-          fontFamily:    "var(--font-heading)",
-          fontSize:      "9px",
-          fontWeight:    700,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase" as const,
-          color:         "rgba(255,255,255,0.28)",
+    <div className="flex flex-col gap-2 pl-1">
+      <input
+        ref={inputRef}
+        id={id}
+        type="file"
+        accept={ACCEPT_ATTR}
+        className="sr-only"
+        aria-describedby={error ? `${id}-error` : undefined}
+        disabled={disabled}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onPick(f);
+          e.target.value = "";
         }}
-      >
-        {label}
-      </span>
-      {href ? (
-        <a
-          href={href}
-          className="text-off-white hover:text-pink transition-colors duration-300"
-          style={{
-            fontFamily:    "var(--font-body)",
-            fontSize:      "14px",
-            transitionTimingFunction: cssBezier(EASE.expo),
-          }}
-        >
-          {value}
-        </a>
+      />
+      {file ? (
+        <div className="flex items-center gap-2.5 text-[14px]">
+          <PaperclipIcon />
+          <span className="truncate font-body text-[#0f0f0f]">{file.name}</span>
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={disabled}
+            aria-label="Usuń załączony plik"
+            className="ml-1 rounded-full p-1 text-black/45 transition-colors duration-200 hover:bg-black/5 hover:text-black/80"
+          >
+            <svg width="13" height="13" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+              <path d="M4 4L11 11M11 4L4 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       ) : (
-        <span
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize:   "14px",
-            color:      "rgba(255,255,255,0.7)",
-          }}
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={disabled}
+          className="group flex w-fit items-center gap-2.5 font-body text-[14px] text-black/60 transition-colors duration-200 hover:text-[#0f0f0f] disabled:opacity-50"
         >
-          {value}
-        </span>
+          <PaperclipIcon />
+          Załącz brief
+          <span className="text-black/55">(opcjonalne, do 10 MB)</span>
+        </button>
+      )}
+      {error && (
+        <p id={`${id}-error`} role="alert" className="font-body text-[12.5px] text-[#cc2b5e]">
+          {error}
+        </p>
       )}
     </div>
   );
 }
 
-/* ── Right decorative panel ──────────────────────────────────────── */
-function DecorativePanel() {
-  return (
-    <FadeUp inView delay={0.15} className="hidden lg:flex flex-col justify-between h-full">
-      <div
-        className="relative flex flex-col justify-between rounded-2xl overflow-hidden h-full"
-        style={{
-          backgroundColor: "#0d0d0d",
-          border:          "1px solid rgba(255,255,255,0.05)",
-          padding:         "clamp(32px, 4vw, 52px)",
-          minHeight:       "520px",
-        }}
-      >
-        {/* Pink glow top-right */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{
-            top:       "-80px",
-            right:     "-80px",
-            width:     "260px",
-            height:    "260px",
-            background:
-              "radial-gradient(circle, rgba(207,67,184,0.12) 0%, transparent 70%)",
-          }}
-        />
-
-        {/* Large decorative letter */}
-        <div
-          aria-hidden="true"
-          className="absolute bottom-0 right-0 pointer-events-none select-none overflow-hidden"
-          style={{ width: "60%", height: "50%" }}
-        >
-          <span
-            style={{
-              fontFamily:    "var(--font-heading)",
-              fontWeight:    800,
-              fontSize:      "clamp(140px, 16vw, 220px)",
-              color:         "rgba(255,255,255,0.025)",
-              lineHeight:    1,
-              letterSpacing: "-0.04em",
-              position:      "absolute",
-              bottom:        "-10px",
-              right:         "-12px",
-            }}
-          >
-            K
-          </span>
-        </div>
-
-        {/* Top: heading tag */}
-        <div>
-          <span
-            className="label-koda"
-            style={{ fontSize: "10px" }}
-          >
-            K O N T A K T
-          </span>
-        </div>
-
-        {/* Middle: big response promise */}
-        <div className="flex flex-col gap-3" style={{ zIndex: 1 }}>
-          <p
-            style={{
-              fontFamily:    "var(--font-heading)",
-              fontWeight:    800,
-              fontSize:      "clamp(1.6rem, 2.5vw, 2.2rem)",
-              lineHeight:    1.1,
-              letterSpacing: "-0.025em",
-              color:         "#ffffff",
-            }}
-          >
-            Odpiszemy
-            <br />
-            <span style={{ color: "#cf43b8" }}>w 24 godziny.</span>
-          </p>
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize:   "13px",
-              lineHeight: 1.65,
-              color:      "rgba(255,255,255,0.38)",
-              maxWidth:   "220px",
-            }}
-          >
-            Każdy projekt zaczyna się od rozmowy. Napisz do nas, a wrócimy z propozycją.
-          </p>
-        </div>
-
-        {/* Bottom: contact details */}
-        <div className="flex flex-col gap-5" style={{ zIndex: 1 }}>
-          <div
-            style={{
-              width:           "100%",
-              height:          "1px",
-              backgroundColor: "rgba(255,255,255,0.06)",
-            }}
-          />
-          <ContactDetail
-            label="E-mail"
-            value={CONTACT.email}
-            href={`mailto:${CONTACT.email}`}
-          />
-          <ContactDetail
-            label="Lokalizacja"
-            value="Polska"
-          />
-        </div>
-      </div>
-    </FadeUp>
-  );
-}
-
-/* ── Success state ───────────────────────────────────────────────── */
-function SuccessMessage() {
+/* ── Stan sukcesu ────────────────────────────────────────────────── */
+function SuccessMessage({ firstName }: { firstName: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: DURATION.fade, ease: EASE.expo }}
-      className="flex flex-col gap-6 items-start"
-      style={{ paddingTop: "clamp(40px, 5vh, 64px)" }}
+      className="flex flex-col items-start gap-5"
     >
-      {/* Pink circle check */}
-      <div
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, ease: EASE.back, delay: 0.05 }}
         aria-hidden="true"
-        className="flex items-center justify-center rounded-full"
-        style={{
-          width:           "56px",
-          height:          "56px",
-          backgroundColor: "rgba(207,67,184,0.12)",
-          border:          "1px solid rgba(207,67,184,0.25)",
-        }}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-pink"
       >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 22 22"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
+        <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <motion.path
             d="M4 11.5L9 16.5L18 7"
-            stroke="#cf43b8"
-            strokeWidth="2"
+            stroke="#0f0f0f"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.5, ease: EASE.expo, delay: 0.25 }}
           />
         </svg>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h3
-          style={{
-            fontFamily:    "var(--font-heading)",
-            fontWeight:    800,
-            fontSize:      "clamp(1.5rem, 3vw, 2rem)",
-            letterSpacing: "-0.025em",
-            lineHeight:    1.1,
-            color:         "#ffffff",
-          }}
-        >
-          Wiadomość wysłana.
-        </h3>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize:   "15px",
-            color:      "rgba(255,255,255,0.45)",
-            lineHeight: 1.6,
-            maxWidth:   "360px",
-          }}
-        >
-          Dziękujemy za kontakt. Odezwiemy się w ciągu 24 godzin z odpowiedzią lub propozycją.
-        </p>
-      </div>
-
-      <Link
-        href="/"
-        className="group inline-flex items-center gap-4 rounded-full px-7 py-3.5 text-white/50 hover:text-white transition-all duration-500"
-        style={{
-          backgroundColor:         "#1a1a1a",
-          border:                  "1px solid rgba(255,255,255,0.07)",
-          fontFamily:              "var(--font-heading)",
-          fontSize:                "11px",
-          fontWeight:              700,
-          letterSpacing:           "0.18em",
-          textTransform:           "uppercase",
-          transitionTimingFunction: cssBezier(EASE.expo),
-        }}
-      >
-        Wróć na stronę główną
-        <span
-          className="text-lg font-light leading-none transition-transform duration-500 group-hover:rotate-45"
-          style={{ transitionTimingFunction: cssBezier(EASE.expo) }}
-        >
-          +
-        </span>
-      </Link>
+      </motion.div>
+      <h2 className="font-heading text-[clamp(1.8rem,3.4vw,2.6rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#0f0f0f]">
+        Dziękujemy{firstName ? `, ${firstName}` : ""}!
+      </h2>
+      <p className="max-w-[440px] font-body text-[16px] leading-relaxed text-black/60">
+        Wiadomość wysłana. Odezwiemy się w ciągu 24 godzin z odpowiedzią i propozycją następnego kroku.
+      </p>
     </motion.div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+   GŁÓWNY KOMPONENT
+   ════════════════════════════════════════════════════════════════════ */
 export function Contact() {
   const uid = useId();
-  const id = (name: string) => `${uid}-${name}`;
+  const id = (n: string) => `${uid}-${n}`;
 
-  const [fields, setFields] = useState<Record<string, FieldState>>({
-    name:    { value: "", error: null, touched: false },
-    email:   { value: "", error: null, touched: false },
-    phone:   { value: "", error: null, touched: false },
-    company: { value: "", error: null, touched: false },
+  const [fields, setFields] = useState<Record<FieldKey, FieldState>>({
+    name: { value: "", error: null, touched: false },
+    email: { value: "", error: null, touched: false },
+    phone: { value: "", error: null, touched: false },
     message: { value: "", error: null, touched: false },
   });
+  const [focusedKey, setFocusedKey] = useState<FieldKey | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [status, setStatus] = useState<FormStatus>("idle");
+  const isLoading = status === "loading";
 
-  /* Focus styles — injected via JS to avoid global CSS pollution */
-  const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.borderColor = "rgba(207,67,184,0.45)";
-    e.currentTarget.style.boxShadow   = "0 0 0 3px rgba(207,67,184,0.08)";
-  };
-  const onBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-    fieldKey: string,
-    validator?: (v: string) => string | null,
-  ) => {
-    e.currentTarget.style.borderColor = "";
-    e.currentTarget.style.boxShadow   = "";
-    if (!validator) return;
-    const error = validator(fields[fieldKey].value);
+  const update = (key: FieldKey, value: string) =>
     setFields((prev) => ({
       ...prev,
-      [fieldKey]: { ...prev[fieldKey], error, touched: true },
+      [key]: { ...prev[key], value, error: prev[key].touched ? null : prev[key].error },
     }));
+
+  const handleFocus = (key: FieldKey) => setFocusedKey(key);
+  const handleBlur = (key: FieldKey) => {
+    setFocusedKey(null);
+    setFields((prev) => ({ ...prev, [key]: { ...prev[key], error: VALIDATORS[key](prev[key].value), touched: true } }));
   };
 
-  const update = (key: string, value: string) => {
-    setFields((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        value,
-        /* Clear error as user corrects the field */
-        error: prev[key].touched ? null : prev[key].error,
-      },
-    }));
+  const pickFile = (f: File) => {
+    if (f.size > MAX_FILE_BYTES) return setFileError("Plik jest za duży (max 10 MB).");
+    const ext = "." + (f.name.split(".").pop()?.toLowerCase() ?? "");
+    if (!ACCEPT_EXTS.includes(ext)) return setFileError("Nieobsługiwany format pliku.");
+    setFileError(null);
+    setFile(f);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const nextErrors = {} as Record<FieldKey, string | null>;
+    (Object.keys(fields) as FieldKey[]).forEach((k) => (nextErrors[k] = VALIDATORS[k](fields[k].value)));
+    setFields((prev) => {
+      const next = { ...prev };
+      (Object.keys(prev) as FieldKey[]).forEach((k) => (next[k] = { ...prev[k], error: nextErrors[k], touched: true }));
+      return next;
+    });
 
-    /* Run all validators and mark fields touched */
-    const nameErr    = validateName(fields.name.value);
-    const emailErr   = validateEmail(fields.email.value);
-    const messageErr = validateMessage(fields.message.value);
-
-    setFields((prev) => ({
-      ...prev,
-      name:    { ...prev.name,    error: nameErr,    touched: true },
-      email:   { ...prev.email,   error: emailErr,   touched: true },
-      message: { ...prev.message, error: messageErr, touched: true },
-    }));
-
-    if (nameErr || emailErr || messageErr) {
-      /* Focus first invalid field */
-      if (nameErr)         document.getElementById(id("name"))?.focus();
-      else if (emailErr)   document.getElementById(id("email"))?.focus();
-      else if (messageErr) document.getElementById(id("message"))?.focus();
-      return;
-    }
+    const target = (Object.keys(fields) as FieldKey[]).find((k) => nextErrors[k]);
+    if (target) return document.getElementById(id(target))?.focus();
 
     setStatus("loading");
-
-    /* Simulated async submit — replace with real API call */
-    await new Promise((res) => setTimeout(res, 1200));
-    setStatus("success");
+    try {
+      // TODO(backend): podłącz realny endpoint pozyskiwania leadów ({ ...pola, file }).
+      await new Promise((res) => setTimeout(res, 1100));
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   };
-
-  const isLoading = status === "loading";
-
-  const staggerDelay = (i: number) => 0.05 + i * 0.07;
 
   return (
     <section
-      data-header-theme="dark"
+      data-header-theme="light"
       id="kontakt"
-      className="relative overflow-hidden bg-dark"
       aria-labelledby="contact-heading"
+      className="relative min-h-svh overflow-hidden bg-white"
+      style={{ paddingTop: "clamp(128px, 15vw, 200px)", paddingBottom: "clamp(72px, 9vw, 128px)" }}
     >
-      {/* ── Dot grid ───────────────────────────────────────────── */}
+      {/* Subtelny różowy refleks w rogu — jedyny ozdobnik */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.018) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
+        style={{ background: "radial-gradient(ellipse 50% 45% at 92% 6%, rgba(207,67,184,0.05) 0%, transparent 70%)" }}
       />
 
-      {/* ── Pink glow — top-left ────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 55% 40% at 8% 15%, rgba(207,67,184,0.06) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* ── Top border line ─────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        className="absolute top-0 left-0 right-0"
-        style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.05)" }}
-      />
-
-      <div
-        className="container-koda section-y relative z-10"
-      >
-        <div
-          className="grid grid-cols-1 gap-16"
-          style={{
-            gridTemplateColumns: "1fr",
-          }}
-        >
-          {/* On lg+: 2 columns */}
-          <div
-            className="grid grid-cols-1 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-12 xl:gap-16 items-start"
-          >
-            {/* ═══ LEFT: form ═══════════════════════════════════ */}
-            <div className="flex flex-col">
-              {/* Section label */}
-              <Reveal inView delay={0}>
-                <div className="flex items-center gap-5 mb-10">
-                  <span className="label-koda">P O R O Z M A W I A J M Y</span>
-                  <div
-                    style={{
-                      height:     "1px",
-                      width:      "clamp(30px, 10vw, 80px)",
-                      background: "rgba(255,255,255,0.07)",
-                    }}
-                  />
-                </div>
-              </Reveal>
-
-              {/* Heading */}
-              <FadeUp inView delay={0.08}>
-                <h2
-                  id="contact-heading"
-                  className="text-section-title"
-                  style={{ maxWidth: "560px", marginBottom: "clamp(10px, 2vh, 16px)" }}
+      <div className="relative z-10 mx-auto w-full max-w-[600px] px-6 sm:px-8">
+        {status === "success" ? (
+          <SuccessMessage firstName={fields.name.value.trim().split(" ")[0]} />
+        ) : (
+          <>
+            {/* ── Nagłówek ── */}
+            <FadeUp inView>
+              <span className="flex items-center gap-2.5 font-heading text-[11px] font-bold uppercase tracking-[0.4em] text-black/55">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-pink" />
+                Kontakt
+              </span>
+            </FadeUp>
+            <FadeUp inView delay={0.07}>
+              <h1
+                id="contact-heading"
+                className="mt-5 font-heading font-extrabold text-[#0f0f0f]"
+                style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", lineHeight: 1.02, letterSpacing: "-0.035em" }}
+              >
+                Porozmawiajmy<span className="text-pink">.</span>
+              </h1>
+            </FadeUp>
+            <FadeUp inView delay={0.13}>
+              <p className="mt-5 max-w-[440px] font-body text-[16px] leading-relaxed text-black/60">
+                Opowiedz nam o projekcie, a wrócimy z propozycją i wyceną w ciągu 24 godzin. Wolisz e-mail?{" "}
+                <a
+                  href={`mailto:${CONTACT.email}`}
+                  className="text-[#0f0f0f] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:decoration-pink"
                 >
-                  Cześć. Opowiedz nam
-                  <br />
-                  <span style={{ color: "rgba(255,255,255,0.45)" }}>
-                    o swoim projekcie.
-                  </span>
-                </h2>
-              </FadeUp>
+                  {CONTACT.email}
+                </a>
+              </p>
+            </FadeUp>
 
-              {/* Subtext */}
-              <FadeUp inView delay={0.16}>
-                <p
-                  style={{
-                    fontFamily:   "var(--font-body)",
-                    fontSize:     "clamp(0.875rem, 1.1vw, 1rem)",
-                    color:        "rgba(255,255,255,0.4)",
-                    lineHeight:   1.65,
-                    marginBottom: "clamp(36px, 5vh, 52px)",
-                    maxWidth:     "420px",
-                  }}
-                >
-                  Wypełnij formularz lub napisz bezpośrednio na{" "}
-                  <a
-                    href={`mailto:${CONTACT.email}`}
-                    className="text-pink hover:text-pink-light transition-colors duration-300"
+            {/* ── Formularz ── */}
+            <FadeUp inView delay={0.2}>
+              <form onSubmit={handleSubmit} noValidate aria-label="Formularz kontaktowy" className="mt-11 flex flex-col gap-4">
+                <FloatingField id={id("name")} name="name" label="Imię i nazwisko" field={fields.name} focused={focusedKey === "name"} autoComplete="name" required disabled={isLoading} onChange={update} onFocus={handleFocus} onBlur={handleBlur} />
+                <FloatingField id={id("email")} name="email" label="E-mail" field={fields.email} focused={focusedKey === "email"} type="email" inputMode="email" autoComplete="email" required disabled={isLoading} onChange={update} onFocus={handleFocus} onBlur={handleBlur} />
+                <FloatingField id={id("phone")} name="phone" label="Telefon" field={fields.phone} focused={focusedKey === "phone"} type="tel" inputMode="tel" autoComplete="tel" disabled={isLoading} onChange={update} onFocus={handleFocus} onBlur={handleBlur} />
+                <FloatingField id={id("message")} name="message" label="Opis projektu" field={fields.message} focused={focusedKey === "message"} multiline required disabled={isLoading} onChange={update} onFocus={handleFocus} onBlur={handleBlur} />
+
+                <FileAttach id={id("file")} file={file} error={fileError} disabled={isLoading} onPick={pickFile} onClear={() => { setFile(null); setFileError(null); }} />
+
+                {/* ── CTA ── */}
+                <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className={cn(
+                      "group inline-flex items-center justify-center gap-3 rounded-full px-8 py-4",
+                      "font-heading text-[14px] font-bold uppercase tracking-[0.1em] text-[#0f0f0f]",
+                      "bg-pink transition-transform duration-300",
+                      isLoading ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:-translate-y-0.5",
+                    )}
                     style={{ transitionTimingFunction: cssBezier(EASE.expo) }}
                   >
-                    {CONTACT.email}
-                  </a>
-                  .
-                </p>
-              </FadeUp>
-
-              {/* ── Form or success ─────────────────────────── */}
-              {status === "success" ? (
-                <SuccessMessage />
-              ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  noValidate
-                  aria-label="Formularz kontaktowy"
-                >
-                  <div className="flex flex-col gap-5">
-                    {/* Row 1: Name + Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <FadeUp inView delay={staggerDelay(0)}>
-                        <Field
-                          id={id("name")}
-                          label="Imię i nazwisko"
-                          required
-                          error={fields.name.touched ? fields.name.error : null}
-                        >
-                          <input
-                            id={id("name")}
-                            type="text"
-                            name="name"
-                            autoComplete="name"
-                            placeholder="Jan Kowalski"
-                            required
-                            aria-required="true"
-                            aria-invalid={!!fields.name.error}
-                            aria-describedby={
-                              fields.name.error ? `${id("name")}-error` : undefined
-                            }
-                            value={fields.name.value}
-                            onChange={(e) => update("name", e.target.value)}
-                            onFocus={onFocus}
-                            onBlur={(e) => onBlur(e, "name", validateName)}
-                            style={inputStyle(
-                              !!(fields.name.touched && fields.name.error),
-                            )}
-                            disabled={isLoading}
-                          />
-                        </Field>
-                      </FadeUp>
-
-                      <FadeUp inView delay={staggerDelay(1)}>
-                        <Field
-                          id={id("email")}
-                          label="Adres e-mail"
-                          required
-                          error={fields.email.touched ? fields.email.error : null}
-                        >
-                          <input
-                            id={id("email")}
-                            type="email"
-                            name="email"
-                            autoComplete="email"
-                            placeholder="jan@firma.pl"
-                            required
-                            aria-required="true"
-                            aria-invalid={!!fields.email.error}
-                            value={fields.email.value}
-                            onChange={(e) => update("email", e.target.value)}
-                            onFocus={onFocus}
-                            onBlur={(e) => onBlur(e, "email", validateEmail)}
-                            style={inputStyle(
-                              !!(fields.email.touched && fields.email.error),
-                            )}
-                            disabled={isLoading}
-                          />
-                        </Field>
-                      </FadeUp>
-                    </div>
-
-                    {/* Row 2: Phone + Company */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <FadeUp inView delay={staggerDelay(2)}>
-                        <Field id={id("phone")} label="Telefon" optional>
-                          <input
-                            id={id("phone")}
-                            type="tel"
-                            name="phone"
-                            autoComplete="tel"
-                            placeholder="+48 000 000 000"
-                            value={fields.phone.value}
-                            onChange={(e) => update("phone", e.target.value)}
-                            onFocus={onFocus}
-                            onBlur={(e) => onBlur(e, "phone")}
-                            style={inputStyle(false)}
-                            disabled={isLoading}
-                          />
-                        </Field>
-                      </FadeUp>
-
-                      <FadeUp inView delay={staggerDelay(3)}>
-                        <Field id={id("company")} label="Firma" optional>
-                          <input
-                            id={id("company")}
-                            type="text"
-                            name="company"
-                            autoComplete="organization"
-                            placeholder="Nazwa firmy"
-                            value={fields.company.value}
-                            onChange={(e) => update("company", e.target.value)}
-                            onFocus={onFocus}
-                            onBlur={(e) => onBlur(e, "company")}
-                            style={inputStyle(false)}
-                            disabled={isLoading}
-                          />
-                        </Field>
-                      </FadeUp>
-                    </div>
-
-                    {/* Row 3: Message */}
-                    <FadeUp inView delay={staggerDelay(4)}>
-                      <Field
-                        id={id("message")}
-                        label="O czym chcesz porozmawiać?"
-                        required
-                        error={fields.message.touched ? fields.message.error : null}
-                      >
-                        <textarea
-                          id={id("message")}
-                          name="message"
-                          rows={5}
-                          placeholder="Opisz swój projekt — zakres, cel, budżet, termin..."
-                          required
-                          aria-required="true"
-                          aria-invalid={!!fields.message.error}
-                          value={fields.message.value}
-                          onChange={(e) => update("message", e.target.value)}
-                          onFocus={onFocus}
-                          onBlur={(e) => onBlur(e, "message", validateMessage)}
-                          style={{
-                            ...inputStyle(
-                              !!(fields.message.touched && fields.message.error),
-                            ),
-                            resize:    "vertical",
-                            minHeight: "130px",
-                          }}
-                          disabled={isLoading}
-                        />
-                      </Field>
-                    </FadeUp>
-
-                    {/* Submit row */}
-                    <FadeUp inView delay={staggerDelay(5)}>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-5 pt-2">
-                        {/* CTA button */}
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className={cn(
-                            "group inline-flex items-center gap-5 rounded-full px-8 py-4",
-                            "transition-all duration-500",
-                            isLoading
-                              ? "cursor-not-allowed opacity-60"
-                              : "cursor-pointer",
-                          )}
-                          style={{
-                            fontFamily:              "var(--font-heading)",
-                            fontSize:                "11px",
-                            fontWeight:              700,
-                            letterSpacing:           "0.18em",
-                            textTransform:           "uppercase",
-                            color:                   isLoading ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.6)",
-                            backgroundColor:         "#1a1a1a",
-                            border:                  "1px solid rgba(255,255,255,0.07)",
-                            transitionTimingFunction: cssBezier(EASE.expo),
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isLoading) {
-                              (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-                              (e.currentTarget as HTMLButtonElement).style.borderColor =
-                                "rgba(255,255,255,0.14)";
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLButtonElement).style.color =
-                              "rgba(255,255,255,0.6)";
-                            (e.currentTarget as HTMLButtonElement).style.borderColor =
-                              "rgba(255,255,255,0.07)";
-                          }}
-                        >
-                          {isLoading ? (
-                            <>
-                              <Spinner />
-                              Wysyłanie...
-                            </>
-                          ) : (
-                            <>
-                              Wyślij wiadomość
-                              <span
-                                className="text-xl font-light leading-none transition-transform duration-500 group-hover:rotate-45"
-                                style={{ transitionTimingFunction: cssBezier(EASE.expo) }}
-                              >
-                                +
-                              </span>
-                            </>
-                          )}
-                        </button>
-
-                        {/* Trust microcopy */}
-                        <p
-                          style={{
-                            fontFamily: "var(--font-body)",
-                            fontSize:   "11px",
-                            color:      "rgba(255,255,255,0.22)",
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          Odpiszemy w ciągu 24 godzin.
-                          <br className="hidden sm:block" />
-                          {" "}Nie wysyłamy spamu.
-                        </p>
-                      </div>
-                    </FadeUp>
-
-                    {/* Server error message */}
-                    {status === "error" && (
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        role="alert"
-                        style={{
-                          fontFamily: "var(--font-body)",
-                          fontSize:   "13px",
-                          color:      "rgba(255, 100, 100, 0.85)",
-                        }}
-                      >
-                        Coś poszło nie tak. Spróbuj ponownie lub napisz bezpośrednio na{" "}
-                        <a href={`mailto:${CONTACT.email}`} className="underline">
-                          {CONTACT.email}
-                        </a>
-                        .
-                      </motion.p>
+                    {isLoading ? (
+                      <>
+                        <Spinner />
+                        Wysyłanie...
+                      </>
+                    ) : (
+                      <>
+                        Wyślij wiadomość
+                        <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" style={{ transitionTimingFunction: cssBezier(EASE.expo) }}>
+                          →
+                        </span>
+                      </>
                     )}
-                  </div>
-                </form>
-              )}
-            </div>
+                  </button>
+                  <p className="font-body text-[12.5px] text-black/55">Odpowiemy w ciągu 24 godzin.</p>
+                </div>
 
-            {/* ═══ RIGHT: decorative panel ══════════════════════ */}
-            <DecorativePanel />
-          </div>
-        </div>
+                {status === "error" && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} role="alert" className="font-body text-[13px] text-[#cc2b5e]">
+                    Coś poszło nie tak. Spróbuj ponownie albo napisz na{" "}
+                    <a href={`mailto:${CONTACT.email}`} className="underline">{CONTACT.email}</a>.
+                  </motion.p>
+                )}
+              </form>
+            </FadeUp>
+          </>
+        )}
       </div>
     </section>
   );
 }
 
-/* ── Inline spinner ──────────────────────────────────────────────── */
+/* ── Ikony / spinner ─────────────────────────────────────────────── */
 function Spinner() {
   return (
     <motion.span
       animate={{ rotate: 360 }}
       transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-      className="inline-block"
       aria-hidden="true"
-      style={{
-        width:        "14px",
-        height:       "14px",
-        border:       "2px solid rgba(255,255,255,0.15)",
-        borderTop:    "2px solid rgba(255,255,255,0.6)",
-        borderRadius: "50%",
-        flexShrink:   0,
-      }}
+      className="inline-block"
+      style={{ width: 15, height: 15, border: "2px solid rgba(15,15,15,0.3)", borderTopColor: "#0f0f0f", borderRadius: "50%", flexShrink: 0 }}
     />
+  );
+}
+
+function PaperclipIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true" className="shrink-0 text-pink">
+      <path
+        d="M14.5 8.5l-5.2 5.2a3 3 0 0 1-4.24-4.24l5.2-5.2a2 2 0 0 1 2.83 2.83l-5.2 5.2a1 1 0 0 1-1.42-1.42l4.6-4.6"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

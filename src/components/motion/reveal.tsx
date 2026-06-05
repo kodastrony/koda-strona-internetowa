@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "motion/react";
-import { EASE, DURATION } from "@/lib/motion";
+import { EASE, DURATION, type Bezier } from "@/lib/motion";
 
 const variants: Variants = {
   hidden:  { clipPath: "inset(0 100% 0 0)" },
@@ -15,6 +15,8 @@ interface RevealProps {
   delay?: number;
   /** Animation length in seconds. */
   duration?: number;
+  /** Easing curve (cubic-bezier tuple). Default EASE.smooth. */
+  ease?: Bezier;
   /**
    * Trigger when the element scrolls into view instead of on mount.
    * Use for below-the-fold sections (Stage 4+); leave off for the hero,
@@ -31,6 +33,7 @@ export function Reveal({
   className,
   delay = 0,
   duration = DURATION.reveal,
+  ease = EASE.smooth,
   inView = false,
 }: RevealProps) {
   return (
@@ -41,7 +44,7 @@ export function Reveal({
       animate={inView ? undefined : "visible"}
       whileInView={inView ? "visible" : undefined}
       viewport={inView ? { once: true, margin: "0px 0px -80px 0px" } : undefined}
-      transition={{ duration, ease: EASE.smooth, delay }}
+      transition={{ duration, ease, delay }}
     >
       {children}
     </motion.div>
