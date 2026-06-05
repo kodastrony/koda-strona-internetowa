@@ -1,5 +1,8 @@
 import { ImageResponse } from "next/og";
 
+// Przy output: export obrazek generowany statycznie raz przy buildzie.
+export const dynamic = "force-static";
+
 // Social share card (Open Graph + Twitter fallback) — generated at build time.
 export const alt = "KODA Studio — Strony internetowe, które konwertują.";
 export const size = { width: 1200, height: 630 };

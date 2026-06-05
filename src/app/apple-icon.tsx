@@ -1,5 +1,8 @@
 import { ImageResponse } from "next/og";
 
+// Przy output: export ikona generowana statycznie raz przy buildzie.
+export const dynamic = "force-static";
+
 // Apple touch icon (home-screen) — generated as PNG at build time.
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
