@@ -1,16 +1,21 @@
 import type { NextConfig } from "next";
 
-// ── GitHub Pages: statyczny eksport pod subpath /<repo> ─────────────────
-// Flagę GITHUB_PAGES ustawia workflow .github/workflows/deploy-pages.yml.
-// Bez flagi (lokalny `next dev` / `next build`) konfiguracja jest DOMYŚLNA —
-// dev działa na http://localhost:3000 bez subpatha i z pełną optymalizacją obrazów.
-const isGithubPages = process.env.GITHUB_PAGES === "true";
-const repo = "koda-strona-internetowa";
+// ── Static export pod WŁASNĄ domenę (OVH / dowolny statyczny hosting) ───────
+// Flagę STATIC_EXPORT ustawia workflow .github/workflows/deploy-ovh.yml (CI).
+// Buduje czysty statyczny folder out/ serwowany z ROOTA domeny (https://kodastrony.pl/),
+// dlatego BEZ basePath (inaczej assety szukałyby /<repo>/... → 404 na własnej domenie).
+// trailingSlash → każda podstrona to /sciezka/index.html, co Apache na OVH serwuje
+// natywnie (czyste URL-e bez .html). Routy plikowe (robots.txt, sitemap.xml,
+// opengraph-image, apple-icon, icon.svg) mają już `export const dynamic = "force-static"`.
+//
+// Bez flagi (lokalny `next dev` / `next build`) konfiguracja jest DOMYŚLNA — pełny
+// Next z optymalizacją obrazów (pod lokalne testy oraz ewentualny przyszły SSR/Vercel).
+const isStaticExport = process.env.STATIC_EXPORT === "true";
 
-const nextConfig: NextConfig = isGithubPages
+const nextConfig: NextConfig = isStaticExport
   ? {
       output: "export", // build → statyczny folder out/ (czysty HTML/CSS/JS)
-      basePath: `/${repo}`, // strona żyje pod kodastrony.github.io/<repo>
+      trailingSlash: true, // /kontakt/ → out/kontakt/index.html (Apache-friendly na OVH)
       images: { unoptimized: true }, // brak serwera Next = brak optymalizacji obrazów w locie
       experimental: { optimizePackageImports: ["lucide-react", "motion"] },
     }
