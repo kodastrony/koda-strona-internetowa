@@ -180,8 +180,12 @@ export function Hero() {
           {/* Label — WJEŻDŻA Z LEWEJ (slide poziomy + fade). Prowadzi kaskadę,
               startuje najwcześniej (2.0s) — gdy linia tła zamalowała już lewą
               stronę, więc pojawia się na ciemnym jeszcze w trakcie sweepu. */}
+          {/* data-logo-hide-anchor: gdy ten wiersz (czoło treści hero, NAD wielkim
+              nagłówkiem) dojedzie do logo na scrollu, header-owe KODA znika i zostaje
+              schowane niżej. Anchor na eyebrow → logo nie nałoży się nawet na ten
+              mały napis „KODA" (uniknięcie podwójnego KODA). */}
           <FadeUp delay={BASE - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
-            <div className="flex items-center gap-5 mb-9">
+            <div data-logo-hide-anchor className="flex items-center gap-5 mb-9">
               <span className="label-koda">KODA</span>
               <div
                 className="h-px"

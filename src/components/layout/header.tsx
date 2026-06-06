@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
+import { useLogoHidden } from "@/hooks/use-logo-hide";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, INTRO_DURATION, cssBezier } from "@/lib/motion";
 import { introHasPlayed } from "@/lib/intro-state";
@@ -36,6 +37,21 @@ export function Header() {
   // różowe akcenty (kropka logo, pill KONTAKT) muszą zmienić kolor, bo róż-na-różu
   // znika. Gdy menu otwarte, tło jest białe → traktuj jak zwykłe „light".
   const onPink = theme === "pink" && !open;
+
+  // ── Ukrywanie logo (widoczne na górze → znika gdy dojdziesz do nagłówka) ──
+  // Logo KODA jest fixed w lewym-górnym rogu. Jest widoczne na SAMEJ górze strony,
+  // a gdy zjedziesz na tyle, że zaczęłoby zasłaniać główny nagłówek strony, płynnie
+  // znika — i ZOSTAJE schowane do końca zjazdu (nie wraca nad treścią niżej).
+  // Powrót na górę = znowu się pojawia. Próg jest jednokierunkowy (anchor =
+  // `[data-logo-hide-anchor]` na czole hero/kontakt) → zero migotania. Mierzymy
+  // STABILNY wrapper (nie animowany — inaczej jego ruch wracałby do testu).
+  const logoSlotRef = useRef<HTMLDivElement>(null);
+  const logoHidden = useLogoHidden(logoSlotRef);
+  // Focus override: gdy ktoś przejdzie na logo Tabem, MUSI być widoczne (inaczej
+  // „niewidzialny" focus). Logo zostaje też w drzewie a11y (czytniki zawsze mają
+  // link do strony głównej).
+  const [logoFocused, setLogoFocused] = useState(false);
+  const hideLogo = logoHidden && !logoFocused;
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -91,30 +107,56 @@ export function Header() {
             aria-label="Nawigacja główna"
           >
             {/* ── Logo ── (top-LEFT — ciemnieje wcześnie, więc wjeżdża wcześnie:
-                 jeszcze w trakcie sweepu, slide z góry) */}
-            <motion.div
-              data-reveal
-              className="z-10 shrink-0"
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.3 }}
-            >
-              <Link
-                href="/"
-                aria-label={SITE_CONFIG.name}
-                className={cn(
-                  "block",
-                  // Nad różem KODA zostaje białe (róż-na-różu by zniknął); poza nim
-                  // standard: dziedziczy kolor sekcji, na hover różowieje jak kropka.
-                  onPink
-                    ? "text-[#eeeeee] hover:text-white"
-                    : cn("hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]"),
-                )}
-                style={{ transition: `color ${CLR_DUR} ${CLR_EASE}` }}
+                 jeszcze w trakcie sweepu, slide z góry)
+                 ANCHOR (plain div) = STABILNY box do detekcji kolizji — NIGDY nie
+                 transformowany, więc ani wejście, ani ukrywanie nie wracają do
+                 testu nakładania (zero oscylacji, zero skew przy starcie). */}
+            <div ref={logoSlotRef} className="z-10 shrink-0">
+              {/* WEJŚCIE — slide z góry, jednorazowe, zsync z intro */}
+              <motion.div
+                data-reveal
+                initial={{ opacity: 0, y: -16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.3 }}
               >
-                <KodaLogo width={124} height={32} dotColor={onPink ? "#ffffff" : "#cf43b8"} />
-              </Link>
-            </motion.div>
+                {/* WIDOCZNOŚĆ — gładkie, powolne zniknięcie (fade + delikatny lift,
+                    jakby chowało się z powrotem w header) i równie gładki powrót.
+                    Dłużej (0.6s) + miękka krzywa in-out (EASE.smooth) = bez „skoku".
+                    Focus (Tab) wymusza powrót do widoku; link zostaje w drzewie
+                    a11y. Schowane = nieklikalne myszą (pointer-events none).
+                    reduced-motion: motion zdejmuje transform, zostaje sam fade. */}
+                <motion.div
+                  onFocus={() => setLogoFocused(true)}
+                  onBlur={() => setLogoFocused(false)}
+                  animate={{
+                    opacity: hideLogo ? 0 : 1,
+                    y:       hideLogo ? -10 : 0,
+                  }}
+                  transition={{ duration: 0.6, ease: EASE.smooth }}
+                  style={{
+                    transformOrigin: "left center",
+                    pointerEvents:   hideLogo ? "none" : "auto",
+                    willChange:      "opacity, transform",
+                  }}
+                >
+                  <Link
+                    href="/"
+                    aria-label={SITE_CONFIG.name}
+                    className={cn(
+                      "block",
+                      // Nad różem KODA zostaje białe (róż-na-różu by zniknął); poza nim
+                      // standard: dziedziczy kolor sekcji, na hover różowieje jak kropka.
+                      onPink
+                        ? "text-[#eeeeee] hover:text-white"
+                        : cn("hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]"),
+                    )}
+                    style={{ transition: `color ${CLR_DUR} ${CLR_EASE}` }}
+                  >
+                    <KodaLogo width={124} height={32} dotColor={onPink ? "#ffffff" : "#cf43b8"} />
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
 
             {/* ── Right side ── (top-RIGHT — ciemnieje na końcu sweepu, więc
                  wjeżdża gdy linia dochodzi do prawej krawędzi) */}

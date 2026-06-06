@@ -410,7 +410,10 @@ export function Contact() {
       <KodaColumn />
 
       <div className="container-koda relative z-10 w-full">
-        <div className="mx-auto w-full max-w-[620px] lg:mx-0 lg:w-[54%]">
+        {/* data-logo-hide-anchor: czoło tej kolumny = eyebrow „Kontakt"/nagłówek.
+            Logo widoczne na wejściu /kontakt, znika gdy nagłówek dojedzie do niego
+            na scrollu (koniec zasłaniania pól, zob. zrzut „E-mail") i zostaje schowane. */}
+        <div data-logo-hide-anchor className="mx-auto w-full max-w-[620px] lg:mx-0 lg:w-[54%]">
           {status === "success" ? (
             <SuccessMessage firstName={fields.name.value.trim().split(" ")[0]} />
           ) : (
