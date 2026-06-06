@@ -3,6 +3,12 @@ interface KodaLogoProps {
   height?: number;
   /** Extra CSS classes — use to set color, e.g. "text-[#eeeeee]" */
   className?: string;
+  /**
+   * Colour of the trailing dot ".". Defaults to brand-pink (#cf43b8). Pass a
+   * different colour (e.g. white) over a pink background, where a pink dot would
+   * be invisible. A CSS transition on the <tspan> keeps the switch smooth.
+   */
+  dotColor?: string;
 }
 
 /**
@@ -12,9 +18,10 @@ interface KodaLogoProps {
  * property of the nearest ancestor — transition color on the parent Link to
  * get smooth fill animation on hover / section-theme switches.
  *
- * The dot "." is always brand-pink (#cf43b8).
+ * The dot "." is brand-pink by default, but `dotColor` lets the header turn it
+ * white over the pink statement block so it never disappears.
  */
-export function KodaLogo({ width = 108, height = 28, className }: KodaLogoProps) {
+export function KodaLogo({ width = 108, height = 28, className, dotColor = "#cf43b8" }: KodaLogoProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -34,8 +41,8 @@ export function KodaLogo({ width = 108, height = 28, className }: KodaLogoProps)
       >
         {/* KODA inherits CSS `color` so transitions work on the parent */}
         <tspan fill="currentColor">KODA</tspan>
-        {/* dot stays brand-pink always */}
-        <tspan fill="#cf43b8">.</tspan>
+        {/* dot colour is themable (pink by default, white over pink sections) */}
+        <tspan fill={dotColor} style={{ transition: "fill 500ms cubic-bezier(0.19,1,0.22,1)" }}>.</tspan>
       </text>
     </svg>
   );

@@ -179,7 +179,7 @@
 
 /* ── Typography utilities ─────────────────────────────────────────── */
 
-/* Label style: "K O D A   S T U D I O" */
+/* Label style: wide-tracked eyebrow, e.g. "KODA" → renders "K O D A" */
 .label-koda {
   font-family:    var(--font-heading);
   font-size:      0.6875rem;  /* 11px */

@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 
-export type HeaderTheme = "dark" | "light";
+export type HeaderTheme = "dark" | "light" | "pink";
 
-// Reads data-header-theme="dark|light" from sections and returns
+// Reads data-header-theme="dark|light|pink" from sections and returns
 // the theme of whichever section is currently behind the header.
+// "pink" = a brand-pink background (the statement block): header elements stay
+// white like on "dark", but the logo dot + contact pill must adapt so they
+// don't vanish against the pink (a pink dot / pink pill would be invisible).
 export function useHeaderTheme(headerHeight = 110): HeaderTheme {
   const [theme, setTheme] = useState<HeaderTheme>("dark");
 

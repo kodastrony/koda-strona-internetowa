@@ -3,6 +3,7 @@ import { Syne, Inter } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
+import { MotionProvider } from "@/components/motion/motion-provider";
 import "./globals.css";
 
 const syne = Syne({
@@ -64,10 +65,23 @@ export default function RootLayout({
   return (
     <html lang="pl" className={`${syne.variable} ${inter.variable}`}>
       <body className="bg-dark text-off-white font-body antialiased flex flex-col min-h-svh">
-        <Header />
-        <ScrollProgress />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {/* Fail-open: bez JS (lub dla botów nieczytających JS) animacje wejścia nie
+            odpalą się, więc tu wymuszamy widoczność każdego [data-reveal] i chowamy
+            zamrożony overlay intro. Z JS — ignorowane, animacje grają normalnie. */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html:
+                "[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}[data-intro]{display:none!important}[data-menu]{display:none!important}",
+            }}
+          />
+        </noscript>
+        <MotionProvider>
+          <Header />
+          <ScrollProgress />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </MotionProvider>
       </body>
     </html>
   );

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, INTRO_DURATION, cssBezier } from "@/lib/motion";
+import { introHasPlayed } from "@/lib/intro-state";
 import { MenuOverlay, type Origin } from "@/components/layout/menu-overlay";
 
 const CLR_EASE = cssBezier(EASE.expo);
@@ -23,8 +24,18 @@ export function Header() {
   const [origin, setOrigin] = useState<Origin | null>(null);
   const theme = useHeaderTheme();
 
+  // Wejście headera jest zsync z intro tylko gdy intro gra (1. twarde wejście,
+  // bez reduced-motion). Inaczej (SPA / reduced-motion) header jest od razu —
+  // bez ~2.4 s pustego paska. Spójne z Hero.
+  const reduce = useReducedMotion();
+  const base = reduce || introHasPlayed() ? 0 : INTRO_DURATION;
+
   // Na białym menu (open) elementy headera są ciemne — niezależnie od sekcji.
   const light = open || theme === "light";
+  // Nad różową sekcją (statement): elementy zostają białe jak na „dark", ALE
+  // różowe akcenty (kropka logo, pill KONTAKT) muszą zmienić kolor, bo róż-na-różu
+  // znika. Gdy menu otwarte, tło jest białe → traktuj jak zwykłe „light".
+  const onPink = theme === "pink" && !open;
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -52,8 +63,24 @@ export function Header() {
     setOpen((o) => !o);
   };
 
-  const buttonBg = open ? "#141414" : theme === "light" ? "#e8e8e8" : "#1f1e1d";
-  const iconColor = open ? "#ffffff" : light ? "#0f0f0f" : "#ffffff";
+  // A1 — przycisk hamburgera HIGH-CONTRAST (odwrócony): biały krążek na ciemnym/
+  // różowym tle, ciemny krążek na białym tle. Linie/X kontrastują z krążkiem.
+  //   • czarne tło (hero)      → biały krążek, ciemne linie
+  //   • białe tło (kontakt)    → ciemny krążek, białe linie
+  //   • różowe tło (statement) → biały krążek, ciemne linie
+  //   • menu otwarte           → ciemny krążek (#141414) na białym menu, biały X
+  const buttonBg = open ? "#141414" : light ? "#0f0f0f" : "#ffffff";
+  const iconColor = light ? "#ffffff" : "#0f0f0f";
+
+  // B1 — wyrazisty pill KONTAKT (ważny przycisk → solidne tło = zawsze czytelny,
+  // nigdy nie „nachodzi"/zlewa się z treścią za nim podczas scrolla).
+  //   • ciemne/białe tło → różowy pill, biały tekst (akcent marki)
+  //   • różowe tło        → biały pill, ciemny tekst (róż-na-różu by zniknął)
+  const pillBg   = onPink ? "#ffffff" : "#cf43b8";
+  const pillText = onPink ? "#0f0f0f" : "#ffffff";
+  const pillShadow = onPink
+    ? "shadow-[0_6px_20px_-10px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.45)]"
+    : "shadow-[0_8px_24px_-10px_rgba(207,67,184,0.7)] hover:shadow-[0_14px_34px_-10px_rgba(207,67,184,0.9)]";
 
   return (
     <>
@@ -66,44 +93,54 @@ export function Header() {
             {/* ── Logo ── (top-LEFT — ciemnieje wcześnie, więc wjeżdża wcześnie:
                  jeszcze w trakcie sweepu, slide z góry) */}
             <motion.div
+              data-reveal
               className="z-10 shrink-0"
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE.primary, delay: INTRO_DURATION - 0.3 }}
+              transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.3 }}
             >
               <Link
                 href="/"
                 aria-label={SITE_CONFIG.name}
-                className={cn("block hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]")}
+                className={cn(
+                  "block",
+                  // Nad różem KODA zostaje białe (róż-na-różu by zniknął); poza nim
+                  // standard: dziedziczy kolor sekcji, na hover różowieje jak kropka.
+                  onPink
+                    ? "text-[#eeeeee] hover:text-white"
+                    : cn("hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]"),
+                )}
                 style={{ transition: `color ${CLR_DUR} ${CLR_EASE}` }}
               >
-                <KodaLogo width={124} height={32} />
+                <KodaLogo width={124} height={32} dotColor={onPink ? "#ffffff" : "#cf43b8"} />
               </Link>
             </motion.div>
 
             {/* ── Right side ── (top-RIGHT — ciemnieje na końcu sweepu, więc
                  wjeżdża gdy linia dochodzi do prawej krawędzi) */}
             <motion.div
+              data-reveal
               className="flex items-center gap-6"
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE.primary, delay: INTRO_DURATION - 0.02 }}
+              transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.02 }}
             >
-              {/* "Porozmawiajmy" */}
+              {/* ── KONTAKT pill (główne CTA do kontaktu) ── */}
               <Link
                 href="/kontakt"
                 className={cn(
-                  "hidden font-heading text-[13px] font-bold uppercase tracking-[0.16em] md:block",
-                  light ? "text-[#0f0f0f]/70 hover:text-[#0f0f0f]" : "text-white/70 hover:text-white",
+                  "hidden items-center justify-center rounded-full md:inline-flex",
+                  "font-heading text-[12px] font-bold uppercase tracking-[0.14em]",
+                  "px-5 py-2.5 hover:-translate-y-px",
+                  pillShadow,
                 )}
                 style={{
-                  textDecoration:      "underline",
-                  textDecorationColor: light ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.22)",
-                  textUnderlineOffset: "5px",
-                  transition: `color ${CLR_DUR} ${CLR_EASE}, text-decoration-color ${CLR_DUR} ${CLR_EASE}`,
+                  backgroundColor: pillBg,
+                  color:           pillText,
+                  transition: `background-color ${CLR_DUR} ${CLR_EASE}, color ${CLR_DUR} ${CLR_EASE}, transform 320ms ${CLR_EASE}, box-shadow 320ms ${CLR_EASE}`,
                 }}
               >
-                Porozmawiajmy
+                Kontakt
               </Link>
 
               {/* ── Magnetic circular button ── */}

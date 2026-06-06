@@ -49,6 +49,7 @@ export function FadeUp({
   };
   return (
     <motion.div
+      data-reveal
       className={className}
       variants={variants}
       initial="hidden"

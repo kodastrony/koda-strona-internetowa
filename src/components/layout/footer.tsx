@@ -60,7 +60,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-gray-muted">
-          <span>© {year} KODA Studio. Wszelkie prawa zastrzeżone.</span>
+          <span>© {year} KODA. Wszelkie prawa zastrzeżone.</span>
           <div className="flex gap-6">
             <Link href="/polityka-prywatnosci" className="hover:text-white transition-colors">
               Polityka prywatności

@@ -340,10 +340,10 @@ export function Work() {
   const colARef = useRef<HTMLDivElement>(null);
   const colBRef = useRef<HTMLDivElement>(null);
 
-  // Scroll-parallax kolumn — RĘCZNY, bulletproof: passive scroll listener +
-  // bezpośredni transform (translate3d = GPU). Działa w KAŻDEJ przeglądarce,
-  // 1:1 ze scrollem = płynne i przewidywalne. Tylko md+ (mobile: kolumny się
-  // stackują → bez parallaxu, by nie było pionowych dziur). reduced-motion → off.
+  // Scroll-parallax kolumn — listener `scroll` (passive) ustawia transform
+  // BEZPOŚREDNIO (działa w każdej przeglądarce; testowalne przez dispatch).
+  // Łagodność/„oddychanie" (lekko opóźniony ruch) daje CSS `transition: transform`
+  // na kolumnach (patrz ich style). Tylko transform (GPU). md+; mobile off; reduced-motion off.
   useEffect(() => {
     const section = sectionRef.current;
     const a = colARef.current;
@@ -351,27 +351,26 @@ export function Work() {
     if (!section || !a || !b) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const update = () => {
+    const apply = () => {
       if (window.innerWidth < 768) {
-        a.style.transform = "";
-        b.style.transform = "";
+        a.style.transform = "none";
+        b.style.transform = "none";
         return;
       }
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-      // p: 0 = sekcja wjeżdża od dołu, 1 = wyjeżdża górą; c: −0.5..0.5 (środek = 0)
-      const p = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
-      const c = p - 0.5;
-      a.style.transform = `translate3d(0, ${(-c * 150).toFixed(1)}px, 0)`; // ±75
-      b.style.transform = `translate3d(0, ${(-c * 60).toFixed(1)}px, 0)`;  // ±30
+      // p: 0 = sekcja wjeżdża od dołu, 1 = wyjechała górą; c: −0.5..0.5 (środek = 0)
+      const c = Math.max(-0.5, Math.min(0.5, (vh - rect.top) / (vh + rect.height) - 0.5));
+      a.style.transform = `translate3d(0, ${(-c * 720).toFixed(1)}px, 0)`; // lewa ±360px (bardzo mocny, dynamiczny dryf)
+      b.style.transform = `translate3d(0, ${(-c * 260).toFixed(1)}px, 0)`; // prawa ±130px (wolniej → wyraźne „oddychanie")
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    apply();
+    window.addEventListener("scroll", apply, { passive: true });
+    window.addEventListener("resize", apply);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", apply);
+      window.removeEventListener("resize", apply);
     };
   }, []);
 
@@ -390,6 +389,7 @@ export function Work() {
             {["Wybrane", "realizacje"].map((line, i) => (
               <motion.span
                 key={line}
+                data-reveal
                 className="block"
                 initial={{ clipPath: "inset(0 100% 0 0)" }}
                 whileInView={{ clipPath: "inset(0 0% 0 0)" }}
@@ -425,7 +425,7 @@ export function Work() {
           <div
             ref={colARef}
             className="flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform" }}
+            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform", transition: "transform 0.1s cubic-bezier(0.22,1,0.36,1)" }}
           >
             <WorkCard project={FEATURED[0]} delay={0}    />
             <WorkCard project={FEATURED[2]} delay={0.08} />
@@ -435,7 +435,7 @@ export function Work() {
           <div
             ref={colBRef}
             className="work-right-stagger flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform" }}
+            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform", transition: "transform 0.1s cubic-bezier(0.22,1,0.36,1)" }}
           >
             <WorkCard project={FEATURED[1]} delay={0.05} />
             <WorkCard project={FEATURED[3]} delay={0.13} />

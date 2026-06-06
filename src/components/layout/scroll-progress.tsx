@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion, useScroll } from "motion/react";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
 import { EASE, cssBezier } from "@/lib/motion";
 
@@ -19,12 +19,10 @@ import { EASE, cssBezier } from "@/lib/motion";
 const SWITCH = `background-color 500ms ${cssBezier(EASE.expo)}`;
 
 export function ScrollProgress() {
+  // scaleY = scrollYProgress BEZPOŚREDNIO (bez useSpring). Spring trzymał
+  // perpetualną pętlę rAF na głównym wątku (konkurując z innymi animacjami);
+  // bezpośrednie wiązanie aktualizuje pasek tylko podczas scrolla = lżej i płynniej.
   const { scrollYProgress } = useScroll();
-  const scaleY = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping:   30,
-    mass:      0.3,
-  });
 
   const theme = useHeaderTheme();
   const fill = theme === "light" ? "#0f0f0f" : "#eeeeee";
@@ -43,7 +41,7 @@ export function ScrollProgress() {
       <motion.div
         className="absolute inset-x-0 top-0 h-full"
         style={{
-          scaleY,
+          scaleY: scrollYProgress,
           transformOrigin: "top",
           backgroundColor: fill,
           transition:      SWITCH,

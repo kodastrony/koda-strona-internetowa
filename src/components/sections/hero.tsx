@@ -4,11 +4,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from "motion/react"
 import { EASE, INTRO_DURATION } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { PillLink } from "@/components/ui/pill-link";
-
-// Synced to INTRO_DURATION — hero elements appear as the intro overlay fades.
-// FadeUp is a shared primitive (@/components/motion); the hero drives it on
-// mount, so each call passes an absolute `delay` of BASE_DELAY + offset.
-const BASE_DELAY = INTRO_DURATION;
+import { introHasPlayed } from "@/lib/intro-state";
 
 /* ── Vertical "KODA" letter column ───────────────────────────────
    SHARED ELEMENT, nie crossfade. Ta KODA jest piksel-w-piksel pod
@@ -56,12 +52,12 @@ function KodaColumn() {
 }
 
 /* ── Vertical SCROLL indicator — bottom-right ────────────────── */
-function ScrollIndicator() {
+function ScrollIndicator({ base }: { base: number }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.7, delay: BASE_DELAY + 0.7 }}
+      transition={{ duration: 0.7, delay: base + 0.7 }}
       aria-hidden="true"
       className="absolute bottom-10 right-[clamp(20px,3vw,44px)] hidden lg:flex flex-col items-center gap-3"
       style={{ zIndex: 10 }}
@@ -105,6 +101,12 @@ function ScrollIndicator() {
 
 /* ══════════════════════════════════════════════════════════════ */
 export function Hero() {
+  // Opóźnienie wejścia treści jest zsynchronizowane z intro TYLKO gdy intro
+  // faktycznie gra (twarde wejście, bez reduced-motion). Przy nawigacji SPA /
+  // reduced-motion treść pojawia się natychmiast (BASE = 0) — bez pustego kadru.
+  const reduce = useReducedMotion();
+  const BASE = reduce || introHasPlayed() ? 0 : INTRO_DURATION;
+
   return (
     <section
       data-header-theme="dark"
@@ -161,7 +163,7 @@ export function Hero() {
       <KodaColumn />
 
       {/* ── SCROLL indicator ─────────────────────────────────── */}
-      <ScrollIndicator />
+      <ScrollIndicator base={BASE} />
 
       {/* ══ Main content ══════════════════════════════════════
           z-[210] = NAD intro-overlayem (z-200). Tekst jest opacity 0 do
@@ -178,9 +180,9 @@ export function Hero() {
           {/* Label — WJEŻDŻA Z LEWEJ (slide poziomy + fade). Prowadzi kaskadę,
               startuje najwcześniej (2.0s) — gdy linia tła zamalowała już lewą
               stronę, więc pojawia się na ciemnym jeszcze w trakcie sweepu. */}
-          <FadeUp delay={BASE_DELAY - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
+          <FadeUp delay={BASE - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
             <div className="flex items-center gap-5 mb-9">
-              <span className="label-koda">K O D A &nbsp; S T U D I O</span>
+              <span className="label-koda">KODA</span>
               <div
                 className="h-px"
                 style={{
@@ -209,25 +211,30 @@ export function Hero() {
               }}
             >
               <motion.span
+                data-reveal
                 style={{ display: "block" }}
                 initial={{ opacity: 0, y: 52 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE_DELAY - 0.28 }}
+                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.28 }}
               >
                 Robimy strony,
               </motion.span>
               <motion.span
-                style={{ display: "block", color: "rgba(255,255,255,0.52)" }}
+                data-reveal
+                style={{ display: "block" }}
                 initial={{ opacity: 0, y: 52 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE_DELAY - 0.18 }}
+                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.18 }}
               >
-                które sprzedają.
+                które{" "}
+                {/* słowo-klucz w różu marki, kropka biała (jak na inspiracji) */}
+                <span style={{ color: "#cf43b8" }}>sprzedają</span>
+                <span style={{ color: "#ffffff" }}>.</span>
               </motion.span>
             </h1>
 
             {/* Opis — łagodny rise + fade (mniejszy dystans, EASE.expo) */}
-            <FadeUp delay={BASE_DELAY - 0.06} duration={0.6} ease={EASE.expo} y={22} className="mt-8">
+            <FadeUp delay={BASE - 0.06} duration={0.6} ease={EASE.expo} y={22} className="mt-8">
               <p
                 className="text-white/45 leading-relaxed"
                 style={{ fontSize: "clamp(0.875rem, 1.1vw, 1rem)" }}
@@ -239,8 +246,17 @@ export function Hero() {
 
             {/* CTA — POP: scale 0.9→1 + lekki rise, BACK (overshoot) = motoryka
                 przycisku, wyraźnie inna niż wjazdy tekstu. Domyka kaskadę. */}
-            <FadeUp delay={BASE_DELAY + 0.08} duration={0.6} ease={EASE.back} y={16} scale={0.9} className="mt-10">
-              <PillLink href="/kontakt">Porozmawiajmy</PillLink>
+            <FadeUp delay={BASE + 0.08} duration={0.6} ease={EASE.back} y={16} scale={0.9} className="mt-10">
+              {/* Główne CTA — różowy pill „Darmowa wycena" (kolory jak na inspiracji).
+                  hover: subtelny lift + różowa poświata + obrót „+". */}
+              <PillLink
+                href="/kontakt"
+                bg="#cf43b8"
+                border="#cf43b8"
+                className="text-white hover:-translate-y-0.5 hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
+              >
+                Darmowa wycena
+              </PillLink>
             </FadeUp>
           </div>
         </div>

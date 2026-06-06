@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useAnimate, stagger, useScroll, useTransform } from "motion/react";
 import { EASE } from "@/lib/motion";
+import { introHasPlayed, markIntroPlayed } from "@/lib/intro-state";
 
 /* ════════════════════════════════════════════════════════════════════
    KODA — intro entrance animation
@@ -38,9 +39,6 @@ const KODA_GRAY = "#1c1c1c";            // kolor KODA w hero.tsx też
 
 // easeOutQuart — gładkie, spokojne wyhamowanie reveala liter (bez overshootu)
 const REVEAL: [number, number, number, number] = [0.25, 1, 0.5, 1];
-
-/** Resetuje się przy hard-refresh (F5); trwa przez SPA-nawigację. */
-let introPlayedThisLoad = false;
 
 const LETTERS = ["K", "O", "D", "A"] as const;
 
@@ -89,10 +87,10 @@ export function IntroAnimation() {
       // Skip (replay-guard po SPA-nawigacji / reduced-motion). Wewnątrz async,
       // NIE w ciele efektu → SSR-safe i bez react-hooks/set-state-in-effect.
       if (
-        introPlayedThisLoad ||
+        introHasPlayed() ||
         window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
       ) {
-        introPlayedThisLoad = true;
+        markIntroPlayed();
         setDone(true);
         return;
       }
@@ -141,7 +139,7 @@ export function IntroAnimation() {
       overlay.style.pointerEvents = "none";
       await animate(overlay, { opacity: 0 }, { duration: 0.28, ease: EASE.primary });
 
-      introPlayedThisLoad = true;
+      markIntroPlayed();
       setDone(true);
     };
 
@@ -150,12 +148,13 @@ export function IntroAnimation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const skip = () => { introPlayedThisLoad = true; setDone(true); };
+  const skip = () => { markIntroPlayed(); setDone(true); };
   if (done) return null;
 
   return (
     <div
       ref={scope}
+      data-intro
       className="absolute left-0 top-0 z-[var(--z-intro)] h-svh w-full overflow-hidden"
       onClick={skip}
       style={{ cursor: "pointer" }}
