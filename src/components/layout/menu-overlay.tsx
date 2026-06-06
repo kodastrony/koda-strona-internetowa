@@ -43,20 +43,23 @@ const SLIDE = 40;                        // px — wysunięcie słowa na hover
 
 const CIRCLE_R = 30;                     // promień koła bazowego (60px)
 
-// Stagger treści. „hidden" ma własny (odwrócony) stagger, żeby zamknięcie też
-// było płynne — bez AnimatePresence/exit treść po prostu wraca do „hidden".
+// ── Timing OTWIERANIA vs ZAMYKANIA (asymetryczny — kluczowe dla „czystego" zamknięcia) ──
+// OTWARCIE: białe koło rozszerza się, a treść wjeżdża staggerem PO nim (delayChildren).
+// ZAMKNIĘCIE: treść znika NAJPIERW — szybko i RAZEM (bez staggera, easeOut = od razu
+//   gaśnie) — a dopiero potem koło się cofa (ma własny delay, niżej). Inaczej koło
+//   odsłaniało ciemny hero ZANIM zniknął ciemny tekst → tekst „wisiał" (bug z filmiku).
 const content: Variants = {
-  hidden:  { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
+  hidden:  {}, // brak orkiestracji → wszystkie dzieci gasną jednocześnie i szybko
   visible: { transition: { staggerChildren: 0.06, delayChildren: 0.22 } },
 };
 
 const fadeItem: Variants = {
-  hidden:  { opacity: 0, y: 24, transition: { duration: 0.3, ease: "easeIn" } },
+  hidden:  { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE.primary } },
 };
 
 const fadeSide: Variants = {
-  hidden:  { opacity: 0, y: 18, transition: { duration: 0.25, ease: "easeIn" } },
+  hidden:  { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE.primary } },
 };
 
@@ -132,7 +135,9 @@ export function MenuOverlay({
         animate={{ scale: open ? scale : 0 }}
         transition={reduce
           ? { duration: 0 }
-          : { duration: open ? 0.7 : 0.5, ease: EASE.primary }}
+          // Zamknięcie: koło CZEKA ~0.12s (tekst zdąży zniknąć), POTEM szybko się cofa
+          // → kolejność „najpierw tekst, potem białe tło" (nie odwrotnie).
+          : { duration: open ? 0.7 : 0.45, ease: EASE.primary, delay: open ? 0 : 0.12 }}
       />
 
       {/* ── Treść menu ───────────────────────────────────────────── */}
