@@ -2,26 +2,21 @@
 
 import Link from "next/link";
 import { FadeUp } from "@/components/motion";
+import { SERVICES } from "@/lib/services-data";
 
 /* ── "Co robimy" — interactive hover-wipe list ───────────────────────────
    NOT a generic icon-card grid (the slop the owner rejected). Big service
    names as full-width rows; on hover a pink gradient WIPES in left→right
    (clip-path, Emil's strong ease-out — the left→right reveal the owner liked),
    the label brightens, and the description + arrow slide in. Rows reveal with a
-   stagger on scroll. Bold, alive, interactive. */
+   stagger on scroll. Bold, alive, interactive. Data = @/lib/services-data
+   (shared with the /uslugi page). The row links to that service's section. */
 
-const SERVICES = [
-  { n: "01", title: "Projektowanie UX/UI", desc: "Interfejsy, które prowadzą użytkownika prosto do kontaktu i zakupu. Każdy ekran ma zadanie." },
-  { n: "02", title: "Strony i sklepy",     desc: "Szybkie, nowoczesne strony i sklepy na solidnym kodzie. Pod Twój biznes, nie pod szablon." },
-  { n: "03", title: "Optymalizacja i SEO", desc: "Szybkość, widoczność w Google i analityka, żeby strona realnie przyciągała klientów." },
-  { n: "04", title: "Wsparcie i rozwój",   desc: "Po wdrożeniu zostajemy: aktualizacje, opieka techniczna i rozwój, gdy Twój biznes rośnie." },
-];
-
-function ServiceRow({ n, title, desc, delay }: { n: string; title: string; desc: string; delay: number }) {
+function ServiceRow({ n, title, desc, href, delay }: { n: string; title: string; desc: string; href: string; delay: number }) {
   return (
     <FadeUp inView delay={delay} y={22}>
       <Link
-        href="/uslugi"
+        href={href}
         className="group relative block overflow-hidden"
         style={{ borderTop: "1px solid var(--color-line)" }}
       >
@@ -43,12 +38,12 @@ function ServiceRow({ n, title, desc, delay }: { n: string; title: string; desc:
               {title}
             </h3>
             {/* Desktop (lg+): opis wjeżdża na hover (interaktywna lista). */}
-            <p className="hidden max-w-[34ch] -translate-x-3 text-[0.98rem] leading-snug text-[var(--color-ink-muted)] opacity-0 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0 group-hover:text-white/90 group-hover:opacity-100 lg:block">
+            <p className="hidden max-w-[34ch] -translate-x-3 text-[0.98rem] leading-snug text-[var(--color-ink-muted)] opacity-0 transition-[transform,opacity,color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0 group-hover:text-white/90 group-hover:opacity-100 lg:block">
               {desc}
             </p>
             <span
               aria-hidden="true"
-              className="shrink-0 -translate-x-1.5 font-heading text-2xl text-[var(--color-ink-faint)] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0 group-hover:text-white"
+              className="shrink-0 -translate-x-1.5 font-heading text-2xl text-[var(--color-ink-faint)] transition-[transform,color] duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-0 group-hover:text-white"
             >
               →
             </span>
@@ -98,7 +93,7 @@ export function Services() {
         {/* ── Interactive list ── */}
         <div style={{ borderBottom: "1px solid var(--color-line)" }}>
           {SERVICES.map((s, i) => (
-            <ServiceRow key={s.n} n={s.n} title={s.title} desc={s.desc} delay={0.05 * i} />
+            <ServiceRow key={s.n} n={s.n} title={s.title} desc={s.short} href={`/uslugi#${s.id}`} delay={0.05 * i} />
           ))}
         </div>
       </div>
