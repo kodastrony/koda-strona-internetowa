@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Usługi",
   description:
     "Projektowanie UX/UI, strony i sklepy internetowe, optymalizacja i SEO oraz wsparcie po wdrożeniu — wszystko skrojone pod Twój biznes.",
-  alternates: { canonical: "/uslugi" },
+  alternates: { canonical: "/uslugi/" },
 };
 
 export default function UslugiPage() {

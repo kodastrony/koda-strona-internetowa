@@ -4,7 +4,7 @@ import { motion, type Variants } from "motion/react";
 import { EASE, DURATION, type Bezier } from "@/lib/motion";
 
 const variants: Variants = {
-  hidden:  { clipPath: "inset(0 100% 0 0)" },
+  hidden: { clipPath: "inset(0 100% 0 0)" },
   visible: { clipPath: "inset(0 0% 0 0)" },
 };
 

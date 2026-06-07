@@ -21,25 +21,25 @@ export type Bezier = [number, number, number, number];
  */
 export const EASE = {
   /** ease-out expo — fast, energetic start with a smooth settle. THE KODA curve. */
-  expo:     [0.19, 1, 0.22, 1]       as Bezier,
+  expo: [0.19, 1, 0.22, 1] as Bezier,
   /** smooth in-out — balanced, used for clip-path reveals. */
-  smooth:   [0.63, 0.03, 0.21, 1]    as Bezier,
+  smooth: [0.63, 0.03, 0.21, 1] as Bezier,
   /** slow & dramatic — overlay fades and big "moment" beats. */
-  primary:  [0.475, 0.425, 0, 0.995] as Bezier,
+  primary: [0.475, 0.425, 0, 0.995] as Bezier,
   /** snappy start — quick UI feedback. */
-  quick:    [0.835, -0.005, 0.06, 1] as Bezier,
+  quick: [0.835, -0.005, 0.06, 1] as Bezier,
   /** intro-only: f(0.5) ≈ 0.7355 → the bg sweep reaches the KODA text's visual
    *  centre (ink centre ≈ 73.6% of the viewport for typical sizes) exactly when
    *  the text sweep does, so the two lines meet in the middle of the letters. */
-  crossing: [0, 0, 0.47, 1]          as Bezier,
+  crossing: [0, 0, 0.47, 1] as Bezier,
   /** gentle overshoot ("back") — for playful pop-in of buttons / CTAs. */
-  back:     [0.34, 1.4, 0.64, 1]     as Bezier,
+  back: [0.34, 1.4, 0.64, 1] as Bezier,
   /** Emil Kowalski's strong ease-out — entrances/reveals (punchy, responsive). */
-  out:      [0.23, 1, 0.32, 1]       as Bezier,
+  out: [0.23, 1, 0.32, 1] as Bezier,
   /** Emil's strong ease-in-out — on-screen movement / morphing / wipes. */
-  inOut:    [0.77, 0, 0.175, 1]      as Bezier,
+  inOut: [0.77, 0, 0.175, 1] as Bezier,
   /** iOS-like "drawer" curve (Ionic) — buttery section/panel motion. */
-  drawer:   [0.32, 0.72, 0, 1]       as Bezier,
+  drawer: [0.32, 0.72, 0, 1] as Bezier,
 } as const;
 
 /**
@@ -47,11 +47,11 @@ export const EASE = {
  * Mirror of globals.css `--duration-*` (÷1000).
  */
 export const DURATION = {
-  fast:   0.15,
-  base:   0.3,
-  slow:   0.6,
+  fast: 0.15,
+  base: 0.3,
+  slow: 0.6,
   reveal: 0.85,
-  fade:   0.9,
+  fade: 0.9,
 } as const;
 
 /**

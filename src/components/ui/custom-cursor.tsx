@@ -205,7 +205,7 @@ export function CustomCursor() {
       aria-hidden="true"
       data-cursor-state="idle"
       data-cursor-theme="dark"
-      className="koda-cursor pointer-events-none fixed left-0 top-0 z-[var(--z-cursor)] hidden lg:block"
+      className="koda-cursor pointer-events-none fixed top-0 left-0 z-[var(--z-cursor)] hidden lg:block"
       style={{ opacity: 0 }}
     >
       <div ref={ringRef} className="koda-cursor__ring-pos">

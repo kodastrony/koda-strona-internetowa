@@ -425,6 +425,7 @@ export function Contact() {
   // string `action` (poleganie na „braku preventDefault" potrafi nie wysłać).
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading) return; // już wysyłamy — ignoruj powtórne kliknięcia (anty-podwójny submit)
     const nextErrors = {} as Record<FieldKey, string | null>;
     (Object.keys(fields) as FieldKey[]).forEach(
       (k) => (nextErrors[k] = VALIDATORS[k](fields[k].value))

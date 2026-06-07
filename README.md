@@ -4,14 +4,14 @@ Strona agencji KODA Studio. Statyczny eksport Next.js 16 hostowany na OVH.
 
 ## Stack
 
-| Warstwa | Technologia |
-|---|---|
-| Framework | Next.js 16 (App Router, static export) |
-| Styling | Tailwind CSS v4 |
-| Animacje | Framer Motion (motion/react v12) |
-| Czcionki | Geologica (nagłówki) + Inter (body) + Syne (logo), przez next/font |
-| Hosting | OVH shared hosting (Apache) |
-| Deploy | GitHub Actions → FTP (deploy-ovh.yml) |
+| Warstwa   | Technologia                                                        |
+| --------- | ------------------------------------------------------------------ |
+| Framework | Next.js 16 (App Router, static export)                             |
+| Styling   | Tailwind CSS v4                                                    |
+| Animacje  | Framer Motion (motion/react v12)                                   |
+| Czcionki  | Geologica (nagłówki) + Inter (body) + Syne (logo), przez next/font |
+| Hosting   | OVH shared hosting (Apache)                                        |
+| Deploy    | GitHub Actions → FTP (deploy-ovh.yml)                              |
 
 ## Uruchamianie
 
@@ -51,19 +51,21 @@ public/
 
 ## Zmienne środowiskowe
 
-| Zmienna | Wartość w CI | Opis |
-|---|---|---|
-| `STATIC_EXPORT` | `"true"` | Włącza `output: "export"` w next.config.ts |
+| Zmienna         | Wartość w CI | Opis                                       |
+| --------------- | ------------ | ------------------------------------------ |
+| `STATIC_EXPORT` | `"true"`     | Włącza `output: "export"` w next.config.ts |
 
 Formularz leadów używa FormSubmit.co (natywny POST) — **bez kluczy ani zmiennych środowiskowych**.
 
 ## Deploy
 
 Każdy push na `main` uruchamia `.github/workflows/deploy-ovh.yml`:
+
 1. `npm ci` → `STATIC_EXPORT=true npm run build` → `out/`
 2. `SamKirkland/FTP-Deploy-Action` uploaduje `out/` → OVH `www/`
 
 Sekrety GitHub (ustawione w Settings → Secrets):
+
 - `FTP_USERNAME` — login FTP do konta OVH
 - `FTP_PASSWORD` — hasło FTP
 

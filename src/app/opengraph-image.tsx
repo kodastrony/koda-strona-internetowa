@@ -10,47 +10,68 @@ export const contentType = "image/png";
 
 export default function Image() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        background: "#0b0b0d",
+        padding: "72px 80px",
+        fontFamily: "sans-serif",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          background: "#0b0b0d",
-          padding: "72px 80px",
-          fontFamily: "sans-serif",
+          alignItems: "center",
+          color: "#cf43b8",
+          fontSize: 30,
+          fontWeight: 700,
+          letterSpacing: 10,
         }}
       >
+        KODA STUDIO
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            color: "#cf43b8",
-            fontSize: 30,
-            fontWeight: 700,
-            letterSpacing: 10,
+            color: "#ffffff",
+            fontSize: 88,
+            fontWeight: 800,
+            lineHeight: 1.05,
           }}
         >
-          KODA STUDIO
+          Strony internetowe,
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", color: "#ffffff", fontSize: 88, fontWeight: 800, lineHeight: 1.05 }}>
-            Strony internetowe,
-          </div>
-          <div style={{ display: "flex", color: "rgba(255,255,255,0.5)", fontSize: 88, fontWeight: 800, lineHeight: 1.05 }}>
-            które konwertują.
-          </div>
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.42)", fontSize: 28 }}>
-          <div style={{ display: "flex" }}>kodastrony.pl</div>
-          <div style={{ display: "flex" }}>Polska</div>
+        <div
+          style={{
+            display: "flex",
+            color: "rgba(255,255,255,0.5)",
+            fontSize: 88,
+            fontWeight: 800,
+            lineHeight: 1.05,
+          }}
+        >
+          które konwertują.
         </div>
       </div>
-    ),
-    { ...size },
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          color: "rgba(255,255,255,0.42)",
+          fontSize: 28,
+        }}
+      >
+        <div style={{ display: "flex" }}>kodastrony.pl</div>
+        <div style={{ display: "flex" }}>Polska</div>
+      </div>
+    </div>,
+    { ...size }
   );
 }

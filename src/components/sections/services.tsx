@@ -12,7 +12,19 @@ import { SERVICES } from "@/lib/services-data";
    stagger on scroll. Bold, alive, interactive. Data = @/lib/services-data
    (shared with the /uslugi page). The row links to that service's section. */
 
-function ServiceRow({ n, title, desc, href, delay }: { n: string; title: string; desc: string; href: string; delay: number }) {
+function ServiceRow({
+  n,
+  title,
+  desc,
+  href,
+  delay,
+}: {
+  n: string;
+  title: string;
+  desc: string;
+  href: string;
+  delay: number;
+}) {
   return (
     <FadeUp inView delay={delay} y={22}>
       <Link
@@ -23,8 +35,10 @@ function ServiceRow({ n, title, desc, href, delay }: { n: string; title: string;
         {/* Pink wipe — fills the row left→right on hover (clip-path + Emil ease-out) */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 [clip-path:inset(0_100%_0_0)] transition-[clip-path] duration-[620ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:[clip-path:inset(0_0_0_0)]"
-          style={{ background: "linear-gradient(100deg, var(--color-accent), var(--color-pink-bright))" }}
+          className="pointer-events-none absolute inset-0 transition-[clip-path] duration-[620ms] ease-[cubic-bezier(0.23,1,0.32,1)] [clip-path:inset(0_100%_0_0)] group-hover:[clip-path:inset(0_0_0_0)]"
+          style={{
+            background: "linear-gradient(100deg, var(--color-accent), var(--color-pink-bright))",
+          }}
         />
         <div className="relative py-[clamp(24px,3.4vw,44px)]">
           <div className="flex items-center gap-[clamp(18px,4vw,56px)]">
@@ -33,7 +47,11 @@ function ServiceRow({ n, title, desc, href, delay }: { n: string; title: string;
             </span>
             <h3
               className="flex-1 font-heading font-semibold text-[var(--color-ink)] transition-colors duration-500 group-hover:text-white"
-              style={{ fontSize: "clamp(1.55rem,3.4vw,2.9rem)", letterSpacing: "-0.03em", lineHeight: 1.06 }}
+              style={{
+                fontSize: "clamp(1.55rem,3.4vw,2.9rem)",
+                letterSpacing: "-0.03em",
+                lineHeight: 1.06,
+              }}
             >
               {title}
             </h3>
@@ -67,10 +85,25 @@ export function Services() {
       style={{ backgroundColor: "var(--color-graphite)" }}
     >
       {/* Smooth fades — graphite melts into the black sections above/below */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40" style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }} />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40" style={{ background: "linear-gradient(to top, var(--color-bg), transparent)" }} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40"
+        style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40"
+        style={{ background: "linear-gradient(to top, var(--color-bg), transparent)" }}
+      />
       {/* Section mood — soft violet atmosphere */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse 55% 50% at 88% 2%, rgba(154,99,239,0.10) 0%, transparent 58%)" }} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 55% 50% at 88% 2%, rgba(154,99,239,0.10) 0%, transparent 58%)",
+        }}
+      />
 
       <div className="container-koda section-y relative z-10">
         {/* ── Header ── */}
@@ -84,7 +117,14 @@ export function Services() {
             </FadeUp>
           </div>
           <FadeUp inView delay={0.14} className="md:max-w-[330px] md:pb-2 md:text-right">
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "clamp(0.95rem,1.05vw,1.05rem)", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "clamp(0.95rem,1.05vw,1.05rem)",
+                color: "var(--color-ink-muted)",
+                lineHeight: 1.6,
+              }}
+            >
               Od pierwszego pomysłu po działającą stronę, która zarabia. Wszystko w jednym miejscu.
             </p>
           </FadeUp>
@@ -93,7 +133,14 @@ export function Services() {
         {/* ── Interactive list ── */}
         <div style={{ borderBottom: "1px solid var(--color-line)" }}>
           {SERVICES.map((s, i) => (
-            <ServiceRow key={s.n} n={s.n} title={s.title} desc={s.short} href={`/uslugi#${s.id}`} delay={0.05 * i} />
+            <ServiceRow
+              key={s.n}
+              n={s.n}
+              title={s.title}
+              desc={s.short}
+              href={`/uslugi#${s.id}`}
+              delay={0.05 * i}
+            />
           ))}
         </div>
       </div>

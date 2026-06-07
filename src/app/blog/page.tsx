@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Blog",
   description:
     "Praktyczna wiedza o stronach internetowych dla firm: ceny, szybkość, UX i najczęstsze błędy, które kosztują klientów.",
-  alternates: { canonical: "/blog" },
+  alternates: { canonical: "/blog/" },
 };
 
 export default function BlogPage() {

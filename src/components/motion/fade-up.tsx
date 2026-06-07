@@ -44,7 +44,7 @@ export function FadeUp({
   inView = false,
 }: FadeUpProps) {
   const variants: Variants = {
-    hidden:  { opacity: 0, x, y, scale },
+    hidden: { opacity: 0, x, y, scale },
     visible: { opacity: 1, x: 0, y: 0, scale: 1 },
   };
   return (

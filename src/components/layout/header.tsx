@@ -13,7 +13,7 @@ import { introHasPlayed } from "@/lib/intro-state";
 import { MenuOverlay, type Origin } from "@/components/layout/menu-overlay";
 
 const CLR_EASE = cssBezier(EASE.expo);
-const CLR_DUR  = "500ms";
+const CLR_DUR = "500ms";
 
 // Siła magnesu: przycisk DOJEŻDŻA do kursora o 50% odległości od środka (to
 // przycisk nachodzi na kursor — nie odwrotnie; ring kursora tylko ramkuje ikonę).
@@ -68,7 +68,10 @@ export function Header() {
     mvx.set((e.clientX - cx) * MAGNET_STRENGTH);
     mvy.set((e.clientY - cy) * MAGNET_STRENGTH);
   };
-  const onMagnetLeave = () => { mvx.set(0); mvy.set(0); };
+  const onMagnetLeave = () => {
+    mvx.set(0);
+    mvy.set(0);
+  };
 
   // Stabilny handler zamknięcia (identyczna referencja) → efekt focus-trapu w
   // MenuOverlay nie re-uruchamia się przy każdym renderze.
@@ -96,7 +99,7 @@ export function Header() {
   // nigdy nie „nachodzi"/zlewa się z treścią za nim podczas scrolla).
   //   • ciemne/białe tło → różowy pill, biały tekst (akcent marki)
   //   • różowe tło        → biały pill, ciemny tekst (róż-na-różu by zniknął)
-  const pillBg   = onPink ? "#ffffff" : "#cf43b8";
+  const pillBg = onPink ? "#ffffff" : "#cf43b8";
   const pillText = onPink ? "#0f0f0f" : "#ffffff";
   const pillShadow = onPink
     ? "shadow-[0_6px_20px_-10px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.45)]"
@@ -134,12 +137,12 @@ export function Header() {
                   onBlur={() => setLogoFocused(false)}
                   animate={{
                     opacity: hideLogo ? 0 : 1,
-                    y:       hideLogo ? -10 : 0,
+                    y: hideLogo ? -10 : 0,
                   }}
                   transition={{ duration: 0.6, ease: EASE.smooth }}
                   style={{
                     transformOrigin: "left center",
-                    pointerEvents:   hideLogo ? "none" : "auto",
+                    pointerEvents: hideLogo ? "none" : "auto",
                   }}
                 >
                   <Link
@@ -151,7 +154,7 @@ export function Header() {
                       // standard: dziedziczy kolor sekcji, na hover różowieje jak kropka.
                       onPink
                         ? "text-[#eeeeee] hover:text-white"
-                        : cn("hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]"),
+                        : cn("hover:text-[#cf43b8]", light ? "text-[#0f0f0f]" : "text-[#eeeeee]")
                     )}
                     style={{ transition: `color ${CLR_DUR} ${CLR_EASE}` }}
                   >
@@ -175,13 +178,13 @@ export function Header() {
                 href="/kontakt"
                 className={cn(
                   "hidden items-center justify-center rounded-full md:inline-flex",
-                  "font-heading text-[12px] font-bold uppercase tracking-[0.14em]",
+                  "font-heading text-[12px] font-bold tracking-[0.14em] uppercase",
                   "min-h-[44px] px-5 py-2.5 hover:-translate-y-px",
-                  pillShadow,
+                  pillShadow
                 )}
                 style={{
                   backgroundColor: pillBg,
-                  color:           pillText,
+                  color: pillText,
                   transition: `background-color ${CLR_DUR} ${CLR_EASE}, color ${CLR_DUR} ${CLR_EASE}, transform 320ms ${CLR_EASE}, box-shadow 320ms ${CLR_EASE}`,
                 }}
               >
@@ -197,7 +200,12 @@ export function Header() {
               >
                 <motion.button
                   ref={btnRef}
-                  style={{ x, y, backgroundColor: buttonBg, transition: `background-color ${CLR_DUR} ${CLR_EASE}` }}
+                  style={{
+                    x,
+                    y,
+                    backgroundColor: buttonBg,
+                    transition: `background-color ${CLR_DUR} ${CLR_EASE}`,
+                  }}
                   className="relative flex h-[50px] w-[50px] items-center justify-center rounded-full"
                   onClick={toggle}
                   aria-label={open ? "Zamknij menu" : "Otwórz menu"}
@@ -205,9 +213,10 @@ export function Header() {
                 >
                   {/* hamburger lines */}
                   <span
+                    aria-hidden="true"
                     className={cn(
-                      "absolute flex flex-col gap-[5px] transition-all duration-300",
-                      open ? "scale-75 opacity-0" : "scale-100 opacity-100",
+                      "absolute flex flex-col gap-[5px] transition-[transform,opacity] duration-300",
+                      open ? "scale-75 opacity-0" : "scale-100 opacity-100"
                     )}
                   >
                     {[20, 20, 12].map((w, i) => (
@@ -215,9 +224,9 @@ export function Header() {
                         key={i}
                         className="block h-px"
                         style={{
-                          width:           w,
+                          width: w,
                           backgroundColor: iconColor,
-                          transition:      `background-color ${CLR_DUR} ${CLR_EASE}`,
+                          transition: `background-color ${CLR_DUR} ${CLR_EASE}`,
                         }}
                       />
                     ))}
@@ -225,9 +234,10 @@ export function Header() {
 
                   {/* X (close) */}
                   <span
+                    aria-hidden="true"
                     className={cn(
-                      "absolute flex items-center justify-center transition-all duration-300",
-                      open ? "scale-100 opacity-100" : "scale-75 opacity-0",
+                      "absolute flex items-center justify-center transition-[transform,opacity] duration-300",
+                      open ? "scale-100 opacity-100" : "scale-75 opacity-0"
                     )}
                   >
                     <svg

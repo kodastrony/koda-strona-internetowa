@@ -91,11 +91,15 @@ export const PROJECTS: Project[] = [
     type: "Strona firmowa",
     year: "2023",
     client: "Usługi prawne",
-    summary:
-      "Strona firmowa kancelarii prawnej — buduje powagę i zaufanie od pierwszego ekranu.",
+    summary: "Strona firmowa kancelarii prawnej — buduje powagę i zaufanie od pierwszego ekranu.",
     intro:
       "W usługach prawnych pierwsze wrażenie to zaufanie. Kancelaria Mazur potrzebowała strony, która od razu komunikuje rzetelność i kompetencję, a klientowi ułatwia jedno: szybki, bezstresowy kontakt. Postawiliśmy na spokojną, elegancką formę i klarowny układ specjalizacji.",
-    scope: ["Projekt UX/UI", "Copywriting we współpracy", "Wdrożenie strony", "Formularz kontaktowy"],
+    scope: [
+      "Projekt UX/UI",
+      "Copywriting we współpracy",
+      "Wdrożenie strony",
+      "Formularz kontaktowy",
+    ],
     deliverables: [
       "Stonowana, budząca zaufanie identyfikacja online",
       "Czytelny układ obszarów praktyki",
@@ -117,7 +121,12 @@ export const PROJECTS: Project[] = [
       "Platforma B2B dla dystrybutora HoReCa — porządkuje obszerną ofertę w przejrzysty, wydajny katalog.",
     intro:
       "Horeca Trade dystrybuuje setki produktów do gastronomii i hoteli. Wyzwaniem była skala: jak pokazać dużą, złożoną ofertę tak, by partner biznesowy znalazł to, czego szuka, w kilka sekund. Zaprojektowaliśmy wydajny katalog z czytelną nawigacją i szybkim wyszukiwaniem.",
-    scope: ["Architektura informacji", "Projekt UX/UI", "Wdrożenie platformy", "Optymalizacja wydajności"],
+    scope: [
+      "Architektura informacji",
+      "Projekt UX/UI",
+      "Wdrożenie platformy",
+      "Optymalizacja wydajności",
+    ],
     deliverables: [
       "Uporządkowana, skalowalna struktura katalogu",
       "Szybka nawigacja i filtrowanie oferty",

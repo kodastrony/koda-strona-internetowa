@@ -1,6 +1,13 @@
 "use client";
 
-import { motion, useScroll, useTransform, useReducedMotion, useMotionValue, useSpring } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+} from "motion/react";
 import { EASE, INTRO_DURATION } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -25,10 +32,10 @@ function KodaColumn() {
   return (
     <motion.div
       aria-hidden="true"
-      className="absolute top-0 hidden select-none pointer-events-none lg:block"
+      className="pointer-events-none absolute top-0 hidden select-none lg:block"
       style={{
-        right:  "19%",
-        width:  "clamp(160px, 21vw, 340px)",
+        right: "19%",
+        width: "clamp(160px, 21vw, 340px)",
         height: "130%",
         y,
       }}
@@ -39,12 +46,12 @@ function KodaColumn() {
           style={{
             // The giant background "KODA" is the wordmark at scale → stays on
             // the logo font (Syne), matching the header logo, not the heading font.
-            fontFamily:    "var(--font-logo)",
-            fontWeight:    800,
-            fontSize:      "clamp(160px, 21vw, 340px)",
+            fontFamily: "var(--font-logo)",
+            fontWeight: 800,
+            fontSize: "clamp(160px, 21vw, 340px)",
             letterSpacing: "-0.04em",
-            color:         "#1c1c1c",
-            lineHeight:    0.9,
+            color: "#1c1c1c",
+            lineHeight: 0.9,
           }}
         >
           {letter}
@@ -63,14 +70,11 @@ function ScrollIndicator({ base }: { base: number }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7, delay: base + 0.7 }}
       aria-hidden="true"
-      className="absolute bottom-10 right-[clamp(20px,3vw,44px)] hidden lg:flex flex-col items-center gap-3"
+      className="absolute right-[clamp(20px,3vw,44px)] bottom-10 hidden flex-col items-center gap-3 lg:flex"
       style={{ zIndex: 10 }}
     >
       <div className="relative h-14 w-px overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: "rgba(255,255,255,0.07)" }}
-        />
+        <div className="absolute inset-0" style={{ backgroundColor: "rgba(255,255,255,0.07)" }} />
         {/* Połysk przesuwa się w pętli (repeat:Infinity) → przy „ogranicz ruch"
             NIE renderujemy go wcale (zero perpetualnej animacji dla tych userów). */}
         {!reduce && (
@@ -82,9 +86,9 @@ function ScrollIndicator({ base }: { base: number }) {
             }}
             animate={{ y: ["-100%", "200%"] }}
             transition={{
-              duration:    1.8,
-              repeat:      Infinity,
-              ease:        "linear",
+              duration: 1.8,
+              repeat: Infinity,
+              ease: "linear",
               repeatDelay: 0.6,
             }}
           />
@@ -92,13 +96,13 @@ function ScrollIndicator({ base }: { base: number }) {
       </div>
       <span
         style={{
-          fontFamily:    "var(--font-heading)",
-          fontSize:      "8px",
-          fontWeight:    700,
+          fontFamily: "var(--font-heading)",
+          fontSize: "8px",
+          fontWeight: 700,
           letterSpacing: "0.35em",
           textTransform: "uppercase" as const,
-          color:         "rgba(255,255,255,0.18)",
-          writingMode:   "vertical-rl" as const,
+          color: "rgba(255,255,255,0.18)",
+          writingMode: "vertical-rl" as const,
         }}
       >
         SCROLL
@@ -136,15 +140,14 @@ export function Hero() {
     <section
       data-header-theme="dark"
       onMouseMove={onMouseMove}
-      className="relative min-h-svh flex flex-col overflow-hidden bg-dark"
+      className="relative flex min-h-svh flex-col overflow-hidden bg-dark"
     >
       {/* ── Dot grid ─────────────────────────────────────────── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -189,24 +192,24 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute z-0 rounded-full"
         style={{
-          width:     "clamp(480px, 62vw, 940px)",
-          height:    "clamp(480px, 62vw, 940px)",
-          right:     "clamp(-280px, -14vw, -60px)",
-          top:       "50%",
+          width: "clamp(480px, 62vw, 940px)",
+          height: "clamp(480px, 62vw, 940px)",
+          right: "clamp(-280px, -14vw, -60px)",
+          top: "50%",
           transform: "translateY(-50%)",
-          border:    "1px solid rgba(255,255,255,0.022)",
+          border: "1px solid rgba(255,255,255,0.022)",
         }}
       />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute z-0 rounded-full"
         style={{
-          width:     "clamp(280px, 36vw, 560px)",
-          height:    "clamp(280px, 36vw, 560px)",
-          right:     "clamp(-80px, -3vw, 20px)",
-          top:       "50%",
+          width: "clamp(280px, 36vw, 560px)",
+          height: "clamp(280px, 36vw, 560px)",
+          right: "clamp(-80px, -3vw, 20px)",
+          top: "50%",
           transform: "translateY(-50%)",
-          border:    "1px solid rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.03)",
         }}
       />
 
@@ -225,7 +228,7 @@ export function Hero() {
           (z-0) zostaje POD overlayem i jest odsłaniane jego zanikiem. */}
       <div className="container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[84px] md:pt-[130px]">
         <div
-          className="flex flex-col justify-center flex-1"
+          className="flex flex-1 flex-col justify-center"
           style={{ paddingBottom: "clamp(50px, 7vh, 90px)" }}
         >
           {/* Label — WJEŻDŻA Z LEWEJ (slide poziomy + fade). Prowadzi kaskadę,
@@ -236,12 +239,12 @@ export function Hero() {
               schowane niżej. Anchor na eyebrow → logo nie nałoży się nawet na ten
               mały napis „KODA" (uniknięcie podwójnego KODA). */}
           <FadeUp delay={BASE - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
-            <div data-logo-hide-anchor className="flex items-center gap-5 mb-9">
+            <div data-logo-hide-anchor className="mb-9 flex items-center gap-5">
               <span className="label-koda">KODA</span>
               <div
                 className="h-px"
                 style={{
-                  width:      "clamp(40px, 14vw, 160px)",
+                  width: "clamp(40px, 14vw, 160px)",
                   background: "rgba(255,255,255,0.08)",
                 }}
               />
@@ -252,17 +255,16 @@ export function Hero() {
               Full width on phones/tablets (decorative KODA is hidden there);
               constrained to ~54% on lg+ to leave room for the KODA column. */}
           <div className="w-full lg:w-[54%] lg:max-w-[620px]">
-
             {/* h1 — DWIE LINIE wjeżdżają OSOBNO z dołu (stagger 0.1s). Inny
                 ruch niż label (pion vs poziom) + per-linia = premium reveal. */}
             <h1
               style={{
-                fontFamily:    "var(--font-heading)",
-                fontWeight:    600,
-                fontSize:      "clamp(2.5rem, 6vw, 5.25rem)",
-                lineHeight:    1.03,
+                fontFamily: "var(--font-heading)",
+                fontWeight: 600,
+                fontSize: "clamp(2.5rem, 6vw, 5.25rem)",
+                lineHeight: 1.03,
                 letterSpacing: "-0.03em",
-                color:         "var(--color-ink)",
+                color: "var(--color-ink)",
               }}
             >
               <motion.span
@@ -281,8 +283,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.18 }}
               >
-                które{" "}
-                {/* słowo-klucz w różu marki (akcent), kropka w kolorze tekstu */}
+                które {/* słowo-klucz w różu marki (akcent), kropka w kolorze tekstu */}
                 <span style={{ color: "var(--color-accent)" }}>sprzedają</span>
                 <span style={{ color: "var(--color-ink)" }}>.</span>
               </motion.span>
@@ -294,18 +295,25 @@ export function Hero() {
                 className="leading-relaxed"
                 style={{
                   fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)",
-                  color:    "var(--color-ink-muted)",
+                  color: "var(--color-ink-muted)",
                   maxWidth: "44ch",
                 }}
               >
-                Projektujemy i wdrażamy strony internetowe dla polskich firm.
-                Od pierwszego szkicu po realne wyniki w sprzedaży.
+                Projektujemy i wdrażamy strony internetowe dla polskich firm. Od pierwszego szkicu
+                po realne wyniki w sprzedaży.
               </p>
             </FadeUp>
 
             {/* CTA — POP: scale 0.9→1 + lekki rise, BACK (overshoot) = motoryka
                 przycisku, wyraźnie inna niż wjazdy tekstu. Domyka kaskadę. */}
-            <FadeUp delay={BASE + 0.08} duration={0.6} ease={EASE.back} y={16} scale={0.9} className="mt-10">
+            <FadeUp
+              delay={BASE + 0.08}
+              duration={0.6}
+              ease={EASE.back}
+              y={16}
+              scale={0.9}
+              className="mt-10"
+            >
               {/* Główne CTA — różowy pill „Darmowa wycena" (kolory jak na inspiracji).
                   hover: subtelny lift + różowa poświata + obrót „+". */}
               <Magnetic strength={0.4}>

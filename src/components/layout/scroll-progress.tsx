@@ -33,10 +33,7 @@ export function ScrollProgress() {
       className="pointer-events-none fixed top-0 right-0 z-[var(--z-scrollbar)] block h-screen w-[2px] sm:w-[3px]"
     >
       {/* tor — ledwo widoczny, neutralny (działa na ciemnym i jasnym) */}
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: "rgba(140,140,140,0.18)" }}
-      />
+      <div className="absolute inset-0" style={{ backgroundColor: "rgba(140,140,140,0.18)" }} />
       {/* wypełnienie — rośnie z góry; kolor adaptuje się do tła sekcji */}
       <motion.div
         className="absolute inset-x-0 top-0 h-full"
@@ -44,8 +41,8 @@ export function ScrollProgress() {
           scaleY: scrollYProgress,
           transformOrigin: "top",
           backgroundColor: fill,
-          transition:      SWITCH,
-          willChange:      "transform",
+          transition: SWITCH,
+          willChange: "transform",
         }}
       />
     </div>

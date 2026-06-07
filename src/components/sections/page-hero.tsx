@@ -45,7 +45,9 @@ export function PageHero({
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: `radial-gradient(ellipse 52% 60% at 90% 0%, ${glow} 0%, transparent 60%)` }}
+        style={{
+          background: `radial-gradient(ellipse 52% 60% at 90% 0%, ${glow} 0%, transparent 60%)`,
+        }}
       />
       {/* Bottom fade into the next (black) section — seamless world */}
       <div

@@ -29,19 +29,19 @@ import { NAV_LINKS, CONTACT, SITE_CONFIG } from "@/lib/constants";
    Kolory KODA: białe tło, ciemny tekst (#0f0f0f), różowe akcenty (#cf43b8).
    ════════════════════════════════════════════════════════════════════ */
 
-export interface Origin { x: number; y: number; }
+export interface Origin {
+  x: number;
+  y: number;
+}
 
 // Pozycje menu = nawigacja + Kontakt (numerowane 01–05)
-const MENU_ITEMS = [
-  ...NAV_LINKS,
-  { label: "Kontakt", href: "/kontakt" },
-] as const;
+const MENU_ITEMS = [...NAV_LINKS, { label: "Kontakt", href: "/kontakt" }] as const;
 
-const DARK  = "#0f0f0f";                 // tekst aktywny
-const DIM   = "rgba(15, 15, 15, 0.16)";  // tekst przygaszony (dim)
-const SLIDE = 40;                        // px — wysunięcie słowa na hover
+const DARK = "#0f0f0f"; // tekst aktywny
+const DIM = "rgba(15, 15, 15, 0.16)"; // tekst przygaszony (dim)
+const SLIDE = 40; // px — wysunięcie słowa na hover
 
-const CIRCLE_R = 30;                     // promień koła bazowego (60px)
+const CIRCLE_R = 30; // promień koła bazowego (60px)
 
 // ── Timing OTWIERANIA vs ZAMYKANIA (asymetryczny — kluczowe dla „czystego" zamknięcia) ──
 // OTWARCIE: białe koło rozszerza się, a treść wjeżdża staggerem PO nim (delayChildren).
@@ -49,17 +49,17 @@ const CIRCLE_R = 30;                     // promień koła bazowego (60px)
 //   gaśnie) — a dopiero potem koło się cofa (ma własny delay, niżej). Inaczej koło
 //   odsłaniało ciemny hero ZANIM zniknął ciemny tekst → tekst „wisiał" (bug z filmiku).
 const content: Variants = {
-  hidden:  {}, // brak orkiestracji → wszystkie dzieci gasną jednocześnie i szybko
+  hidden: {}, // brak orkiestracji → wszystkie dzieci gasną jednocześnie i szybko
   visible: { transition: { staggerChildren: 0.06, delayChildren: 0.22 } },
 };
 
 const fadeItem: Variants = {
-  hidden:  { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE.primary } },
 };
 
 const fadeSide: Variants = {
-  hidden:  { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 6, transition: { duration: 0.15, ease: "easeOut" } },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE.primary } },
 };
 
@@ -107,8 +107,8 @@ export function MenuOverlay({
       if (!root) return [];
       return Array.from(
         root.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        ),
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
       ).filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
     };
 
@@ -116,7 +116,10 @@ export function MenuOverlay({
     const focusTimer = window.setTimeout(() => focusable()[0]?.focus(), 80);
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
       if (e.key !== "Tab") return;
       const items = focusable();
       if (!items.length) return;
@@ -125,7 +128,10 @@ export function MenuOverlay({
       const active = document.activeElement as HTMLElement | null;
       const inside = !!dialogRef.current?.contains(active);
       if (e.shiftKey) {
-        if (!inside || active === first) { e.preventDefault(); last.focus(); }
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
       } else if (!inside || active === last) {
         e.preventDefault();
         first.focus();
@@ -165,23 +171,25 @@ export function MenuOverlay({
       <motion.div
         aria-hidden="true"
         style={{
-          position:        "fixed",
-          left:            cx - CIRCLE_R,
-          top:             cy - CIRCLE_R,
-          width:           CIRCLE_R * 2,
-          height:          CIRCLE_R * 2,
-          borderRadius:    "50%",
+          position: "fixed",
+          left: cx - CIRCLE_R,
+          top: cy - CIRCLE_R,
+          width: CIRCLE_R * 2,
+          height: CIRCLE_R * 2,
+          borderRadius: "50%",
           backgroundColor: "#ffffff",
           transformOrigin: "center",
-          willChange:      "transform",
+          willChange: "transform",
         }}
         initial={false}
         animate={{ scale: open ? scale : 0 }}
-        transition={reduce
-          ? { duration: 0 }
-          // Zamknięcie: koło CZEKA ~0.12s (tekst zdąży zniknąć), POTEM szybko się cofa
-          // → kolejność „najpierw tekst, potem białe tło" (nie odwrotnie).
-          : { duration: open ? 0.7 : 0.45, ease: EASE.primary, delay: open ? 0 : 0.12 }}
+        transition={
+          reduce
+            ? { duration: 0 }
+            : // Zamknięcie: koło CZEKA ~0.12s (tekst zdąży zniknąć), POTEM szybko się cofa
+              // → kolejność „najpierw tekst, potem białe tło" (nie odwrotnie).
+              { duration: open ? 0.7 : 0.45, ease: EASE.primary, delay: open ? 0 : 0.12 }
+        }
       />
 
       {/* ── Treść menu ───────────────────────────────────────────────
@@ -197,25 +205,26 @@ export function MenuOverlay({
         animate={open ? "visible" : "hidden"}
         // Po pełnym zamknięciu zerujemy podświetlenie → następne otwarcie startuje
         // bez stale-hover. (Bez setState-in-effect.)
-        onAnimationComplete={(def) => { if (def === "hidden") setHovered(null); }}
+        onAnimationComplete={(def) => {
+          if (def === "hidden") setHovered(null);
+        }}
       >
         <div className="my-auto grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
-
           {/* LEWA: etykieta MENU + pozycje */}
           <div className="flex items-start gap-5 sm:gap-8">
             <motion.span
               variants={fadeSide}
               aria-hidden="true"
-              className="hidden sm:block shrink-0"
+              className="hidden shrink-0 sm:block"
               style={{
-                fontFamily:    "var(--font-heading)",
-                fontSize:      "11px",
-                fontWeight:    700,
+                fontFamily: "var(--font-heading)",
+                fontSize: "11px",
+                fontWeight: 700,
                 letterSpacing: "0.3em",
-                color:         "rgba(15,15,15,0.3)",
-                writingMode:   "vertical-rl",
-                transform:     "rotate(180deg)",
-                marginTop:     "0.5rem",
+                color: "rgba(15,15,15,0.3)",
+                writingMode: "vertical-rl",
+                transform: "rotate(180deg)",
+                marginTop: "0.5rem",
               }}
             >
               MENU
@@ -241,13 +250,13 @@ export function MenuOverlay({
                           aria-hidden="true"
                           className="absolute"
                           style={{
-                            left:          0,
-                            top:           "0.65em",
-                            fontFamily:    "var(--font-heading)",
-                            fontWeight:    700,
-                            fontSize:      "clamp(10px, 0.9vw, 13px)",
+                            left: 0,
+                            top: "0.65em",
+                            fontFamily: "var(--font-heading)",
+                            fontWeight: 700,
+                            fontSize: "clamp(10px, 0.9vw, 13px)",
                             letterSpacing: "0.05em",
-                            color:         "var(--color-pink)",
+                            color: "var(--color-pink)",
                           }}
                           animate={{ opacity: isHover ? 1 : 0, x: isHover ? 0 : -6 }}
                           transition={{ duration: 0.45, ease: EASE.smooth }}
@@ -259,10 +268,10 @@ export function MenuOverlay({
                         <motion.span
                           className="block"
                           style={{
-                            fontFamily:    "var(--font-heading)",
-                            fontWeight:    800,
-                            fontSize:      "clamp(2.5rem, 7vw, 5.25rem)",
-                            lineHeight:    1.04,
+                            fontFamily: "var(--font-heading)",
+                            fontWeight: 800,
+                            fontSize: "clamp(2.5rem, 7vw, 5.25rem)",
+                            lineHeight: 1.04,
                             letterSpacing: "-0.03em",
                           }}
                           animate={{ x: isHover ? SLIDE : 0, color: dim ? DIM : DARK }}
@@ -290,8 +299,8 @@ export function MenuOverlay({
               className="underline decoration-pink/50 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink"
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize:   "clamp(0.95rem, 1.3vw, 1.15rem)",
-                color:      "#0f0f0f",
+                fontSize: "clamp(0.95rem, 1.3vw, 1.15rem)",
+                color: "#0f0f0f",
               }}
             >
               {CONTACT.email}
@@ -299,27 +308,26 @@ export function MenuOverlay({
             <span
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize:   "0.95rem",
-                color:      "rgba(15,15,15,0.7)",
+                fontSize: "0.95rem",
+                color: "rgba(15,15,15,0.7)",
               }}
             >
               Warszawa, Polska
             </span>
             <span
               style={{
-                fontFamily:    "var(--font-heading)",
-                fontSize:      "10px",
-                fontWeight:    700,
+                fontFamily: "var(--font-heading)",
+                fontSize: "10px",
+                fontWeight: 700,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color:         "rgba(15,15,15,0.3)",
-                marginTop:     "1.25rem",
+                color: "rgba(15,15,15,0.3)",
+                marginTop: "1.25rem",
               }}
             >
               {SITE_CONFIG.url.replace("https://", "")}
             </span>
           </motion.div>
-
         </div>
       </motion.div>
     </div>

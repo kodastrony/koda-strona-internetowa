@@ -21,7 +21,12 @@ interface KodaLogoProps {
  * The dot "." is brand-pink by default, but `dotColor` lets the header turn it
  * white over the pink statement block so it never disappears.
  */
-export function KodaLogo({ width = 108, height = 28, className, dotColor = "#cf43b8" }: KodaLogoProps) {
+export function KodaLogo({
+  width = 108,
+  height = 28,
+  className,
+  dotColor = "#cf43b8",
+}: KodaLogoProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +47,9 @@ export function KodaLogo({ width = 108, height = 28, className, dotColor = "#cf4
         {/* KODA inherits CSS `color` so transitions work on the parent */}
         <tspan fill="currentColor">KODA</tspan>
         {/* dot colour is themable (pink by default, white over pink sections) */}
-        <tspan fill={dotColor} style={{ transition: "fill 500ms cubic-bezier(0.19,1,0.22,1)" }}>.</tspan>
+        <tspan fill={dotColor} style={{ transition: "fill 500ms cubic-bezier(0.19,1,0.22,1)" }}>
+          .
+        </tspan>
       </text>
     </svg>
   );

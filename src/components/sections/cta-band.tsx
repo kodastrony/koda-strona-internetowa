@@ -27,7 +27,10 @@ export function CTABand({
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: "radial-gradient(ellipse 70% 75% at 50% 112%, rgba(207,67,184,0.22) 0%, rgba(207,67,184,0.06) 38%, transparent 68%)" }}
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 75% at 50% 112%, rgba(207,67,184,0.22) 0%, rgba(207,67,184,0.06) 38%, transparent 68%)",
+        }}
       />
       {/* Top fade so it melts out of the section above */}
       <div
@@ -38,7 +41,10 @@ export function CTABand({
 
       <div
         className="container-koda relative z-10 flex flex-col items-center text-center"
-        style={{ paddingTop: "clamp(80px, 11vw, 150px)", paddingBottom: "clamp(80px, 11vw, 150px)" }}
+        style={{
+          paddingTop: "clamp(80px, 11vw, 150px)",
+          paddingBottom: "clamp(80px, 11vw, 150px)",
+        }}
       >
         <FadeUp inView>
           <span className="label-koda mb-6 block">Porozmawiajmy</span>
@@ -71,7 +77,13 @@ export function CTABand({
             {subtitle}
           </p>
         </FadeUp>
-        <FadeUp inView delay={0.2} y={16} scale={0.96} className="mt-10 flex flex-col items-center gap-5">
+        <FadeUp
+          inView
+          delay={0.2}
+          y={16}
+          scale={0.96}
+          className="mt-10 flex flex-col items-center gap-5"
+        >
           <Magnetic strength={0.4}>
             <PillLink
               href="/kontakt"

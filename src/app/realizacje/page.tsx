@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Realizacje",
   description:
     "Wybrane projekty KODA — sklepy internetowe, strony korporacyjne i firmowe oraz platformy B2B dla polskich marek.",
-  alternates: { canonical: "/realizacje" },
+  alternates: { canonical: "/realizacje/" },
 };
 
 export default function RealizacjePage() {

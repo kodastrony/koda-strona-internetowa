@@ -10,62 +10,62 @@
    Full rationale + contrast notes live in /DESIGN.md. */
 @theme {
   /* ── Brand pink + accent ramp (bold accents + the wipe = energy/variety) ── */
-  --color-pink:          #cf43b8;   /* primary brand accent */
-  --color-pink-light:    #ff5ec8;   /* vivid highlight (pop) */
-  --color-pink-bright:   #ff5ec8;   /* the WOW pink — glows, wipes, highlights */
-  --color-pink-lighter:  #FE83C6;
-  --color-pink-soft:     #FFF2F9;
-  --color-accent:        #cf43b8;
+  --color-pink: #cf43b8; /* primary brand accent */
+  --color-pink-light: #ff5ec8; /* vivid highlight (pop) */
+  --color-pink-bright: #ff5ec8; /* the WOW pink — glows, wipes, highlights */
+  --color-pink-lighter: #fe83c6;
+  --color-pink-soft: #fff2f9;
+  --color-accent: #cf43b8;
   --color-accent-bright: #ff5ec8;
-  --color-accent-deep:   #54164b;   /* deep magenta — base of the pink CTA moment */
-  --color-accent-2:      #c44ad0;   /* magenta — variety */
-  --color-accent-3:      #9a63ef;   /* violet  — variety */
-  --color-accent-4:      #6478f0;   /* indigo  — variety */
+  --color-accent-deep: #54164b; /* deep magenta — base of the pink CTA moment */
+  --color-accent-2: #c44ad0; /* magenta — variety */
+  --color-accent-3: #9a63ef; /* violet  — variety */
+  --color-accent-4: #6478f0; /* indigo  — variety */
 
   /* ── Dark world — richer NEUTRAL black + lifted graphite (no tint) ── */
-  --color-bg:            #0b0b0d;   /* base canvas (hero, work)   */
-  --color-bg-deep:       #070709;   /* footer / deepest beats     */
-  --color-graphite:      #141417;   /* section variant (services) */
-  --color-surface-1:     #1a1a1f;   /* cards, raised panels       */
-  --color-surface-2:     #232329;   /* hover / inner panels       */
-  --color-line:          rgba(255,255,255,0.08);  /* hairline borders */
-  --color-line-strong:   rgba(255,255,255,0.15);
+  --color-bg: #0b0b0d; /* base canvas (hero, work)   */
+  --color-bg-deep: #070709; /* footer / deepest beats     */
+  --color-graphite: #141417; /* section variant (services) */
+  --color-surface-1: #1a1a1f; /* cards, raised panels       */
+  --color-surface-2: #232329; /* hover / inner panels       */
+  --color-line: rgba(255, 255, 255, 0.08); /* hairline borders */
+  --color-line-strong: rgba(255, 255, 255, 0.15);
 
   /* Legacy aliases — existing components (bg-dark, text-off-white…) keep working. */
-  --color-dark:          #0b0b0d;
-  --color-dark-2:        #070709;
-  --color-dark-3:        #232329;
-  --color-dark-card:     #1a1a1f;
+  --color-dark: #0b0b0d;
+  --color-dark-2: #070709;
+  --color-dark-3: #232329;
+  --color-dark-card: #1a1a1f;
 
   /* ── Ink — NEUTRAL, brighter muted (kills the "pale" washed-out feel) ── */
-  --color-white:         #ffffff;
-  --color-ink:           #f5f5f7;   /* primary text + headings  */
-  --color-ink-muted:     #b2b2ba;   /* secondary (brighter → not pale, AA) */
-  --color-ink-faint:     #8a8a93;   /* tertiary labels (AA ~5:1 on graphite/bg) */
-  --color-off-white:     #f5f5f7;
-  --color-gray-muted:    #74747d;
+  --color-white: #ffffff;
+  --color-ink: #f5f5f7; /* primary text + headings  */
+  --color-ink-muted: #b2b2ba; /* secondary (brighter → not pale, AA) */
+  --color-ink-faint: #94949d; /* tertiary labels (AA ~5:1 on graphite/bg) */
+  --color-off-white: #f5f5f7;
+  --color-gray-muted: #74747d;
 
   /* KODA Easing curves (derived from Baunfire analysis) */
-  --ease-primary:        cubic-bezier(0.475, 0.425, 0, 0.995);
-  --ease-expo:           cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-quick:          cubic-bezier(0.835, -0.005, 0.06, 1);
-  --ease-smooth:         cubic-bezier(0.63, 0.03, 0.21, 1);
-  --ease-back:           cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-primary: cubic-bezier(0.475, 0.425, 0, 0.995);
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-quick: cubic-bezier(0.835, -0.005, 0.06, 1);
+  --ease-smooth: cubic-bezier(0.63, 0.03, 0.21, 1);
+  --ease-back: cubic-bezier(0.34, 1.4, 0.64, 1);
   /* Emil Kowalski curves — strong, intentional (CSS defaults are too weak) */
-  --ease-out:            cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out:         cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-drawer:         cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* Durations */
-  --duration-fast:       150ms;
-  --duration-base:       300ms;
-  --duration-slow:       600ms;
-  --duration-reveal:     950ms;
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+  --duration-reveal: 950ms;
 
   /* Border radius */
-  --radius-full:         9999px;
-  --radius-card:         16px;
-  --radius-sm:           6px;
+  --radius-full: 9999px;
+  --radius-card: 16px;
+  --radius-sm: 6px;
 }
 
 /* ── Font references (CSS vars injected by next/font in layout.tsx) ──
@@ -76,8 +76,8 @@
    in layout.tsx + the fallback name here. */
 @theme inline {
   --font-heading: var(--font-display), "Geologica", sans-serif;
-  --font-body:    var(--font-inter), "Inter", sans-serif;
-  --font-logo:    var(--font-syne), "Syne", sans-serif;
+  --font-body: var(--font-inter), "Inter", sans-serif;
+  --font-logo: var(--font-syne), "Syne", sans-serif;
 }
 
 /* ── Runtime color mirror ────────────────────────────────────────────
@@ -87,23 +87,23 @@
    var(--color-*) resolves at runtime. Values MUST match the @theme block above
    (single conceptual source; see /DESIGN.md). */
 :root {
-  --color-bg:            #0b0b0d;
-  --color-bg-deep:       #070709;
-  --color-graphite:      #141417;
-  --color-surface-1:     #1a1a1f;
-  --color-surface-2:     #232329;
-  --color-line:          rgba(255,255,255,0.08);
-  --color-line-strong:   rgba(255,255,255,0.15);
-  --color-ink:           #f5f5f7;
-  --color-ink-muted:     #b2b2ba;
-  --color-ink-faint:     #8a8a93;
-  --color-accent:        #cf43b8;
+  --color-bg: #0b0b0d;
+  --color-bg-deep: #070709;
+  --color-graphite: #141417;
+  --color-surface-1: #1a1a1f;
+  --color-surface-2: #232329;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.15);
+  --color-ink: #f5f5f7;
+  --color-ink-muted: #b2b2ba;
+  --color-ink-faint: #94949d;
+  --color-accent: #cf43b8;
   --color-accent-bright: #ff5ec8;
-  --color-accent-deep:   #54164b;
-  --color-accent-2:      #c44ad0;
-  --color-accent-3:      #9a63ef;
-  --color-accent-4:      #6478f0;
-  --color-pink-bright:   #ff5ec8;
+  --color-accent-deep: #54164b;
+  --color-accent-2: #c44ad0;
+  --color-accent-3: #9a63ef;
+  --color-accent-4: #6478f0;
+  --color-pink-bright: #ff5ec8;
 }
 
 /* ── Z-index scale — SINGLE SOURCE OF TRUTH for layering ─────────────
@@ -112,26 +112,32 @@
    across components. Use in JSX via Tailwind arbitrary values:
    `className="z-[var(--z-header)]"`. Within a section, bg = z-0, content = z-10. */
 :root {
-  --z-scrollbar:     60;  /* custom scroll-progress bar (right edge)            */
-  --z-intro:        200;  /* intro overlay (covers hero bg during the entrance) */
-  --z-hero-content: 210;  /* hero text — ABOVE the intro so it reveals mid-sweep */
-  --z-menu:         280;  /* full-screen expanding menu overlay                  */
-  --z-header:       300;  /* header logo + menu button (above menu so X works)   */
-  --z-cursor:       400;  /* custom cursor follower (above everything)           */
+  --z-scrollbar: 60; /* custom scroll-progress bar (right edge)            */
+  --z-intro: 200; /* intro overlay (covers hero bg during the entrance) */
+  --z-hero-content: 210; /* hero text — ABOVE the intro so it reveals mid-sweep */
+  --z-menu: 280; /* full-screen expanding menu overlay                  */
+  --z-header: 300; /* header logo + menu button (above menu so X works)   */
+  --z-cursor: 400; /* custom cursor follower (above everything)           */
 }
 
 /* ── Keyframe animations ─────────────────────────────────────────── */
 /* Reveals/entrances są w motion/react (FadeUp/Reveal) — tu zostaje TYLKO marquee
    (CSS keyframe poza main-threadem). */
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ── Base reset & global styles — inside @layer base so Tailwind ──
    utilities (in @layer utilities) can override these when needed   */
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -144,35 +150,44 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    scrollbar-width: none;     /* Firefox — natywny scrollbar ukryty */
-    -ms-overflow-style: none;  /* legacy Edge */
+    scrollbar-width: none; /* Firefox — natywny scrollbar ukryty */
+    -ms-overflow-style: none; /* legacy Edge */
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after {
-      animation-duration:       0.01ms !important;
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
-      transition-duration:      0.01ms !important;
+      transition-duration: 0.01ms !important;
     }
   }
 
   body {
     background-color: var(--color-dark);
-    color:            var(--color-off-white);
-    font-family:      var(--font-body);
-    font-size:        1.0625rem;  /* 17px */
-    line-height:      1.7;
-    min-height:       100svh;
+    color: var(--color-off-white);
+    font-family: var(--font-body);
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.7;
+    min-height: 100svh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family:    var(--font-heading);
-    font-weight:    600;            /* hierarchy via scale + weight, NOT heaviness */
-    line-height:    1.08;           /* light type on dark needs a touch more air   */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 600; /* hierarchy via scale + weight, NOT heaviness */
+    line-height: 1.08; /* light type on dark needs a touch more air   */
     letter-spacing: -0.02em;
-    color:          var(--color-ink);
-    text-wrap:      balance;
+    color: var(--color-ink);
+    text-wrap: balance;
   }
 
   a {
@@ -180,23 +195,27 @@
     text-decoration: none;
   }
 
-  img, video {
+  img,
+  video {
     max-width: 100%;
     display: block;
   }
 
   ::selection {
     background-color: var(--color-pink);
-    color:            var(--color-white);
+    color: var(--color-white);
   }
 
   /* Natywny scrollbar ukryty — zastępuje go <ScrollProgress> (pasek po prawej). */
-  ::-webkit-scrollbar { width: 0; height: 0; }
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 
   :focus-visible {
-    outline:        2px solid var(--color-pink);
+    outline: 2px solid var(--color-pink);
     outline-offset: 4px;
-    border-radius:  4px;
+    border-radius: 4px;
   }
 }
 
@@ -281,11 +300,21 @@
 
 /* ── Lenis smooth-scroll (darkroomengineering/lenis) ──────────────────── */
 html.lenis,
-html.lenis body            { height: auto; }
-.lenis.lenis-smooth        { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped       { overflow: hidden; }
-.lenis.lenis-smooth iframe { pointer-events: none; }
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
 
 /* ── Layout utilities ─────────────────────────────────────────────── */
 
@@ -304,16 +333,16 @@ html.lenis body            { height: auto; }
    działa w każdej przeglądarce. */
 
 .container-koda {
-  width:         100%;
-  max-width:     1400px;
-  margin-left:   auto;
-  margin-right:  auto;
-  padding-left:  clamp(20px, 5vw, 80px);
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(20px, 5vw, 80px);
   padding-right: clamp(20px, 5vw, 80px);
 }
 
 .section-y {
-  padding-top:    clamp(80px, 10vw, 160px);
+  padding-top: clamp(80px, 10vw, 160px);
   padding-bottom: clamp(80px, 10vw, 160px);
 }
 
@@ -322,45 +351,45 @@ html.lenis body            { height: auto; }
 /* Label / eyebrow — used SPARINGLY (an eyebrow over every section reads as
    AI scaffolding). Refined tracking, pink accent. */
 .label-koda {
-  font-family:    var(--font-heading);
-  font-size:      0.72rem;
-  font-weight:    700;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color:          var(--color-accent);
+  color: var(--color-accent);
 }
 
 /* Display heading — hero scale (capped ≤ ~5.25rem; ls floor ≥ -0.04em) */
 .text-display {
-  font-family:    var(--font-heading);
-  font-size:      clamp(2.5rem, 6vw, 5.25rem);
-  font-weight:    600;
-  line-height:    1.03;
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 6vw, 5.25rem);
+  font-weight: 600;
+  line-height: 1.03;
   letter-spacing: -0.03em;
-  color:          var(--color-ink);
-  text-wrap:      balance;
+  color: var(--color-ink);
+  text-wrap: balance;
 }
 
 /* Section heading */
 .text-section-title {
-  font-family:    var(--font-heading);
-  font-size:      clamp(1.9rem, 4vw, 3.35rem);
-  font-weight:    600;
-  line-height:    1.06;
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 4vw, 3.35rem);
+  font-weight: 600;
+  line-height: 1.06;
   letter-spacing: -0.025em;
-  color:          var(--color-ink);
-  text-wrap:      balance;
+  color: var(--color-ink);
+  text-wrap: balance;
 }
 
 /* Lead paragraph — section intros (caps line length, muted-but-legible ink) */
 .text-lead {
-  font-family:    var(--font-body);
-  font-size:      clamp(1.05rem, 1.35vw, 1.25rem);
-  line-height:    1.55;
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  line-height: 1.55;
   letter-spacing: -0.01em;
-  color:          var(--color-ink-muted);
-  max-width:      58ch;
-  text-wrap:      pretty;
+  color: var(--color-ink-muted);
+  max-width: 58ch;
+  text-wrap: pretty;
 }
 
 /* (custom cursor styles: patrz sekcja „Custom cursor" wyżej) */

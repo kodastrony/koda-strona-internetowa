@@ -3,8 +3,8 @@ import { Contact } from "@/components/sections/contact";
 
 export const metadata: Metadata = {
   title: "Kontakt",
-  description:
-    "Opowiedz nam o swoim projekcie. Projektujemy strony internetowe dla polskich firm.",
+  description: "Opowiedz nam o swoim projekcie. Projektujemy strony internetowe dla polskich firm.",
+  alternates: { canonical: "/kontakt/" },
 };
 
 export default function KontaktPage() {

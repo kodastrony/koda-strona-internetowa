@@ -7,7 +7,35 @@ import { MotionProvider } from "@/components/motion/motion-provider";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
+import { SITE_CONFIG, CONTACT } from "@/lib/constants";
 import "./globals.css";
+
+// Organization + WebSite structured data (JSON-LD) — helps search engines build
+// a knowledge panel and understand the brand. Static, so it ships in every page.
+const ORG_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_CONFIG.url}/#organization`,
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+      email: CONTACT.email,
+      logo: `${SITE_CONFIG.url}/icon.svg`,
+      description: SITE_CONFIG.description,
+      areaServed: "PL",
+      address: { "@type": "PostalAddress", addressLocality: "Warszawa", addressCountry: "PL" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_CONFIG.url}/#website`,
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+      inLanguage: "pl-PL",
+      publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
+    },
+  ],
+};
 
 // HEADING font (--font-heading). Variable grotesk → full weight axis, one file.
 // To try another display font: swap this import + the --font-heading fallback
@@ -86,12 +114,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" className={`${display.variable} ${inter.variable} ${syne.variable}`}>
-      <body className="bg-dark text-off-white font-body antialiased flex flex-col min-h-svh">
+      <body className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+        />
         {/* Skip-to-content — pierwszy element fokusowalny; pozwala pominąć nagłówek
             (logo + menu + CTA) i skoczyć do treści. Ukryty do momentu focusu (Tab). */}
         <a
           href="#main"
-          className="sr-only rounded-full bg-pink px-5 py-3 font-heading text-[13px] font-bold text-white shadow-lg focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[400]"
+          className="sr-only rounded-full bg-pink px-5 py-3 font-heading text-[13px] font-bold text-white shadow-lg focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[400]"
         >
           Przejdź do treści
         </a>
@@ -111,7 +143,9 @@ export default function RootLayout({
             <HeaderThemeProvider>
               <Header />
               <ScrollProgress />
-              <main id="main" className="flex-1">{children}</main>
+              <main id="main" className="flex-1">
+                {children}
+              </main>
               <Footer />
               <CustomCursor />
             </HeaderThemeProvider>

@@ -12,8 +12,7 @@ export default function NotFound() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -52,8 +51,8 @@ export default function NotFound() {
             fontSize: "clamp(0.9rem, 1.1vw, 1rem)",
           }}
         >
-          Strona, której szukasz, mogła zostać przeniesiona lub nigdy nie
-          istniała. Wróćmy na właściwy tor.
+          Strona, której szukasz, mogła zostać przeniesiona lub nigdy nie istniała. Wróćmy na
+          właściwy tor.
         </p>
         <PillLink href="/">Wróć na stronę główną</PillLink>
       </div>

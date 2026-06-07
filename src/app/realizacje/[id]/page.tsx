@@ -11,14 +11,18 @@ export function generateStaticParams() {
   return PROJECTS.map((p) => ({ id: p.id }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
   const project = getProject(id);
   if (!project) return {};
   return {
     title: `${project.title} — ${project.type}`,
     description: project.summary,
-    alternates: { canonical: `/realizacje/${project.id}` },
+    alternates: { canonical: `/realizacje/${project.id}/` },
   };
 }
 

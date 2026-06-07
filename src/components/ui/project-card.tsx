@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "motion/react";
@@ -35,12 +35,21 @@ export function MockWebsite({ accent }: { accent: string }) {
               width: 7,
               height: 7,
               borderRadius: "50%",
-              background: i === 0 ? accent : i === 1 ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)",
+              background:
+                i === 0 ? accent : i === 1 ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)",
               opacity: i === 0 ? 0.75 : 1,
             }}
           />
         ))}
-        <div style={{ flex: 1, height: "38%", borderRadius: 999, background: "rgba(255,255,255,0.05)", marginLeft: "2%" }} />
+        <div
+          style={{
+            flex: 1,
+            height: "38%",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.05)",
+            marginLeft: "2%",
+          }}
+        />
       </div>
 
       {/* Hero block */}
@@ -58,10 +67,42 @@ export function MockWebsite({ accent }: { accent: string }) {
           overflow: "hidden",
         }}
       >
-        <div style={{ height: "8%", width: "70%", borderRadius: 3, background: "rgba(255,255,255,0.16)", marginBottom: "5%" }} />
-        <div style={{ height: "8%", width: "54%", borderRadius: 3, background: "rgba(255,255,255,0.10)", marginBottom: "5%" }} />
-        <div style={{ height: "8%", width: "40%", borderRadius: 3, background: "rgba(255,255,255,0.07)", marginBottom: "9%" }} />
-        <div style={{ height: "15%", width: "28%", borderRadius: 999, background: accent, opacity: 0.58 }} />
+        <div
+          style={{
+            height: "8%",
+            width: "70%",
+            borderRadius: 3,
+            background: "rgba(255,255,255,0.16)",
+            marginBottom: "5%",
+          }}
+        />
+        <div
+          style={{
+            height: "8%",
+            width: "54%",
+            borderRadius: 3,
+            background: "rgba(255,255,255,0.10)",
+            marginBottom: "5%",
+          }}
+        />
+        <div
+          style={{
+            height: "8%",
+            width: "40%",
+            borderRadius: 3,
+            background: "rgba(255,255,255,0.07)",
+            marginBottom: "9%",
+          }}
+        />
+        <div
+          style={{
+            height: "15%",
+            width: "28%",
+            borderRadius: 999,
+            background: accent,
+            opacity: 0.58,
+          }}
+        />
       </div>
 
       {/* Feature cards row */}
@@ -90,8 +131,23 @@ export function MockWebsite({ accent }: { accent: string }) {
               padding: "0 8% 10%",
             }}
           >
-            <div style={{ height: 5, width: "60%", borderRadius: 3, background: "rgba(255,255,255,0.12)", marginBottom: 4 }} />
-            <div style={{ height: 5, width: "80%", borderRadius: 3, background: "rgba(255,255,255,0.07)" }} />
+            <div
+              style={{
+                height: 5,
+                width: "60%",
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.12)",
+                marginBottom: 4,
+              }}
+            />
+            <div
+              style={{
+                height: 5,
+                width: "80%",
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.07)",
+              }}
+            />
           </div>
         ))}
       </div>
@@ -121,20 +177,29 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
   const gx = useTransform(mX, [-0.5, 0.5], ["-22%", "22%"]);
   const gy = useTransform(mY, [-0.5, 0.5], ["-22%", "22%"]);
 
+  // Cache the card's rect so onMove (fires up to ~60×/s) never reads layout per
+  // frame. Refreshed on enter and — while hovered — on scroll/resize, since the
+  // parallax columns move the card under the cursor.
+  const rectRef = useRef<DOMRect | null>(null);
+  const measure = useCallback(() => {
+    rectRef.current = wrapperRef.current?.getBoundingClientRect() ?? null;
+  }, []);
+
   const onMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const r = wrapperRef.current?.getBoundingClientRect();
+      const r = rectRef.current;
       if (!r) return;
       mX.set((e.clientX - r.left) / r.width - 0.5);
       mY.set((e.clientY - r.top) / r.height - 0.5);
     },
-    [mX, mY],
+    [mX, mY]
   );
 
   const onEnter = useCallback(() => {
+    measure();
     setHovered(true);
     scaleVal.set(1.03);
-  }, [scaleVal]);
+  }, [measure, scaleVal]);
   const onLeave = useCallback(() => {
     setHovered(false);
     mX.set(0);
@@ -142,11 +207,36 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
     scaleVal.set(1);
   }, [mX, mY, scaleVal]);
 
+  // Keep the cached rect fresh while hovered (scroll/parallax shifts the card).
+  // Only attached during hover, so there's zero cost when not interacting.
+  useEffect(() => {
+    if (!hovered) return;
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, [hovered, measure]);
+
   return (
     <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>
-      <Link href={`/realizacje/${project.id}`} aria-label={`${project.title} — ${project.type}`} className="block">
-        <div ref={wrapperRef} style={{ perspective: "1000px" }} onMouseMove={onMove} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-          <motion.div style={{ rotateX, rotateY, scale, transformStyle: "preserve-3d" }} className="will-change-transform">
+      <Link
+        href={`/realizacje/${project.id}`}
+        aria-label={`${project.title} — ${project.type}`}
+        className="block"
+      >
+        <div
+          ref={wrapperRef}
+          style={{ perspective: "1000px" }}
+          onMouseMove={onMove}
+          onMouseEnter={onEnter}
+          onMouseLeave={onLeave}
+        >
+          <motion.div
+            style={{ rotateX, rotateY, scale, transformStyle: "preserve-3d" }}
+            className="will-change-transform"
+          >
             <div
               className="relative overflow-hidden rounded-[22px]"
               style={{
@@ -161,7 +251,13 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
                 {project.image && (
-                  <Image src={project.image} alt={`${project.title} — ${project.type}`} fill sizes="(min-width: 768px) 45vw, 90vw" className="object-cover object-top" />
+                  <Image
+                    src={project.image}
+                    alt={`${project.title} — ${project.type}`}
+                    fill
+                    sizes="(min-width: 768px) 45vw, 90vw"
+                    className="object-cover object-top"
+                  />
                 )}
 
                 {/* Ambient glow — softness baked into the gradient (no filter:blur). */}
@@ -186,19 +282,38 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
                 <motion.div
                   className="pointer-events-none absolute inset-0 overflow-hidden"
                   aria-hidden={true}
-                  style={{ opacity: hovered ? 1 : 0, transition: `opacity 450ms ${cssBezier(EASE.expo)}` }}
+                  style={{
+                    opacity: hovered ? 1 : 0,
+                    transition: `opacity 450ms ${cssBezier(EASE.expo)}`,
+                  }}
                 >
-                  <motion.div style={{ position: "absolute", inset: "-25%", x: gx, y: gy, background: "radial-gradient(circle at center, rgba(255,255,255,0.18) 0%, transparent 55%)" }} />
+                  <motion.div
+                    style={{
+                      position: "absolute",
+                      inset: "-25%",
+                      x: gx,
+                      y: gy,
+                      background:
+                        "radial-gradient(circle at center, rgba(255,255,255,0.18) 0%, transparent 55%)",
+                    }}
+                  />
                 </motion.div>
 
                 {/* Legibility gradient */}
                 <div
                   className="pointer-events-none absolute inset-x-0 bottom-0"
-                  style={{ height: "58%", background: "linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.40) 42%, transparent 100%)" }}
+                  style={{
+                    height: "58%",
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.40) 42%, transparent 100%)",
+                  }}
                 />
 
                 {/* Project info */}
-                <div className="absolute right-0 bottom-0 flex flex-col items-end" style={{ padding: "clamp(14px,3vw,28px)" }}>
+                <div
+                  className="absolute right-0 bottom-0 flex flex-col items-end"
+                  style={{ padding: "clamp(14px,3vw,28px)" }}
+                >
                   <h3
                     style={{
                       fontFamily: "var(--font-heading)",

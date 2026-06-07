@@ -37,7 +37,8 @@ export const SERVICES: Service[] = [
     n: "02",
     id: "strony",
     title: "Strony i sklepy",
-    short: "Szybkie, nowoczesne strony i sklepy na solidnym kodzie. Pod Twój biznes, nie pod szablon.",
+    short:
+      "Szybkie, nowoczesne strony i sklepy na solidnym kodzie. Pod Twój biznes, nie pod szablon.",
     lead: "Budujemy na czystym, wydajnym kodzie — nie na ciężkich szablonach. Efekt: strona, która ładuje się błyskawicznie, dobrze wygląda na każdym ekranie i łatwo się rozwija.",
     points: [
       "Strony firmowe, landing page i sklepy",

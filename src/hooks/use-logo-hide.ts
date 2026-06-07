@@ -27,9 +27,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
  *   logo's slot — measuring the element we fade/translate would feed its own
  *   offset back into the test.
  */
-export function useLogoHidden<T extends HTMLElement>(
-  logoRef: RefObject<T | null>,
-): boolean {
+export function useLogoHidden<T extends HTMLElement>(logoRef: RefObject<T | null>): boolean {
   const [hidden, setHidden] = useState(false);
   // Synchronous mirror of the committed state for the listener (no stale closure).
   const hiddenRef = useRef(false);
@@ -48,9 +46,7 @@ export function useLogoHidden<T extends HTMLElement>(
     // refresh from the ResizeObserver — never query on every scroll frame.
     let anchors: HTMLElement[] = [];
     const refreshAnchors = () => {
-      anchors = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-logo-hide-anchor]"),
-      );
+      anchors = Array.from(document.querySelectorAll<HTMLElement>("[data-logo-hide-anchor]"));
     };
 
     const commit = (next: boolean) => {

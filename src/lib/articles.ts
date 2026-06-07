@@ -105,8 +105,7 @@ export const ARTICLES: Article[] = [
   {
     slug: "5-rzeczy-ktore-odstraszaja-klientow",
     title: "5 rzeczy, które odstraszają klientów na Twojej stronie",
-    excerpt:
-      "Najczęstsze błędy, które codziennie kosztują firmy zapytania — i jak je naprawić.",
+    excerpt: "Najczęstsze błędy, które codziennie kosztują firmy zapytania — i jak je naprawić.",
     date: "2026-02-04",
     readMinutes: 5,
     category: "UX",
@@ -154,9 +153,7 @@ export function getArticle(slug: string): Article | undefined {
 }
 
 /** Articles sorted newest-first for the /blog index. */
-export const ARTICLES_BY_DATE: Article[] = [...ARTICLES].sort((a, b) =>
-  a.date < b.date ? 1 : -1,
-);
+export const ARTICLES_BY_DATE: Article[] = [...ARTICLES].sort((a, b) => (a.date < b.date ? 1 : -1));
 
 /** Format an ISO date as a Polish long date, e.g. "22 kwietnia 2026". */
 export function formatArticleDate(iso: string): string {

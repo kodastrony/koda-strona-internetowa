@@ -62,7 +62,12 @@ export function Work() {
   }, []);
 
   return (
-    <section ref={sectionRef} data-header-theme="dark" className="relative overflow-hidden" style={{ backgroundColor: "var(--color-bg)" }}>
+    <section
+      ref={sectionRef}
+      data-header-theme="dark"
+      className="relative overflow-hidden"
+      style={{ backgroundColor: "var(--color-bg)" }}
+    >
       <div className="container-koda section-y">
         {/* ── Section header — title left, context right ── */}
         <div className="mb-[clamp(36px,4.5vw,64px)] flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
@@ -88,7 +93,14 @@ export function Work() {
           </div>
 
           <FadeUp inView delay={0.2} y={18} className="md:max-w-[360px] md:pb-2 md:text-right">
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "clamp(0.95rem, 1.05vw, 1.05rem)", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "clamp(0.95rem, 1.05vw, 1.05rem)",
+                color: "var(--color-ink-muted)",
+                lineHeight: 1.6,
+              }}
+            >
               Projekty, które łączą dopracowany design z realnymi wynikami w sprzedaży.
             </p>
           </FadeUp>
@@ -96,12 +108,20 @@ export function Work() {
 
         {/* ── Two-column staggered grid (kolumny z parallaxem na scroll) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "clamp(20px,2.8vw,36px)" }}>
-          <div ref={colARef} className="flex flex-col" style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}>
+          <div
+            ref={colARef}
+            className="flex flex-col"
+            style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}
+          >
             <ProjectCard project={PROJECTS[0]} delay={0} />
             <ProjectCard project={PROJECTS[2]} delay={0.08} />
           </div>
 
-          <div ref={colBRef} className="work-right-stagger flex flex-col" style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}>
+          <div
+            ref={colBRef}
+            className="work-right-stagger flex flex-col"
+            style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}
+          >
             <ProjectCard project={PROJECTS[1]} delay={0.05} />
             <ProjectCard project={PROJECTS[3]} delay={0.13} />
           </div>
@@ -110,7 +130,12 @@ export function Work() {
         {/* ── View-all CTA — quiet surface pill (pink pill stays the primary CTA) ── */}
         <div style={{ marginTop: "clamp(48px,6vw,84px)" }}>
           <FadeUp inView delay={0.08} className="flex justify-center">
-            <PillLink href="/realizacje" bg="var(--color-surface-1)" border="var(--color-line-strong)" className="px-9 py-4">
+            <PillLink
+              href="/realizacje"
+              bg="var(--color-surface-1)"
+              border="var(--color-line-strong)"
+              className="px-9 py-4"
+            >
               Sprawdź wszystkie realizacje
             </PillLink>
           </FadeUp>

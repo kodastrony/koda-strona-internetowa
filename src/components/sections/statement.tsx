@@ -20,15 +20,21 @@ import { CONTACT } from "@/lib/constants";
    Decorations get their own pop-in + scroll-parallax drift. */
 
 /** Decorative "+" glyph — echoes the hero's plus motif, very low contrast. */
-function Plus({ size = "clamp(26px, 3vw, 48px)", opacity = 0.16 }: { size?: string; opacity?: number }) {
+function Plus({
+  size = "clamp(26px, 3vw, 48px)",
+  opacity = 0.16,
+}: {
+  size?: string;
+  opacity?: number;
+}) {
   return (
     <span
-      className="block select-none leading-none"
+      className="block leading-none select-none"
       style={{
         fontFamily: "var(--font-heading)",
         fontWeight: 400,
-        fontSize:   size,
-        color:      `rgba(255,255,255,${opacity})`,
+        fontSize: size,
+        color: `rgba(255,255,255,${opacity})`,
       }}
     >
       +
@@ -41,23 +47,24 @@ function Plus({ size = "clamp(26px, 3vw, 48px)", opacity = 0.16 }: { size?: stri
  * transforms never collide:
  *  • OUTER wrapper → scroll PARALLAX. A passive scroll listener (in <Statement>)
  *    writes `translate3d(0,Y,0)` straight onto it; `data-parallax` is the px
- *    travel (± flips direction / depth). A CSS `transition: transform` gives the
- *    drift its soft lag. No rAF, no library — works in every browser.
+ *    travel (± flips direction / depth). Reads/writes are coalesced to one rAF
+ *    per frame and the drift is locked to scroll (Lenis smooths it; no CSS
+ *    transition → no rubber-band). Works in every browser.
  *  • INNER motion.div → the ENTRANCE: fade + scale (+ optional rotate) on
  *    `inView`, so each ornament pops in on its own beat just after the pink wipe.
  */
 interface FloatDecorProps {
-  inView:      boolean;
+  inView: boolean;
   /** Parallax travel in px (peak-to-peak ≈ this). Negative drifts the other way. */
-  speed:       number;
-  delay:       number;
-  duration?:   number;
-  scaleFrom?:  number;
+  speed: number;
+  delay: number;
+  duration?: number;
+  scaleFrom?: number;
   rotateFrom?: number;
-  ease?:       Bezier;
-  className?:  string;
-  style?:      React.CSSProperties;
-  children:    React.ReactNode;
+  ease?: Bezier;
+  className?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
 }
 
 function FloatDecor({
@@ -97,12 +104,12 @@ function Ripple({ x, y, onDone }: { x: number; y: number; onDone: () => void }) 
       aria-hidden="true"
       className="pointer-events-none absolute z-[1] rounded-full"
       style={{
-        left:       x,
-        top:        y,
-        width:      24,
-        height:     24,
+        left: x,
+        top: y,
+        width: 24,
+        height: 24,
         marginLeft: -12,
-        marginTop:  -12,
+        marginTop: -12,
         background: "rgba(207,67,184,0.45)",
       }}
       initial={{ scale: 0, opacity: 0.55 }}
@@ -124,12 +131,15 @@ function Ripple({ x, y, onDone }: { x: number; y: number; onDone: () => void }) 
      (0.96) for a tactile press. */
 function QuoteButton({ href, label }: { href: string; label: string }) {
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  // Monotonic counter → every ripple has a guaranteed-unique id (no Date.now()
+  // collision on rapid clicks within the same millisecond).
+  const rippleId = useRef(0);
 
   const spawnRipple = (e: React.PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     setRipples((prev) => [
       ...prev,
-      { id: Date.now() + Math.random(), x: e.clientX - r.left, y: e.clientY - r.top },
+      { id: (rippleId.current += 1), x: e.clientX - r.left, y: e.clientY - r.top },
     ]);
   };
 
@@ -137,7 +147,7 @@ function QuoteButton({ href, label }: { href: string; label: string }) {
   const renderLabel = () => (
     <>
       {label}
-      <span aria-hidden="true" className="text-[22px] font-normal leading-none">
+      <span aria-hidden="true" className="text-[22px] leading-none font-normal">
         +
       </span>
     </>
@@ -146,15 +156,15 @@ function QuoteButton({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="inline-block rounded-full">
       <motion.div
-        className="group relative inline-flex overflow-hidden rounded-full font-heading text-[12px] font-bold uppercase tracking-[0.2em]"
+        className="group relative inline-flex overflow-hidden rounded-full font-heading text-[12px] font-bold tracking-[0.2em] uppercase"
         onPointerDown={spawnRipple}
         whileHover={{ y: -3, boxShadow: "0 24px 52px -14px rgba(15,15,15,0.5)" }}
         whileTap={{ scale: 0.96 }}
         transition={{ type: "spring", stiffness: 420, damping: 24 }}
         style={{
           backgroundColor: "#ffffff",
-          boxShadow:       "0 10px 26px -16px rgba(15,15,15,0.35)",
-          willChange:      "transform",
+          boxShadow: "0 10px 26px -16px rgba(15,15,15,0.35)",
+          willChange: "transform",
         }}
       >
         {/* Click ripples — on the white base, behind the labels */}
@@ -225,7 +235,10 @@ export function Statement() {
     let raf = 0;
     const onScroll = () => {
       if (raf) return;
-      raf = requestAnimationFrame(() => { raf = 0; apply(); });
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        apply();
+      });
     };
 
     apply();
@@ -254,7 +267,8 @@ export function Statement() {
         data-reveal
         className="pointer-events-none absolute inset-0 z-0"
         style={{
-          background: "linear-gradient(150deg, var(--color-accent-deep) 0%, var(--color-accent) 130%)",
+          background:
+            "linear-gradient(150deg, var(--color-accent-deep) 0%, var(--color-accent) 130%)",
           willChange: "clip-path",
         }}
         initial={{ clipPath: "inset(0 100% 0 0)" }}
@@ -272,28 +286,66 @@ export function Statement() {
       </motion.div>
 
       {/* Settle into the footer below */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-44" style={{ background: "linear-gradient(to top, var(--color-bg-deep) 0%, transparent 100%)" }} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-44"
+        style={{ background: "linear-gradient(to top, var(--color-bg-deep) 0%, transparent 100%)" }}
+      />
 
       {/* ── Decorations — own pop-in + scroll-parallax drift (subtle, white on pink) ── */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
-        <FloatDecor inView={inView} speed={-160} delay={0.5} scaleFrom={0.3} rotateFrom={-50} ease={EASE.back} className="hidden md:block" style={{ top: "22%", left: "13%" }}>
+        <FloatDecor
+          inView={inView}
+          speed={-160}
+          delay={0.5}
+          scaleFrom={0.3}
+          rotateFrom={-50}
+          ease={EASE.back}
+          className="hidden md:block"
+          style={{ top: "22%", left: "13%" }}
+        >
           <Plus size="clamp(28px, 3vw, 46px)" opacity={0.32} />
         </FloatDecor>
-        <FloatDecor inView={inView} speed={210} delay={0.62} scaleFrom={0.3} rotateFrom={46} ease={EASE.back} style={{ bottom: "23%", right: "15%" }}>
+        <FloatDecor
+          inView={inView}
+          speed={210}
+          delay={0.62}
+          scaleFrom={0.3}
+          rotateFrom={46}
+          ease={EASE.back}
+          style={{ bottom: "23%", right: "15%" }}
+        >
           <Plus size="clamp(24px, 2.6vw, 40px)" opacity={0.28} />
         </FloatDecor>
-        <FloatDecor inView={inView} speed={-150} delay={0.7} scaleFrom={0.3} rotateFrom={-38} ease={EASE.back} className="hidden md:block" style={{ top: "30%", right: "18%" }}>
+        <FloatDecor
+          inView={inView}
+          speed={-150}
+          delay={0.7}
+          scaleFrom={0.3}
+          rotateFrom={-38}
+          ease={EASE.back}
+          className="hidden md:block"
+          style={{ top: "30%", right: "18%" }}
+        >
           <Plus size="clamp(18px, 2vw, 30px)" opacity={0.24} />
         </FloatDecor>
 
         {/* Faint ring — drifts, adds depth (md+ only) */}
-        <FloatDecor inView={inView} speed={150} delay={0.8} duration={1.0} scaleFrom={0.5} className="hidden md:block" style={{ top: "26%", left: "20%" }}>
+        <FloatDecor
+          inView={inView}
+          speed={150}
+          delay={0.8}
+          duration={1.0}
+          scaleFrom={0.5}
+          className="hidden md:block"
+          style={{ top: "26%", left: "20%" }}
+        >
           <div
             style={{
-              width:        "clamp(80px, 9vw, 140px)",
-              height:       "clamp(80px, 9vw, 140px)",
+              width: "clamp(80px, 9vw, 140px)",
+              height: "clamp(80px, 9vw, 140px)",
               borderRadius: "50%",
-              border:       "1px solid rgba(255,255,255,0.22)",
+              border: "1px solid rgba(255,255,255,0.22)",
             }}
           />
         </FloatDecor>
@@ -304,7 +356,7 @@ export function Statement() {
         ref={ref}
         className="container-koda relative z-10 flex flex-col items-center text-center"
         style={{
-          paddingTop:    "clamp(88px, 16vh, 200px)",
+          paddingTop: "clamp(88px, 16vh, 200px)",
           paddingBottom: "clamp(88px, 16vh, 200px)",
         }}
       >
@@ -313,12 +365,12 @@ export function Statement() {
               not the lettering (pink-on-pink would vanish). */}
           <h2
             style={{
-              fontFamily:    "var(--font-heading)",
-              fontWeight:    600,
-              fontSize:      "clamp(2.1rem, 4.8vw, 3.9rem)",
-              lineHeight:    1.07,
+              fontFamily: "var(--font-heading)",
+              fontWeight: 600,
+              fontSize: "clamp(2.1rem, 4.8vw, 3.9rem)",
+              lineHeight: 1.07,
               letterSpacing: "-0.025em",
-              color:         "#ffffff",
+              color: "#ffffff",
             }}
           >
             {["Zbudujmy stronę,", "która przynosi klientów."].map((line, i) => (
@@ -340,17 +392,18 @@ export function Statement() {
             data-reveal
             className="mx-auto mt-7"
             style={{
-              maxWidth:   "46ch",
+              maxWidth: "46ch",
               fontFamily: "var(--font-body)",
-              fontSize:   "clamp(1rem, 1.2vw, 1.18rem)",
+              fontSize: "clamp(1rem, 1.2vw, 1.18rem)",
               lineHeight: 1.6,
-              color:      "rgba(255,255,255,0.92)",
+              color: "rgba(255,255,255,0.92)",
             }}
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.7, ease: EASE.expo, delay: BASE + 0.34 }}
           >
-            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24 godziny. Bez zobowiązań.
+            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24 godziny.
+            Bez zobowiązań.
           </motion.p>
 
           {/* CTA — the white "Darmowa wycena" pill + a secondary email link */}

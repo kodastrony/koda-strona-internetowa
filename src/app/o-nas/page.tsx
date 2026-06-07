@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "O nas",
   description:
     "KODA to niewielki zespół projektantów i programistów z Polski. Tworzymy szybkie, skuteczne strony dla polskich firm — pod cel, nie pod szablon.",
-  alternates: { canonical: "/o-nas" },
+  alternates: { canonical: "/o-nas/" },
 };
 
 export default function ONasPage() {

@@ -48,13 +48,13 @@ export function HeaderThemeProvider({
     // Odczyt offsetów = wymuszony layout → robimy go RZADKO (mount / resize),
     // nie na każdej klatce scrolla.
     const measure = () => {
-      sections = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-header-theme]"),
-      ).map((s) => ({
-        top: s.offsetTop,
-        bottom: s.offsetTop + s.offsetHeight,
-        theme: (s.dataset.headerTheme as HeaderTheme | undefined) ?? "dark",
-      }));
+      sections = Array.from(document.querySelectorAll<HTMLElement>("[data-header-theme]")).map(
+        (s) => ({
+          top: s.offsetTop,
+          bottom: s.offsetTop + s.offsetHeight,
+          theme: (s.dataset.headerTheme as HeaderTheme | undefined) ?? "dark",
+        })
+      );
     };
 
     let raf = 0;

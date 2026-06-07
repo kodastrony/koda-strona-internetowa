@@ -33,9 +33,9 @@ import { introHasPlayed, markIntroPlayed } from "@/lib/intro-state";
    Linia B (tekst P→L): róż zdejmowany clip inset(0 0%→100% 0 0), linear.
    ════════════════════════════════════════════════════════════════════ */
 
-const PINK      = "var(--color-pink)";  // #cf43b8
-const DARK_BG   = "var(--color-dark)";  // #0b0b0d — końcowe tło (= hero/kanwa)
-const KODA_GRAY = "#1c1c1c";            // kolor KODA w hero.tsx też
+const PINK = "var(--color-pink)"; // #cf43b8
+const DARK_BG = "var(--color-dark)"; // #0b0b0d — końcowe tło (= hero/kanwa)
+const KODA_GRAY = "#1c1c1c"; // kolor KODA w hero.tsx też
 
 // easeOutQuart — gładkie, spokojne wyhamowanie reveala liter (bez overshootu)
 const REVEAL: [number, number, number, number] = [0.25, 1, 0.5, 1];
@@ -45,12 +45,12 @@ const LETTERS = ["K", "O", "D", "A"] as const;
 // Styl jednej litery — IDENTYCZNY w obu warstwach i w hero (bezszwowy handoff).
 // Brand "KODA" = logo at scale → logo font (Syne), spójne z headerem.
 const letterStyle: React.CSSProperties = {
-  fontFamily:    "var(--font-logo)",
-  fontWeight:    800,
-  fontSize:      "clamp(160px, 21vw, 340px)",
+  fontFamily: "var(--font-logo)",
+  fontWeight: 800,
+  fontSize: "clamp(160px, 21vw, 340px)",
   letterSpacing: "-0.04em",
-  lineHeight:    0.9,
-  color:         "inherit",
+  lineHeight: 0.9,
+  color: "inherit",
 };
 
 // Lewa krawędź = ta sama co right:19% + width:clamp w hero → róż i baza mają
@@ -64,7 +64,7 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 export function IntroAnimation() {
   const [scope, animate] = useAnimate();
 
-  const bgRef   = useRef<HTMLDivElement>(null); // Linia A — ciemny panel (scaleX)
+  const bgRef = useRef<HTMLDivElement>(null); // Linia A — ciemny panel (scaleX)
   const baseRef = useRef<HTMLDivElement>(null); // BAZA — KODA #1c1c1c (pełna)
   const pinkRef = useRef<HTMLDivElement>(null); // RÓŻ — litery (reveal + clip P→L)
 
@@ -87,10 +87,7 @@ export function IntroAnimation() {
     const run = async () => {
       // Skip (replay-guard po SPA-nawigacji / reduced-motion). Wewnątrz async,
       // NIE w ciele efektu → SSR-safe i bez react-hooks/set-state-in-effect.
-      if (
-        introHasPlayed() ||
-        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-      ) {
+      if (introHasPlayed() || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
         markIntroPlayed();
         setDone(true);
         return;
@@ -98,13 +95,17 @@ export function IntroAnimation() {
 
       if (!scope.current || !bgRef.current || !baseRef.current || !pinkRef.current) return;
 
-      const bgEl    = bgRef.current!;
-      const baseEl  = baseRef.current!;
-      const pinkEl  = pinkRef.current!;
+      const bgEl = bgRef.current!;
+      const baseEl = baseRef.current!;
+      const pinkEl = pinkRef.current!;
       const overlay = scope.current!;
 
       // ── PHASE 0: czcionka gotowa (poprawne glify od razu) ────────────
-      try { await Promise.race([document.fonts.ready, wait(150)]); } catch { /* noop */ }
+      try {
+        await Promise.race([document.fonts.ready, wait(300)]);
+      } catch {
+        /* noop */
+      }
       if (cancelled) return;
       await wait(30); // jedna klatka — stan początkowy zdąży się namalować
       if (cancelled) return;
@@ -114,7 +115,7 @@ export function IntroAnimation() {
       await animate(
         "[data-pink-letter]",
         { opacity: [0, 1], y: ["50%", "0%"] },
-        { duration: 0.85, ease: REVEAL, delay: stagger(0.14) },
+        { duration: 0.85, ease: REVEAL, delay: stagger(0.14) }
       );
       if (cancelled) return;
       await wait(100); // krótki oddech — widz rejestruje logo
@@ -128,7 +129,7 @@ export function IntroAnimation() {
         animate(
           pinkEl,
           { clipPath: ["inset(0% 0% 0% 0%)", "inset(0% 100% 0% 0%)"] },
-          { duration: 0.85, ease: "linear" },
+          { duration: 0.85, ease: "linear" }
         ),
       ]);
       if (cancelled) return;
@@ -156,14 +157,17 @@ export function IntroAnimation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const skip = () => { markIntroPlayed(); setDone(true); };
+  const skip = () => {
+    markIntroPlayed();
+    setDone(true);
+  };
   if (done) return null;
 
   return (
     <div
       ref={scope}
       data-intro
-      className="absolute left-0 top-0 z-[var(--z-intro)] h-svh w-full overflow-hidden"
+      className="absolute top-0 left-0 z-[var(--z-intro)] h-svh w-full overflow-hidden"
       onClick={skip}
       style={{ cursor: "pointer" }}
       aria-hidden="true"
@@ -177,9 +181,9 @@ export function IntroAnimation() {
         className="absolute inset-0"
         style={{
           backgroundColor: DARK_BG,
-          transform:       "scaleX(0)",
+          transform: "scaleX(0)",
           transformOrigin: "left center",
-          willChange:      "transform",
+          willChange: "transform",
         }}
       />
 
@@ -190,17 +194,21 @@ export function IntroAnimation() {
         className="select-none"
         style={{
           position: "absolute",
-          top:      0,
-          right:    "19%",
-          width:    "clamp(160px, 21vw, 340px)",
-          color:    KODA_GRAY,
-          opacity:  0,
+          top: 0,
+          right: "19%",
+          width: "clamp(160px, 21vw, 340px)",
+          color: KODA_GRAY,
+          opacity: 0,
           pointerEvents: "none",
-          y:        kodaY,
+          y: kodaY,
           willChange: "transform",
         }}
       >
-        {LETTERS.map((l) => <div key={l} style={letterStyle}>{l}</div>)}
+        {LETTERS.map((l) => (
+          <div key={l} style={letterStyle}>
+            {l}
+          </div>
+        ))}
       </motion.div>
 
       {/* L3 — RÓŻ: KODA #cf43b8 — litery zapełniają się (Phase 1), potem
@@ -210,21 +218,26 @@ export function IntroAnimation() {
         ref={pinkRef}
         className="select-none"
         style={{
-          position:      "absolute",
-          top:           0,
-          left:          KODA_LEFT,
-          width:         "max-content",
-          color:         PINK,
-          willChange:    "transform, clip-path",
+          position: "absolute",
+          top: 0,
+          left: KODA_LEFT,
+          width: "max-content",
+          color: PINK,
+          willChange: "transform, clip-path",
           pointerEvents: "none",
-          y:             kodaY,
+          y: kodaY,
         }}
       >
         {LETTERS.map((l) => (
           <div
             key={l}
             data-pink-letter
-            style={{ ...letterStyle, opacity: 0, transform: "translateY(50%)", willChange: "transform, opacity" }}
+            style={{
+              ...letterStyle,
+              opacity: 0,
+              transform: "translateY(50%)",
+              willChange: "transform, opacity",
+            }}
           >
             {l}
           </div>
