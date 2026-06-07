@@ -36,7 +36,7 @@ export function PillLink({
       className={cn(
         "group inline-flex items-center gap-5 rounded-full px-8 py-4",
         "font-heading text-[11px] font-bold uppercase tracking-[0.18em]",
-        "text-white/60 transition-all duration-500 hover:text-white",
+        "text-white/60 transition-[color,transform,box-shadow] duration-300 hover:text-white active:scale-[0.97]",
         className,
       )}
       style={{
@@ -48,7 +48,7 @@ export function PillLink({
       {children}
       <span
         aria-hidden="true"
-        className="text-xl font-light leading-none transition-transform duration-500 group-hover:rotate-45"
+        className="text-xl font-normal leading-none transition-transform duration-500 group-hover:rotate-45"
         style={{ transitionTimingFunction: EXPO }}
       >
         +

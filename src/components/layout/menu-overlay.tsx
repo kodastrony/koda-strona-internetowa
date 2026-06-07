@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import { EASE } from "@/lib/motion";
 import { NAV_LINKS, CONTACT, SITE_CONFIG } from "@/lib/constants";
@@ -67,13 +67,17 @@ export function MenuOverlay({
   open,
   origin,
   onClose,
+  triggerRef,
 }: {
   open: boolean;
   origin: Origin | null;
   onClose: () => void;
+  /** Element to return focus to on close (the hamburger button). */
+  triggerRef?: RefObject<HTMLElement | null>;
 }) {
   const reduce = useReducedMotion();
   const [hovered, setHovered] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   // Promień koła pokrywającego cały viewport z pozycji przycisku — DERIVED
   // (useMemo, nie setState w efekcie). SSR-safe: bez window/origin → 1.
@@ -84,20 +88,59 @@ export function MenuOverlay({
     return (Math.hypot(dx, dy) / CIRCLE_R) * 1.08;
   }, [origin]);
 
-  // Blokada scrolla + Esc — TYLKO gdy otwarte. Klucz `open` jest teraz
-  // zmieniany rzadko i czysto (overlay zawsze zamontowany, brak wyścigu
-  // montowania), więc lock/unlock zawsze trzymają się stanu.
+  // Blokada scrolla + Esc + FOCUS MANAGEMENT (modal a11y) — TYLKO gdy otwarte.
+  // aria-modal="true" obiecuje pełnoprawny modal: po otwarciu przenosimy focus do
+  // środka (1. pozycja), Tab/Shift+Tab krąży WEWNĄTRZ dialogu (trap, by nie zejść
+  // na zasłoniętą stronę), a po zamknięciu focus wraca na przycisk hamburgera.
+  // `open` zmienia się rzadko i czysto (overlay zawsze zamontowany), a onClose/
+  // triggerRef są stabilne (useCallback/ref w header) → efekt nie re-fokusuje w kółko.
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    // Trigger (hamburger) jest stabilny i nie odmontowuje się — kopiujemy referencję
+    // teraz, by użyć jej w cleanupie (i uciszyć react-hooks/exhaustive-deps).
+    const trigger = triggerRef?.current ?? null;
+
+    const focusable = (): HTMLElement[] => {
+      const root = dialogRef.current;
+      if (!root) return [];
+      return Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
+    };
+
+    // Po otwarciu (gdy treść jest już interaktywna) przenieś focus na 1. pozycję.
+    const focusTimer = window.setTimeout(() => focusable()[0]?.focus(), 80);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const items = focusable();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const inside = !!dialogRef.current?.contains(active);
+      if (e.shiftKey) {
+        if (!inside || active === first) { e.preventDefault(); last.focus(); }
+      } else if (!inside || active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener("keydown", onKey);
+
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
+      window.clearTimeout(focusTimer);
+      // Powrót focusu na trigger (hamburger) — keyboard user nie zostaje „w pustce".
+      trigger?.focus();
     };
-  }, [open, onClose]);
+  }, [open, onClose, triggerRef]);
 
   // Pozycja koła: środek przycisku (origin). Zanim user pierwszy raz otworzy
   // menu origin jest null → chowamy koło daleko poza ekran (i tak ma scale 0).
@@ -108,6 +151,7 @@ export function MenuOverlay({
     // Zawsze zamontowany. Zamknięty = przezroczysty dla zdarzeń + inert (poza
     // dostępnością/tabulacją). data-menu → noscript chowa go bez JS (fail-open).
     <div
+      ref={dialogRef}
       data-menu
       className="fixed inset-0 z-[var(--z-menu)]"
       role="dialog"
@@ -140,10 +184,14 @@ export function MenuOverlay({
           : { duration: open ? 0.7 : 0.45, ease: EASE.primary, delay: open ? 0 : 0.12 }}
       />
 
-      {/* ── Treść menu ───────────────────────────────────────────── */}
+      {/* ── Treść menu ───────────────────────────────────────────────
+          overflow-y-auto + my-auto: na wysokich ekranach treść jest wyśrodkowana,
+          na niskich/landscape SCROLLUJE się (margin:auto nie ucina góry jak
+          justify-center). data-lenis-prevent → Lenis nie przejmuje kółka tutaj. */}
       <motion.div
-        className="container-koda relative flex h-full flex-col justify-center"
-        style={{ paddingTop: 130, paddingBottom: 40 }}
+        data-lenis-prevent
+        className="container-koda relative flex h-full flex-col overflow-y-auto"
+        style={{ paddingTop: "clamp(96px, 14vw, 130px)", paddingBottom: "clamp(32px, 6vw, 48px)" }}
         variants={content}
         initial={false}
         animate={open ? "visible" : "hidden"}
@@ -151,7 +199,7 @@ export function MenuOverlay({
         // bez stale-hover. (Bez setState-in-effect.)
         onAnimationComplete={(def) => { if (def === "hidden") setHovered(null); }}
       >
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
+        <div className="my-auto grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
 
           {/* LEWA: etykieta MENU + pozycje */}
           <div className="flex items-start gap-5 sm:gap-8">
@@ -235,13 +283,15 @@ export function MenuOverlay({
             variants={fadeSide}
             className="flex flex-col gap-3 lg:items-end lg:text-right"
           >
+            {/* Ciemny ink (AA na bieli) + RÓŻOWE podkreślenie jako akcent marki —
+                pink-jako-tekst na bieli dawał 4.08:1 (<AA). */}
             <a
               href={`mailto:${CONTACT.email}`}
-              className="transition-colors duration-300"
+              className="underline decoration-pink/50 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink"
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize:   "clamp(0.95rem, 1.3vw, 1.15rem)",
-                color:      "var(--color-pink)",
+                color:      "#0f0f0f",
               }}
             >
               {CONTACT.email}
@@ -250,7 +300,7 @@ export function MenuOverlay({
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize:   "0.95rem",
-                color:      "rgba(15,15,15,0.55)",
+                color:      "rgba(15,15,15,0.7)",
               }}
             >
               Warszawa, Polska

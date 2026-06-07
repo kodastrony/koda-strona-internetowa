@@ -34,6 +34,12 @@ export const EASE = {
   crossing: [0, 0, 0.47, 1]          as Bezier,
   /** gentle overshoot ("back") — for playful pop-in of buttons / CTAs. */
   back:     [0.34, 1.4, 0.64, 1]     as Bezier,
+  /** Emil Kowalski's strong ease-out — entrances/reveals (punchy, responsive). */
+  out:      [0.23, 1, 0.32, 1]       as Bezier,
+  /** Emil's strong ease-in-out — on-screen movement / morphing / wipes. */
+  inOut:    [0.77, 0, 0.175, 1]      as Bezier,
+  /** iOS-like "drawer" curve (Ionic) — buttery section/panel motion. */
+  drawer:   [0.32, 0.72, 0, 1]       as Bezier,
 } as const;
 
 /**

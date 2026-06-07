@@ -1,0 +1,87 @@
+# ── KODA Studio — Apache configuration (OVH shared hosting) ────────────────
+# This file is copied verbatim into out/ during `next build` (static export),
+# then uploaded to OVH www/ via FTP. All directives apply to the document root.
+
+# ── HTTPS redirect ──────────────────────────────────────────────────────────
+# Force every HTTP request to HTTPS. OVH shared hosting has SSL enabled via
+# the control panel; this ensures the redirect is enforced at the app level too.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ── Security headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # Prevent MIME-type sniffing (e.g. serving JS as text/html).
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Disallow embedding in frames (clickjacking protection).
+  # Redundant with frame-ancestors in CSP, but kept for older browser support.
+  Header always set X-Frame-Options "DENY"
+
+  # Send full URL to same-origin, only origin to cross-origin HTTPS, nothing to HTTP.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Restrict access to sensitive browser APIs — this site uses none of them.
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+  # HSTS — enforce HTTPS for 1 year. Add includeSubDomains / preload only after
+  # verifying ALL subdomains are HTTPS-ready.
+  Header always set Strict-Transport-Security "max-age=31536000"
+
+  # Content-Security-Policy — tailored to KODA's static Next.js export:
+  #   • script-src: 'unsafe-inline' needed for Next.js hydration JSON blobs
+  #     (__NEXT_DATA__) and dynamic chunk imports in the static export.
+  #   • style-src: 'unsafe-inline' needed because Framer Motion applies animation
+  #     state as inline `style` attributes (cannot be hashed).
+  #   • form-action: includes formsubmit.co — the lead form does a native multipart
+  #     POST there (FormSubmit handles email + file attachment). Native POST is
+  #     governed by form-action (not connect-src), so connect-src stays 'self'.
+  #   • object-src/frame-src 'none': the site embeds no plugins or iframes.
+  #   • frame-ancestors 'none' replaces X-Frame-Options for CSP-aware browsers.
+  Header always set Content-Security-Policy "\
+default-src 'self'; \
+script-src 'self' 'unsafe-inline'; \
+style-src 'self' 'unsafe-inline'; \
+img-src 'self' data:; \
+font-src 'self'; \
+connect-src 'self'; \
+object-src 'none'; \
+frame-src 'none'; \
+frame-ancestors 'none'; \
+base-uri 'self'; \
+form-action 'self' https://formsubmit.co"
+</IfModule>
+
+# ── Custom error documents ───────────────────────────────────────────────────
+# Next.js static export generates out/404.html; Apache uses it for any 404.
+ErrorDocument 404 /404.html
+
+# ── Caching ──────────────────────────────────────────────────────────────────
+# Next.js content-hashes its JS/CSS chunks (e.g. _next/static/chunks/abc123.js),
+# so it's safe to cache them for a full year. HTML pages are NOT hashed and must
+# be revalidated on each visit so users always get the latest deploy.
+<IfModule mod_headers.c>
+  # Immutable assets — hashed filenames, safe to cache forever.
+  <FilesMatch "\.(js|css|woff2?|ttf|eot|ico|png|jpg|jpeg|webp|avif|svg)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # HTML pages — revalidate on every request.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  # Metadata files — cache for 1 day (robots.txt / sitemap.xml rarely change).
+  <FilesMatch "(robots\.txt|sitemap\.xml)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>
+
+# ── Compression (gzip) ───────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript
+  AddOutputFilterByType DEFLATE application/json text/xml image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2 font/woff
+</IfModule>

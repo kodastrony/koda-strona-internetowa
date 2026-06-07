@@ -21,7 +21,7 @@ export function Footer() {
             >
               <KodaLogo width={100} height={26} />
             </Link>
-            <p className="text-sm text-gray-muted leading-relaxed max-w-xs">
+            <p className="text-sm text-ink-muted leading-relaxed max-w-xs">
               {SITE_CONFIG.description}
             </p>
           </div>
@@ -34,7 +34,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-muted hover:text-white transition-colors duration-300"
+                    className="text-sm text-ink-muted hover:text-white transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -48,18 +48,18 @@ export function Footer() {
             <p className="label-koda">Kontakt</p>
             <a
               href={`mailto:${CONTACT.email}`}
-              className="text-sm text-gray-muted hover:text-pink transition-colors duration-300"
+              className="text-sm text-ink-muted hover:text-pink transition-colors duration-300"
             >
               {CONTACT.email}
             </a>
-            <p className="text-sm text-gray-muted">
+            <p className="text-sm text-ink-muted">
               Warszawa, Polska
             </p>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-gray-muted">
+        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-ink-muted">
           <span>© {year} KODA. Wszelkie prawa zastrzeżone.</span>
           <div className="flex gap-6">
             <Link href="/polityka-prywatnosci" className="hover:text-white transition-colors">

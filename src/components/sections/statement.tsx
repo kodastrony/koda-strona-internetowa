@@ -5,34 +5,19 @@ import Link from "next/link";
 import { motion, useInView } from "motion/react";
 import { cn } from "@/lib/utils";
 import { EASE, type Bezier } from "@/lib/motion";
+import { Magnetic } from "@/components/motion/magnetic";
+import { CONTACT } from "@/lib/constants";
 
-/* ── Pink statement block (Baunfire "we are a digital agency" — KODA-pink) ──
-   Full-bleed manifesto panel. Mirrors baunfire's red statement section:
-   wide-tracked eyebrow, one big bold sentence, halftone dot cluster top-right.
-   Swaps baunfire's red (#E93428) for KODA's brand pink (#cf43b8) and adds a
-   contact CTA (not in the original — a deliberate conversion touch).
+/* ── Final CTA "moment" — the conversion climax before the footer ──────────
+   NOT a full-bleed pink slab (that was the old flashbang). Instead the brand
+   pink SWELLS out of the dark world as a soft bloom and settles back into it,
+   so the section emerges from and returns to the same canvas as everything
+   above: one world, no hard seam. A centered headline + a risk-reducer line +
+   the white "Darmowa wycena" pill (the QuoteButton) close the page.
 
-   ENTRANCE (one coordinated moment, driven by a single `useInView`):
-   • the pink panel WIPES in left→right via pure translateX (GPU transform —
-     height-independent, no clip-path repaint, no layout gap). It paints over a
-     #f7f7f7 backdrop that matches the Work section above, so the pre-reveal
-     state is seamless (never a dark/empty seam) and the wipe reads as the pink
-     "painting itself in" — a clean, solid edge (no glow/blur = no smeary seam).
-   • the text cascades on top: eyebrow slides from the left, the sentence reveals
-     line-by-line (clip wipe), the CTA pops (back-ease). Delays are staggered so
-     each element lands just after the pink has covered its area. */
-
-const PINK_GRADIENT =
-  "linear-gradient(145deg, #c23ba9 0%, #cf43b8 50%, #d44ec1 100%)";
-
-// The statement, split into reveal "beats" (each wraps naturally on mobile).
-// A parallel triad — budują / przyciągają / zwiększają — mirrors baunfire's
-// "drive traffic, engagement, and conversion" rhythm.
-const STATEMENT = [
-  "Tworzymy strony internetowe,",
-  "które budują zaufanie, przyciągają klientów",
-  "i realnie zwiększają sprzedaż polskich marek.",
-] as const;
+   ENTRANCE (one coordinated beat, driven by a single `useInView`): the bloom
+   scales/fades up while the copy cascades (headline clip-reveal → sub → CTA pop).
+   Decorations get their own pop-in + scroll-parallax drift. */
 
 /** Decorative "+" glyph — echoes the hero's plus motif, very low contrast. */
 function Plus({ size = "clamp(26px, 3vw, 48px)", opacity = 0.16 }: { size?: string; opacity?: number }) {
@@ -41,7 +26,7 @@ function Plus({ size = "clamp(26px, 3vw, 48px)", opacity = 0.16 }: { size?: stri
       className="block select-none leading-none"
       style={{
         fontFamily: "var(--font-heading)",
-        fontWeight: 300,
+        fontWeight: 400,
         fontSize:   size,
         color:      `rgba(255,255,255,${opacity})`,
       }}
@@ -50,9 +35,6 @@ function Plus({ size = "clamp(26px, 3vw, 48px)", opacity = 0.16 }: { size?: stri
     </span>
   );
 }
-
-/** Smooth easing for the scroll-driven parallax drift (the soft "breathing" lag). */
-const DRIFT_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 /**
  * A decorative ornament with TWO independent motions on TWO elements, so their
@@ -94,7 +76,7 @@ function FloatDecor({
     <div
       data-parallax={speed}
       className={cn("absolute", className)}
-      style={{ transition: `transform 0.35s ${DRIFT_EASE}`, willChange: "transform", ...style }}
+      style={{ willChange: "transform", ...style }}
     >
       <motion.div
         data-reveal
@@ -155,7 +137,7 @@ function QuoteButton({ href, label }: { href: string; label: string }) {
   const renderLabel = () => (
     <>
       {label}
-      <span aria-hidden="true" className="text-[22px] font-light leading-none">
+      <span aria-hidden="true" className="text-[22px] font-normal leading-none">
         +
       </span>
     </>
@@ -205,22 +187,19 @@ function QuoteButton({ href, label }: { href: string; label: string }) {
 }
 
 export function Statement() {
-  // Single trigger for the whole entrance — fires when the content is ~20% into
-  // view, so the pink wipe and the text cascade read as ONE moment the user is
-  // actually looking at (the section is tall; centring the trigger on the copy
-  // keeps block + text in sync instead of the panel wiping while off-screen).
+  // Single trigger orchestrates the whole "moment": the pink bloom swells while
+  // the copy cascades, as ONE beat the user is actually looking at.
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-20% 0px -20% 0px" });
+  const inView = useInView(ref, { once: true, margin: "-18% 0px -18% 0px" });
 
-  // Content lands just after the pink edge has swept past the left margin.
-  const BASE = 0.32;
+  // Content lands as the pink wipe sweeps across (wipe ≈ 1.15s; centre ≈ 0.55s).
+  const BASE = 0.45;
 
   // ── Decoration parallax ────────────────────────────────────────────────
   // A passive scroll listener drives every `[data-parallax]` ornament: as the
-  // section travels through the viewport it writes `translate3d(0,Y,0)` directly
-  // (the CSS `transition: transform` on each one smooths the drift). Direct DOM
-  // writes + CSS transition are bulletproof across browsers (rAF/spring stall in
-  // headless tools). Skipped entirely for reduced-motion users.
+  // section travels through the viewport it writes `translate3d(0,Y,0)` directly,
+  // locked to scroll (no CSS transition → no rubber-band; Lenis already smooths the
+  // scroll). Reads/writes are coalesced to one rAF per frame. Skipped for reduced-motion.
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const section = sectionRef.current;
@@ -243,11 +222,18 @@ export function Statement() {
       }
     };
 
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; apply(); });
+    };
+
     apply();
-    window.addEventListener("scroll", apply, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", apply);
     return () => {
-      window.removeEventListener("scroll", apply);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", apply);
     };
   }, []);
@@ -256,170 +242,134 @@ export function Statement() {
     <section
       ref={sectionRef}
       data-header-theme="pink"
-      className="relative isolate flex min-h-svh flex-col overflow-hidden"
-      style={{ backgroundColor: "#f7f7f7" }}
+      className="relative isolate flex min-h-[78svh] flex-col items-center justify-center overflow-hidden"
+      style={{ backgroundColor: "var(--color-bg)" }}
     >
-      {/* ── Pink panel — wipes in left→right (pure transform, GPU) ───────── */}
+      {/* ── Pink WIPE — the signature left→right reveal (the one the owner liked).
+          The section starts dark (continuous with the black above); as it enters
+          view the pink gradient PAINTS ITSELF IN from the left via an animating
+          clip-path on a strong ease-out. ───────────────────────────────────── */}
       <motion.div
         aria-hidden="true"
         data-reveal
-        className="absolute inset-0 z-0 will-change-transform"
-        style={{ background: PINK_GRADIENT }}
-        initial={{ x: "-100%" }}
-        animate={{ x: inView ? "0%" : "-100%" }}
-        transition={{ duration: 1.2, ease: EASE.smooth }}
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background: "linear-gradient(150deg, var(--color-accent-deep) 0%, var(--color-accent) 130%)",
+          willChange: "clip-path",
+        }}
+        initial={{ clipPath: "inset(0 100% 0 0)" }}
+        animate={inView ? { clipPath: "inset(0 0% 0 0)" } : undefined}
+        transition={{ duration: 1.15, ease: EASE.out }}
       >
-        {/* Faint full-bleed dot texture (revealed with the pink) */}
+        {/* dot texture rides in with the pink */}
         <div
-          aria-hidden="true"
           className="absolute inset-0"
           style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)",
-            backgroundSize: "46px 46px",
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+            backgroundSize: "42px 42px",
           }}
         />
-
       </motion.div>
 
-      {/* ── Decorations — each ornament gets its OWN pop-in entrance + a smooth
-          scroll-parallax drift (varied speeds & directions = depth). Own layer,
-          ABOVE the pink panel, BELOW the content. ─────────────────────────── */}
+      {/* Settle into the footer below */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-44" style={{ background: "linear-gradient(to top, var(--color-bg-deep) 0%, transparent 100%)" }} />
+
+      {/* ── Decorations — own pop-in + scroll-parallax drift (subtle, white on pink) ── */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
-        {/* Halftone dot cluster — top-right (baunfire); fades + scales in, drifts up */}
-        <FloatDecor
-          inView={inView}
-          speed={120}
-          delay={0.5}
-          duration={1.0}
-          scaleFrom={0.86}
-          className="hidden md:block"
-          style={{ top: "clamp(96px, 13vh, 170px)", right: "clamp(28px, 5vw, 96px)" }}
-        >
-          <div
-            style={{
-              width:           280,
-              height:          250,
-              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.34) 1.5px, transparent 1.8px)",
-              backgroundSize:  "18px 18px",
-              WebkitMaskImage: "radial-gradient(circle at 82% 16%, #000 0%, transparent 64%)",
-              maskImage:       "radial-gradient(circle at 82% 16%, #000 0%, transparent 64%)",
-            }}
-          />
+        <FloatDecor inView={inView} speed={-160} delay={0.5} scaleFrom={0.3} rotateFrom={-50} ease={EASE.back} className="hidden md:block" style={{ top: "22%", left: "13%" }}>
+          <Plus size="clamp(28px, 3vw, 46px)" opacity={0.32} />
+        </FloatDecor>
+        <FloatDecor inView={inView} speed={210} delay={0.62} scaleFrom={0.3} rotateFrom={46} ease={EASE.back} style={{ bottom: "23%", right: "15%" }}>
+          <Plus size="clamp(24px, 2.6vw, 40px)" opacity={0.28} />
+        </FloatDecor>
+        <FloatDecor inView={inView} speed={-150} delay={0.7} scaleFrom={0.3} rotateFrom={-38} ease={EASE.back} className="hidden md:block" style={{ top: "30%", right: "18%" }}>
+          <Plus size="clamp(18px, 2vw, 30px)" opacity={0.24} />
         </FloatDecor>
 
-        {/* Plus marks — pop in with a little rotation (back-ease), drift at depth.
-            The right/top two would cross the full-width mobile copy, so they hide
-            below md; the lower band keeps two on every screen. */}
-        <FloatDecor inView={inView} speed={-220} delay={0.60} scaleFrom={0.3} rotateFrom={-55} ease={EASE.back} className="hidden md:block" style={{ top: "31%", right: "27%" }}>
-          <Plus size="clamp(30px, 3.4vw, 54px)" opacity={0.18} />
-        </FloatDecor>
-        <FloatDecor inView={inView} speed={250} delay={0.70} scaleFrom={0.3} rotateFrom={48} ease={EASE.back} style={{ bottom: "18%", right: "14%" }}>
-          <Plus size="clamp(26px, 3vw, 46px)" opacity={0.16} />
-        </FloatDecor>
-        <FloatDecor inView={inView} speed={-170} delay={0.64} scaleFrom={0.3} rotateFrom={-40} ease={EASE.back} style={{ bottom: "25%", left: "46%" }}>
-          <Plus size="clamp(20px, 2.2vw, 34px)" opacity={0.14} />
-        </FloatDecor>
-
-        {/* Faint ring — drifts down, adds depth on the right (md+ only) */}
-        <FloatDecor inView={inView} speed={180} delay={0.82} duration={1.0} scaleFrom={0.5} className="hidden md:block" style={{ top: "54%", right: "19%" }}>
+        {/* Faint ring — drifts, adds depth (md+ only) */}
+        <FloatDecor inView={inView} speed={150} delay={0.8} duration={1.0} scaleFrom={0.5} className="hidden md:block" style={{ top: "26%", left: "20%" }}>
           <div
             style={{
-              width:        "clamp(70px, 8vw, 120px)",
-              height:       "clamp(70px, 8vw, 120px)",
+              width:        "clamp(80px, 9vw, 140px)",
+              height:       "clamp(80px, 9vw, 140px)",
               borderRadius: "50%",
-              border:       "1px solid rgba(255,255,255,0.14)",
+              border:       "1px solid rgba(255,255,255,0.22)",
             }}
           />
         </FloatDecor>
       </div>
 
-      {/* ── Content — upper portion (empty pink below, like baunfire) ────── */}
+      {/* ── Content — centered final-CTA composition (the conversion climax) ── */}
       <div
         ref={ref}
-        className="container-koda relative z-10"
+        className="container-koda relative z-10 flex flex-col items-center text-center"
         style={{
-          paddingTop:    "clamp(150px, 24vh, 280px)",
-          paddingBottom: "clamp(96px, 16vh, 190px)",
+          paddingTop:    "clamp(88px, 16vh, 200px)",
+          paddingBottom: "clamp(88px, 16vh, 200px)",
         }}
       >
-        <div className="max-w-[1000px]">
-          {/* Eyebrow — slides in from the left, leads the cascade */}
-          <motion.div
-            data-reveal
-            className="mb-8 flex items-center gap-5"
-            initial={{ opacity: 0, x: -30 }}
-            animate={inView ? { opacity: 1, x: 0 } : undefined}
-            transition={{ duration: 0.7, ease: EASE.expo, delay: BASE }}
-          >
-            <span
-              style={{
-                fontFamily:    "var(--font-heading)",
-                fontSize:      12,
-                fontWeight:    800,
-                letterSpacing: "0.42em",
-                textTransform: "uppercase",
-                color:         "#ffffff",
-              }}
-            >
-              KODA
-            </span>
-            <span
-              className="h-px"
-              style={{
-                width:      "clamp(36px, 9vw, 120px)",
-                background: "rgba(255,255,255,0.4)",
-              }}
-            />
-          </motion.div>
-
-          {/* Statement — big bold Syne, revealed line-by-line (clip wipe) */}
-          <p
+        <div className="max-w-[880px]">
+          {/* Headline — the final hook. White ink; the pink is the ambient light,
+              not the lettering (pink-on-pink would vanish). */}
+          <h2
             style={{
               fontFamily:    "var(--font-heading)",
-              fontWeight:    700,
-              fontSize:      "clamp(1.7rem, 3.7vw, 3.15rem)",
-              lineHeight:    1.3,
-              letterSpacing: "-0.02em",
+              fontWeight:    600,
+              fontSize:      "clamp(2.1rem, 4.8vw, 3.9rem)",
+              lineHeight:    1.07,
+              letterSpacing: "-0.025em",
               color:         "#ffffff",
             }}
           >
-            {STATEMENT.map((line, i) => (
+            {["Zbudujmy stronę,", "która przynosi klientów."].map((line, i) => (
               <motion.span
                 key={i}
                 data-reveal
                 className="block"
                 initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
-                animate={
-                  inView
-                    ? { clipPath: "inset(0 0% 0 0)", opacity: 1 }
-                    : undefined
-                }
-                transition={{
-                  duration: 0.85,
-                  ease:     EASE.smooth,
-                  delay:    BASE + 0.12 + i * 0.12,
-                }}
+                animate={inView ? { clipPath: "inset(0 0% 0 0)", opacity: 1 } : undefined}
+                transition={{ duration: 0.85, ease: EASE.smooth, delay: BASE + i * 0.12 }}
               >
                 {line}
               </motion.span>
             ))}
-          </p>
+          </h2>
 
-          {/* Contact CTA — pops in last (back-ease overshoot). A white pill that
-              flips dark on hover, with a pink click-ripple (see QuoteButton). */}
+          {/* Sub — concrete risk-reducer (white-ish for contrast over the bloom) */}
+          <motion.p
+            data-reveal
+            className="mx-auto mt-7"
+            style={{
+              maxWidth:   "46ch",
+              fontFamily: "var(--font-body)",
+              fontSize:   "clamp(1rem, 1.2vw, 1.18rem)",
+              lineHeight: 1.6,
+              color:      "rgba(255,255,255,0.92)",
+            }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={inView ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.7, ease: EASE.expo, delay: BASE + 0.34 }}
+          >
+            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24 godziny. Bez zobowiązań.
+          </motion.p>
+
+          {/* CTA — the white "Darmowa wycena" pill + a secondary email link */}
           <motion.div
             data-reveal
-            className="mt-12"
-            initial={{ opacity: 0, y: 18, scale: 0.92 }}
+            className="mt-11 flex flex-col items-center gap-6"
+            initial={{ opacity: 0, y: 18, scale: 0.94 }}
             animate={inView ? { opacity: 1, y: 0, scale: 1 } : undefined}
-            transition={{
-              duration: 0.6,
-              ease:     EASE.back,
-              delay:    BASE + 0.12 + STATEMENT.length * 0.12 + 0.16,
-            }}
+            transition={{ duration: 0.6, ease: EASE.back, delay: BASE + 0.5 }}
           >
-            <QuoteButton href="/kontakt" label="Darmowa wycena" />
+            <Magnetic strength={0.35}>
+              <QuoteButton href="/kontakt" label="Darmowa wycena" />
+            </Magnetic>
+            <a
+              href={`mailto:${CONTACT.email}`}
+              className="text-[14px] text-white/85 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              lub napisz: {CONTACT.email}
+            </a>
           </motion.div>
         </div>
       </div>

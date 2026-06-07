@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { motion, useScroll, useTransform, useReducedMotion, useMotionValue, useSpring } from "motion/react";
 import { EASE, INTRO_DURATION } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
+import { Magnetic } from "@/components/motion/magnetic";
 import { PillLink } from "@/components/ui/pill-link";
 import { introHasPlayed } from "@/lib/intro-state";
 
@@ -36,7 +37,9 @@ function KodaColumn() {
         <div
           key={letter}
           style={{
-            fontFamily:    "var(--font-heading)",
+            // The giant background "KODA" is the wordmark at scale → stays on
+            // the logo font (Syne), matching the header logo, not the heading font.
+            fontFamily:    "var(--font-logo)",
             fontWeight:    800,
             fontSize:      "clamp(160px, 21vw, 340px)",
             letterSpacing: "-0.04em",
@@ -53,6 +56,7 @@ function KodaColumn() {
 
 /* ── Vertical SCROLL indicator — bottom-right ────────────────── */
 function ScrollIndicator({ base }: { base: number }) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -67,20 +71,24 @@ function ScrollIndicator({ base }: { base: number }) {
           className="absolute inset-0"
           style={{ backgroundColor: "rgba(255,255,255,0.07)" }}
         />
-        <motion.div
-          className="absolute inset-x-0 top-0 h-6"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent)",
-          }}
-          animate={{ y: ["-100%", "200%"] }}
-          transition={{
-            duration:    1.8,
-            repeat:      Infinity,
-            ease:        "linear",
-            repeatDelay: 0.6,
-          }}
-        />
+        {/* Połysk przesuwa się w pętli (repeat:Infinity) → przy „ogranicz ruch"
+            NIE renderujemy go wcale (zero perpetualnej animacji dla tych userów). */}
+        {!reduce && (
+          <motion.div
+            className="absolute inset-x-0 top-0 h-6"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent)",
+            }}
+            animate={{ y: ["-100%", "200%"] }}
+            transition={{
+              duration:    1.8,
+              repeat:      Infinity,
+              ease:        "linear",
+              repeatDelay: 0.6,
+            }}
+          />
+        )}
       </div>
       <span
         style={{
@@ -107,9 +115,27 @@ export function Hero() {
   const reduce = useReducedMotion();
   const BASE = reduce || introHasPlayed() ? 0 : INTRO_DURATION;
 
+  // ── Mouse parallax — the aurora glows drift toward the cursor with spring
+  //    momentum (decorative; Emil). Opposite directions + magnitudes give depth.
+  //    Disabled for reduced-motion. ─────────────────────────────────────────
+  const mvx = useMotionValue(0);
+  const mvy = useMotionValue(0);
+  const MSPRING = { stiffness: 55, damping: 18, mass: 0.6 };
+  const px = useSpring(mvx, MSPRING);
+  const py = useSpring(mvy, MSPRING);
+  const vx = useTransform(px, (v) => v * -0.55);
+  const vy = useTransform(py, (v) => v * -0.55);
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (reduce) return;
+    mvx.set((e.clientX / window.innerWidth - 0.5) * 64);
+    mvy.set((e.clientY / window.innerHeight - 0.5) * 64);
+  };
+
   return (
     <section
       data-header-theme="dark"
+      onMouseMove={onMouseMove}
       className="relative min-h-svh flex flex-col overflow-hidden bg-dark"
     >
       {/* ── Dot grid ─────────────────────────────────────────── */}
@@ -123,13 +149,38 @@ export function Hero() {
         }}
       />
 
-      {/* ── Pink glow — bottom-left behind content ───────────── */}
+      {/* ── Pink accent glow — bottom-left, drifts toward the cursor ── */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          x: px,
+          y: py,
+          background:
+            "radial-gradient(ellipse 60% 50% at 12% 84%, rgba(207,67,184,0.22) 0%, transparent 62%)",
+        }}
+      />
+
+      {/* ── Violet counter-glow — top-right, drifts the opposite way (depth) ── */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          x: vx,
+          y: vy,
+          background:
+            "radial-gradient(ellipse 50% 60% at 92% 8%, rgba(138,110,240,0.14) 0%, transparent 60%)",
+        }}
+      />
+
+      {/* ── Cinematic vignette — edges sink into the deeper dark for depth, so the
+           content and header sit on a calmer field (premium, not flat). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 45% at 14% 78%, rgba(207,67,184,0.07) 0%, transparent 70%)",
+            "radial-gradient(125% 95% at 50% 6%, transparent 52%, var(--color-bg-deep) 100%)",
         }}
       />
 
@@ -207,11 +258,11 @@ export function Hero() {
             <h1
               style={{
                 fontFamily:    "var(--font-heading)",
-                fontWeight:    800,
-                fontSize:      "clamp(2.4rem, 5.8vw, 5.2rem)",
-                lineHeight:    1.0,
+                fontWeight:    600,
+                fontSize:      "clamp(2.5rem, 6vw, 5.25rem)",
+                lineHeight:    1.03,
                 letterSpacing: "-0.03em",
-                color:         "#ffffff",
+                color:         "var(--color-ink)",
               }}
             >
               <motion.span
@@ -231,20 +282,24 @@ export function Hero() {
                 transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.18 }}
               >
                 które{" "}
-                {/* słowo-klucz w różu marki, kropka biała (jak na inspiracji) */}
-                <span style={{ color: "#cf43b8" }}>sprzedają</span>
-                <span style={{ color: "#ffffff" }}>.</span>
+                {/* słowo-klucz w różu marki (akcent), kropka w kolorze tekstu */}
+                <span style={{ color: "var(--color-accent)" }}>sprzedają</span>
+                <span style={{ color: "var(--color-ink)" }}>.</span>
               </motion.span>
             </h1>
 
             {/* Opis — łagodny rise + fade (mniejszy dystans, EASE.expo) */}
             <FadeUp delay={BASE - 0.06} duration={0.6} ease={EASE.expo} y={22} className="mt-8">
               <p
-                className="text-white/45 leading-relaxed"
-                style={{ fontSize: "clamp(0.875rem, 1.1vw, 1rem)" }}
+                className="leading-relaxed"
+                style={{
+                  fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)",
+                  color:    "var(--color-ink-muted)",
+                  maxWidth: "44ch",
+                }}
               >
-                Projektujemy custom strony internetowe dla polskich firm —
-                od identyfikacji wizualnej po wdrożenie i wsparcie.
+                Projektujemy i wdrażamy strony internetowe dla polskich firm.
+                Od pierwszego szkicu po realne wyniki w sprzedaży.
               </p>
             </FadeUp>
 
@@ -253,14 +308,16 @@ export function Hero() {
             <FadeUp delay={BASE + 0.08} duration={0.6} ease={EASE.back} y={16} scale={0.9} className="mt-10">
               {/* Główne CTA — różowy pill „Darmowa wycena" (kolory jak na inspiracji).
                   hover: subtelny lift + różowa poświata + obrót „+". */}
-              <PillLink
-                href="/kontakt"
-                bg="#cf43b8"
-                border="#cf43b8"
-                className="text-white hover:-translate-y-0.5 hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
-              >
-                Darmowa wycena
-              </PillLink>
+              <Magnetic strength={0.4}>
+                <PillLink
+                  href="/kontakt"
+                  bg="#cf43b8"
+                  border="#cf43b8"
+                  className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
+                >
+                  Darmowa wycena
+                </PillLink>
+              </Magnetic>
             </FadeUp>
           </div>
         </div>

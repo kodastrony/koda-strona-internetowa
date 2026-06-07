@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   motion,
   useMotionValue,
@@ -14,12 +15,18 @@ import { FadeUp } from "@/components/motion";
 import { PillLink } from "@/components/ui/pill-link";
 
 // ── Project data ──────────────────────────────────────────────────────
+// `image` = path to a real screenshot in /public (e.g. "/realizacje/vitanova.jpg").
+// Empty → the decorative MockWebsite stands in. Card bg + glow stay in ONE
+// coherent magenta/violet family (the brand world), so placeholders never clash;
+// real screenshots bring their own colour and read as a rich, varied portfolio.
 const FEATURED = [
   {
     id:      "vitanova",
     title:   "VitaNova",
     type:    "Sklep internetowy",
-    bg:      "linear-gradient(150deg,#0d0514 0%,#1d0a2e 55%,#290e3f 100%)",
+    year:    "2024",
+    image:   "",
+    bg:      "linear-gradient(150deg,#16111c 0%,#241430 55%,#301a3c 100%)",
     glow:    "#cf43b8",
     rgb:     "207,67,184",
   },
@@ -27,25 +34,31 @@ const FEATURED = [
     id:      "syntra",
     title:   "Syntra Tech",
     type:    "Strona korporacyjna",
-    bg:      "linear-gradient(135deg,#030c18 0%,#071525 55%,#0b2038 100%)",
-    glow:    "#38bdf8",
-    rgb:     "56,189,248",
+    year:    "2024",
+    image:   "",
+    bg:      "linear-gradient(135deg,#120f1d 0%,#1b1432 55%,#221a44 100%)",
+    glow:    "#a472f0",
+    rgb:     "164,114,240",
   },
   {
     id:      "mazur",
     title:   "Kancelaria Mazur",
     type:    "Strona firmowa",
-    bg:      "linear-gradient(160deg,#0e0808 0%,#1b1008 55%,#271808 100%)",
-    glow:    "#d4a848",
-    rgb:     "212,168,72",
+    year:    "2023",
+    image:   "",
+    bg:      "linear-gradient(160deg,#170f1a 0%,#281234 55%,#341846 100%)",
+    glow:    "#e85cc0",
+    rgb:     "232,92,192",
   },
   {
     id:      "horeca",
     title:   "Horeca Trade",
     type:    "Platforma B2B",
-    bg:      "linear-gradient(145deg,#040e0c 0%,#091c16 55%,#0f2920 100%)",
-    glow:    "#34d399",
-    rgb:     "52,211,153",
+    year:    "2023",
+    image:   "",
+    bg:      "linear-gradient(145deg,#130f1c 0%,#1d1332 55%,#281a40 100%)",
+    glow:    "#c77dd0",
+    rgb:     "199,125,208",
   },
 ] as const;
 
@@ -195,8 +208,12 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
   }, [mX, mY, scaleVal]);
 
   return (
-    <FadeUp inView delay={delay} y={48} duration={0.9} ease={EASE.expo}>
-      <Link href={`/realizacje/${project.id}`} className="block">
+    <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>
+      {/* Per-project detail pages (/realizacje/[id]) nie istnieją jeszcze (czekamy na
+          prawdziwe realizacje) — link prowadzi na istniejącą listę /realizacje, żeby
+          karta nigdy nie była 404 na statycznym eksporcie. Gdy powstaną podstrony,
+          wrócić do href={`/realizacje/${project.id}`}. */}
+      <Link href="/realizacje" aria-label={`${project.title} — ${project.type}`} className="block">
         {/* Perspective root — mierzy pozycję kursora */}
         <div
           ref={wrapperRef}
@@ -215,25 +232,41 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
             }}
             className="will-change-transform"
           >
-            {/* Rounded clip — overflow + shadow live here */}
+            {/* Rounded clip — overflow + hairline frame + dark-world shadow.
+                (Big black shadows are invisible on a dark canvas; the lift comes
+                from a soft drop + an accent glow that blooms on hover.) */}
             <div
-              className="relative rounded-[20px] overflow-hidden"
+              className="relative overflow-hidden rounded-[22px]"
               style={{
+                border:     "1px solid rgba(255,255,255,0.09)",
                 transition: `box-shadow 600ms ${cssBezier(EASE.expo)}`,
                 boxShadow: hovered
-                  ? `0 50px 100px -20px rgba(0,0,0,0.42),
-                     0 0  60px -15px rgba(${project.rgb},0.22)`
-                  : "0 15px 50px -15px rgba(0,0,0,0.18)",
+                  ? `0 44px 90px -34px rgba(0,0,0,0.75),
+                     0 0 80px -22px rgba(${project.rgb},0.42)`
+                  : "0 26px 60px -36px rgba(0,0,0,0.6)",
               }}
             >
-              {/* Aspect-ratio shell: 3 ÷ 4.2 ≈ portrait */}
-              <div className="relative" style={{ paddingBottom: "138%" }}>
+              {/* Aspect-ratio shell — landscape (real website screenshots are wide) */}
+              <div className="relative" style={{ paddingBottom: "66%" }}>
 
-                {/* Background gradient */}
+                {/* Background gradient (brand-world base; also the matte behind
+                    a real screenshot while it loads) */}
                 <div
                   className="absolute inset-0"
                   style={{ background: project.bg }}
                 />
+
+                {/* Real screenshot — drop a path into FEATURED[].image and it
+                    replaces the decorative mock. object-top shows the hero fold. */}
+                {project.image && (
+                  <Image
+                    src={project.image}
+                    alt={`${project.title} — ${project.type}`}
+                    fill
+                    sizes="(min-width: 768px) 45vw, 90vw"
+                    className="object-cover object-top"
+                  />
+                )}
 
                 {/* Ambient glow orb */}
                 {/* Ambient glow — softness baked into the gradient (NO filter:blur;
@@ -253,8 +286,9 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
                   }}
                 />
 
-                {/* Decorative website screenshot */}
-                <MockWebsite accent={project.glow} />
+                {/* Decorative website mock — stands in until a real screenshot
+                    is supplied via FEATURED[].image */}
+                {!project.image && <MockWebsite accent={project.glow} />}
 
                 {/* Cursor-following glare (light catches the surface under the pointer) */}
                 <motion.div
@@ -310,18 +344,18 @@ function WorkCard({ project, delay = 0 }: { project: Project; delay?: number }) 
                       fontWeight:    400,
                       letterSpacing: "0.1em",
                       textTransform: "uppercase" as const,
-                      color:         "rgba(255,255,255,0.46)",
-                      marginTop:     4,
+                      color:         "rgba(255,255,255,0.56)",
+                      marginTop:     5,
                     }}
                   >
-                    {project.type}
+                    {project.type} · {project.year}
                   </p>
                 </div>
 
-                {/* Inset border highlight on hover */}
+                {/* Inset accent border — blooms on hover */}
                 <motion.div
-                  className="absolute inset-0 rounded-[20px] pointer-events-none"
-                  style={{ border: `1px solid rgba(${project.rgb},0.40)` }}
+                  className="absolute inset-0 rounded-[22px] pointer-events-none"
+                  style={{ border: `1px solid rgba(${project.rgb},0.45)` }}
                   animate={{ opacity: hovered ? 1 : 0 }}
                   transition={{ duration: 0.35 }}
                 />
@@ -340,10 +374,11 @@ export function Work() {
   const colARef = useRef<HTMLDivElement>(null);
   const colBRef = useRef<HTMLDivElement>(null);
 
-  // Scroll-parallax kolumn — listener `scroll` (passive) ustawia transform
-  // BEZPOŚREDNIO (działa w każdej przeglądarce; testowalne przez dispatch).
-  // Łagodność/„oddychanie" (lekko opóźniony ruch) daje CSS `transition: transform`
-  // na kolumnach (patrz ich style). Tylko transform (GPU). md+; mobile off; reduced-motion off.
+  // Scroll-parallax kolumn — transform pisany BEZPOŚREDNIO, ZSYNCHRONIZOWANY ze
+  // scrollem (zero CSS-transition → kolumny są „przyklejone" do pozycji scrolla,
+  // bez gumkowania; gładkość daje już Lenis). Odczyt rectu + zapis transformu raz
+  // na klatkę (rAF-coalescing — wiele eventów scrolla na klatkę = jeden reflow).
+  // Tylko transform (GPU). md+; mobile off; reduced-motion off.
   useEffect(() => {
     const section = sectionRef.current;
     const a = colARef.current;
@@ -361,15 +396,24 @@ export function Work() {
       const vh = window.innerHeight;
       // p: 0 = sekcja wjeżdża od dołu, 1 = wyjechała górą; c: −0.5..0.5 (środek = 0)
       const c = Math.max(-0.5, Math.min(0.5, (vh - rect.top) / (vh + rect.height) - 0.5));
-      a.style.transform = `translate3d(0, ${(-c * 720).toFixed(1)}px, 0)`; // lewa ±360px (bardzo mocny, dynamiczny dryf)
-      b.style.transform = `translate3d(0, ${(-c * 260).toFixed(1)}px, 0)`; // prawa ±130px (wolniej → wyraźne „oddychanie")
+      // SUBTLE drift only — the old ±360px shoved cards down on entry (the "huge
+      // gap") then up on exit (the "cramped/overlap"). Gentle breathing instead.
+      a.style.transform = `translate3d(0, ${(-c * 90).toFixed(1)}px, 0)`;  // lewa ±45px
+      b.style.transform = `translate3d(0, ${(-c * 40).toFixed(1)}px, 0)`;  // prawa ±20px
+    };
+
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; apply(); });
     };
 
     apply();
-    window.addEventListener("scroll", apply, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", apply);
     return () => {
-      window.removeEventListener("scroll", apply);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", apply);
     };
   }, []);
@@ -377,41 +421,46 @@ export function Work() {
   return (
     <section
       ref={sectionRef}
-      data-header-theme="light"
+      data-header-theme="dark"
       className="relative overflow-hidden"
-      style={{ backgroundColor: "#f7f7f7" }}
+      style={{ backgroundColor: "var(--color-bg)" }}
     >
       <div className="container-koda section-y">
 
-        {/* ── Section header — per-line clip reveal (płynne wejście tekstu) ── */}
-        <div className="mb-[clamp(52px,8vw,108px)]">
-          <h2 className="text-section-title" style={{ color: "#0c0c0c" }}>
-            {["Wybrane", "realizacje"].map((line, i) => (
-              <motion.span
-                key={line}
-                data-reveal
-                className="block"
-                initial={{ clipPath: "inset(0 100% 0 0)" }}
-                whileInView={{ clipPath: "inset(0 0% 0 0)" }}
-                viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-                transition={{ duration: 0.85, ease: EASE.smooth, delay: i * 0.1 }}
-              >
-                {line}
-              </motion.span>
-            ))}
-          </h2>
+        {/* ── Section header — title left, context right, so the heading fills
+            the row instead of floating over a slab of empty space ── */}
+        <div className="mb-[clamp(36px,4.5vw,64px)] flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <FadeUp inView>
+              <span className="label-koda mb-5 block">Realizacje</span>
+            </FadeUp>
+            <h2 className="text-section-title">
+              {["Wybrane", "realizacje"].map((line, i) => (
+                <motion.span
+                  key={line}
+                  data-reveal
+                  className="block"
+                  initial={{ clipPath: "inset(0 100% 0 0)" }}
+                  whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+                  viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+                  transition={{ duration: 0.85, ease: EASE.out, delay: 0.06 + i * 0.1 }}
+                >
+                  {line}
+                </motion.span>
+              ))}
+            </h2>
+          </div>
 
-          <FadeUp inView delay={0.24} y={20} className="mt-5">
+          <FadeUp inView delay={0.2} y={18} className="md:max-w-[360px] md:pb-2 md:text-right">
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize:   "clamp(0.875rem, 1.1vw, 1rem)",
-                color:      "rgba(12,12,12,0.46)",
-                maxWidth:   380,
-                lineHeight: 1.7,
+                fontSize:   "clamp(0.95rem, 1.05vw, 1.05rem)",
+                color:      "var(--color-ink-muted)",
+                lineHeight: 1.6,
               }}
             >
-              Projekty stron internetowych, z których jesteśmy dumni.
+              Projekty, które łączą dopracowany design z realnymi wynikami w sprzedaży.
             </p>
           </FadeUp>
         </div>
@@ -419,13 +468,13 @@ export function Work() {
         {/* ── Two-column staggered grid (kolumny z parallaxem na scroll) ──── */}
         <div
           className="grid grid-cols-1 md:grid-cols-2"
-          style={{ gap: "clamp(16px,2.5vw,28px)" }}
+          style={{ gap: "clamp(20px,2.8vw,36px)" }}
         >
           {/* Left column — dryfuje szybciej (JS parallax, ±75px) */}
           <div
             ref={colARef}
             className="flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform", transition: "transform 0.1s cubic-bezier(0.22,1,0.36,1)" }}
+            style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}
           >
             <WorkCard project={FEATURED[0]} delay={0}    />
             <WorkCard project={FEATURED[2]} delay={0.08} />
@@ -435,20 +484,21 @@ export function Work() {
           <div
             ref={colBRef}
             className="work-right-stagger flex flex-col"
-            style={{ gap: "clamp(16px,2.5vw,28px)", willChange: "transform", transition: "transform 0.1s cubic-bezier(0.22,1,0.36,1)" }}
+            style={{ gap: "clamp(20px,2.8vw,36px)", willChange: "transform" }}
           >
             <WorkCard project={FEATURED[1]} delay={0.05} />
             <WorkCard project={FEATURED[3]} delay={0.13} />
           </div>
         </div>
 
-        {/* ── View-all CTA ─────────────────────────────────────── */}
-        <div style={{ marginTop: "clamp(56px,8vw,96px)" }}>
+        {/* ── View-all CTA — secondary action → quiet surface pill (the pink
+            pill is reserved for the primary "Darmowa wycena" beat) ── */}
+        <div style={{ marginTop: "clamp(48px,6vw,84px)" }}>
           <FadeUp inView delay={0.08} className="flex justify-center">
             <PillLink
               href="/realizacje"
-              bg="#0c0c0c"
-              border="rgba(12,12,12,0.05)"
+              bg="var(--color-surface-1)"
+              border="var(--color-line-strong)"
               className="px-9 py-4"
             >
               Sprawdź wszystkie realizacje

@@ -34,7 +34,7 @@ import { introHasPlayed, markIntroPlayed } from "@/lib/intro-state";
    ════════════════════════════════════════════════════════════════════ */
 
 const PINK      = "var(--color-pink)";  // #cf43b8
-const DARK_BG   = "var(--color-dark)";  // #0f0f0f — końcowe tło (= hero)
+const DARK_BG   = "var(--color-dark)";  // #0b0b0d — końcowe tło (= hero/kanwa)
 const KODA_GRAY = "#1c1c1c";            // kolor KODA w hero.tsx też
 
 // easeOutQuart — gładkie, spokojne wyhamowanie reveala liter (bez overshootu)
@@ -42,9 +42,10 @@ const REVEAL: [number, number, number, number] = [0.25, 1, 0.5, 1];
 
 const LETTERS = ["K", "O", "D", "A"] as const;
 
-// Styl jednej litery — IDENTYCZNY w obu warstwach i w hero (bezszwowy handoff)
+// Styl jednej litery — IDENTYCZNY w obu warstwach i w hero (bezszwowy handoff).
+// Brand "KODA" = logo at scale → logo font (Syne), spójne z headerem.
 const letterStyle: React.CSSProperties = {
-  fontFamily:    "var(--font-heading)",
+  fontFamily:    "var(--font-logo)",
   fontWeight:    800,
   fontSize:      "clamp(160px, 21vw, 340px)",
   letterSpacing: "-0.04em",
@@ -144,7 +145,14 @@ export function IntroAnimation() {
     };
 
     run();
-    return () => { cancelled = true; };
+    // Safety net — gdyby run() wyszedł wcześniej (np. ref chwilowo null), overlay
+    // (fixed, z-200) nigdy nie zostanie zawieszony nad treścią: po max budżecie
+    // wymuś zdjęcie. setDone(true) gdy już done = no-op.
+    const safety = window.setTimeout(() => setDone(true), 4000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(safety);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

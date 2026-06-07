@@ -33,7 +33,7 @@ export function KodaLogo({ width = 108, height = 28, className, dotColor = "#cf4
       className={className}
     >
       <text
-        fontFamily="var(--font-heading), 'Syne', 'Helvetica Neue', Arial, sans-serif"
+        fontFamily="var(--font-logo), 'Syne', 'Helvetica Neue', Arial, sans-serif"
         fontWeight={800}
         fontSize={26}
         letterSpacing="-1.04"

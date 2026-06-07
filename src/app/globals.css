@@ -1,21 +1,49 @@
 @import "tailwindcss";
 
-/* ── Design Tokens — Tailwind v4 @theme ─────────────────────────── */
+/* ── Design Tokens — Tailwind v4 @theme ─────────────────────────────
+   VARIED DARK WORLD. A NEUTRAL deep black base (no colour cast — the violet
+   tint read as "fioletowe" and was wrong). Life + variety come from: (1) a
+   lifted GRAPHITE used on alternating sections, (2) large coloured GLOWS per
+   section, (3) an accent RAMP (pink→magenta→violet→indigo) for differentiating
+   cards, and (4) a rich PINK "moment". Sections differ but are bridged by
+   gentle gradient transitions, so there is variety WITHOUT any hard flashbang.
+   Full rationale + contrast notes live in /DESIGN.md. */
 @theme {
-  /* KODA Brand Colors */
-  --color-pink:          oklch(0.62 0.215 335);   /* #cf43b8 — primary */
-  --color-pink-light:    #FA4EAB;
+  /* ── Brand pink + accent ramp (bold accents + the wipe = energy/variety) ── */
+  --color-pink:          #cf43b8;   /* primary brand accent */
+  --color-pink-light:    #ff5ec8;   /* vivid highlight (pop) */
+  --color-pink-bright:   #ff5ec8;   /* the WOW pink — glows, wipes, highlights */
   --color-pink-lighter:  #FE83C6;
   --color-pink-soft:     #FFF2F9;
+  --color-accent:        #cf43b8;
+  --color-accent-bright: #ff5ec8;
+  --color-accent-deep:   #54164b;   /* deep magenta — base of the pink CTA moment */
+  --color-accent-2:      #c44ad0;   /* magenta — variety */
+  --color-accent-3:      #9a63ef;   /* violet  — variety */
+  --color-accent-4:      #6478f0;   /* indigo  — variety */
 
-  --color-dark:          oklch(0.09 0 0);          /* #0f0f0f — main bg */
-  --color-dark-2:        #1a1a1a;
-  --color-dark-3:        #323232;
-  --color-dark-card:     #141414;
+  /* ── Dark world — richer NEUTRAL black + lifted graphite (no tint) ── */
+  --color-bg:            #0b0b0d;   /* base canvas (hero, work)   */
+  --color-bg-deep:       #070709;   /* footer / deepest beats     */
+  --color-graphite:      #141417;   /* section variant (services) */
+  --color-surface-1:     #1a1a1f;   /* cards, raised panels       */
+  --color-surface-2:     #232329;   /* hover / inner panels       */
+  --color-line:          rgba(255,255,255,0.08);  /* hairline borders */
+  --color-line-strong:   rgba(255,255,255,0.15);
 
+  /* Legacy aliases — existing components (bg-dark, text-off-white…) keep working. */
+  --color-dark:          #0b0b0d;
+  --color-dark-2:        #070709;
+  --color-dark-3:        #232329;
+  --color-dark-card:     #1a1a1f;
+
+  /* ── Ink — NEUTRAL, brighter muted (kills the "pale" washed-out feel) ── */
   --color-white:         #ffffff;
-  --color-off-white:     #eeeeee;
-  --color-gray-muted:    #6b6b6b;
+  --color-ink:           #f5f5f7;   /* primary text + headings  */
+  --color-ink-muted:     #b2b2ba;   /* secondary (brighter → not pale, AA) */
+  --color-ink-faint:     #8a8a93;   /* tertiary labels (AA ~5:1 on graphite/bg) */
+  --color-off-white:     #f5f5f7;
+  --color-gray-muted:    #74747d;
 
   /* KODA Easing curves (derived from Baunfire analysis) */
   --ease-primary:        cubic-bezier(0.475, 0.425, 0, 0.995);
@@ -23,6 +51,10 @@
   --ease-quick:          cubic-bezier(0.835, -0.005, 0.06, 1);
   --ease-smooth:         cubic-bezier(0.63, 0.03, 0.21, 1);
   --ease-back:           cubic-bezier(0.34, 1.4, 0.64, 1);
+  /* Emil Kowalski curves — strong, intentional (CSS defaults are too weak) */
+  --ease-out:            cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out:         cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer:         cubic-bezier(0.32, 0.72, 0, 1);
 
   /* Durations */
   --duration-fast:       150ms;
@@ -30,21 +62,48 @@
   --duration-slow:       600ms;
   --duration-reveal:     950ms;
 
-  /* Animations */
-  --animate-fade-up:     fade-up 0.9s var(--ease-expo) both;
-  --animate-fade-in:     fade-in 0.6s var(--ease-smooth) both;
-  --animate-swipe-line:  swipe-line 0.7s var(--ease-primary) both;
-
   /* Border radius */
   --radius-full:         9999px;
-  --radius-card:         12px;
+  --radius-card:         16px;
   --radius-sm:           6px;
 }
 
-/* ── Font references (CSS vars injected by next/font in layout.tsx) */
+/* ── Font references (CSS vars injected by next/font in layout.tsx) ──
+   --font-heading points at the NEW display font, so every heading + utility
+   that reads var(--font-heading) updates from this ONE line. The KODA logo
+   reads var(--font-logo) (Syne) instead, so a heading-font change never
+   touches the wordmark. Swapping the display font = change next/font import
+   in layout.tsx + the fallback name here. */
 @theme inline {
-  --font-heading: var(--font-syne), "Syne", sans-serif;
+  --font-heading: var(--font-display), "Geologica", sans-serif;
   --font-body:    var(--font-inter), "Inter", sans-serif;
+  --font-logo:    var(--font-syne), "Syne", sans-serif;
+}
+
+/* ── Runtime color mirror ────────────────────────────────────────────
+   Tailwind v4 only emits an @theme var to :root when a utility references it.
+   We reference these tokens in inline style={} gradients/shadows (which Tailwind
+   does NOT scan), so mirror the semantic palette here to guarantee every
+   var(--color-*) resolves at runtime. Values MUST match the @theme block above
+   (single conceptual source; see /DESIGN.md). */
+:root {
+  --color-bg:            #0b0b0d;
+  --color-bg-deep:       #070709;
+  --color-graphite:      #141417;
+  --color-surface-1:     #1a1a1f;
+  --color-surface-2:     #232329;
+  --color-line:          rgba(255,255,255,0.08);
+  --color-line-strong:   rgba(255,255,255,0.15);
+  --color-ink:           #f5f5f7;
+  --color-ink-muted:     #b2b2ba;
+  --color-ink-faint:     #8a8a93;
+  --color-accent:        #cf43b8;
+  --color-accent-bright: #ff5ec8;
+  --color-accent-deep:   #54164b;
+  --color-accent-2:      #c44ad0;
+  --color-accent-3:      #9a63ef;
+  --color-accent-4:      #6478f0;
+  --color-pink-bright:   #ff5ec8;
 }
 
 /* ── Z-index scale — SINGLE SOURCE OF TRUTH for layering ─────────────
@@ -58,24 +117,15 @@
   --z-hero-content: 210;  /* hero text — ABOVE the intro so it reveals mid-sweep */
   --z-menu:         280;  /* full-screen expanding menu overlay                  */
   --z-header:       300;  /* header logo + menu button (above menu so X works)   */
+  --z-cursor:       400;  /* custom cursor follower (above everything)           */
 }
 
 /* ── Keyframe animations ─────────────────────────────────────────── */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes swipe-line {
-  0%   { transform-origin: right center; transform: scaleX(1); }
-  33%  { transform-origin: right center; transform: scaleX(0); }
-  66%  { transform-origin: left  center; transform: scaleX(0); }
-  100% { transform-origin: left  center; transform: scaleX(1); }
+/* Reveals/entrances są w motion/react (FadeUp/Reveal) — tu zostaje TYLKO marquee
+   (CSS keyframe poza main-threadem). */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ── Base reset & global styles — inside @layer base so Tailwind ──
@@ -88,7 +138,9 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior managed by Lenis smooth-scroll (SmoothScroll provider);
+       native smooth removed so anchor jumps don't double-smooth. */
+    scroll-padding-top: clamp(84px, 12vw, 130px); /* anchory (#main itd.) czyszczą fixed-header */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -116,10 +168,11 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family:    var(--font-heading);
-    font-weight:    800;
-    line-height:    1.05;
+    font-weight:    600;            /* hierarchy via scale + weight, NOT heaviness */
+    line-height:    1.08;           /* light type on dark needs a touch more air   */
     letter-spacing: -0.02em;
-    color:          var(--color-white);
+    color:          var(--color-ink);
+    text-wrap:      balance;
   }
 
   a {
@@ -147,6 +200,93 @@
   }
 }
 
+/* ── Custom cursor (smukły akcent nad natywnym — odwzorowanie baunfire) ────
+   NATYWNY kursor (biała strzałka) ZOSTAJE. Tu: mała różowa KROPKA (stała) +
+   cienki, subtelny RING, który na hover „rozkwita" w miękki półprzezroczysty
+   DYSK wypełniany OD ŚRODKA. Pozycję pisze rAF (translate na `__ring-pos` i
+   `__dot`); TU tylko skala/kolor — przejścia CSS poza pętlą.
+   KLUCZ: wypełnienie = `transform: scale()` na WEWNĘTRZNYM `__ring` (GPU, rośnie
+   od środka, idealnie gładko — width/height by się ścinało). */
+.koda-cursor__ring-pos,
+.koda-cursor__dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+/* Pusty anchor 0×0 na punkcie pozycji — wewnętrzny `__ring` (40px) wyśrodkowuje
+   się względem własnego rozmiaru (translate(-50%,-50%)) i MUSI wystawać poza ten
+   box, więc overflow: visible (jawnie, by przyszłe `overflow:hidden` go nie obcięło). */
+.koda-cursor__ring-pos {
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
+/* KROPKA — mała, STAŁY rozmiar (nie zmienia się na hover) */
+.koda-cursor__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background-color: var(--cur-dot, #cf43b8);
+  transition: background-color 0.25s ease;
+}
+
+/* RING wewnętrzny — cienki okrąg; `scale` (od środka) robi wypełnienie */
+.koda-cursor__ring {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 1px solid var(--cur-ring, rgba(245, 245, 247, 0.32));
+  background-color: transparent;
+  transform: translate(-50%, -50%) scale(1); /* wyśrodkowany na punkcie pozycji */
+  transform-origin: center;
+  will-change: transform;
+  transition:
+    transform 0.28s var(--ease-out),
+    border-color 0.32s ease,
+    background-color 0.36s ease;
+}
+
+/* hover — dysk „rozkwita" od środka (scale), border znika, wchodzi miękkie tło.
+   Kropka NIETKNIĘTA (stały rozmiar). */
+.koda-cursor[data-cursor-state="hover"] .koda-cursor__ring {
+  transform: translate(-50%, -50%) scale(2.05); /* ~82px miękki dysk */
+  border-color: transparent;
+  background-color: var(--cur-fill, rgba(245, 245, 247, 0.1));
+}
+
+/* press — mikro-feedback: kropka rozbłyska jaśniejszym różem */
+.koda-cursor[data-cursor-press="1"] .koda-cursor__dot {
+  background-color: var(--color-accent-bright, #ff5ec8);
+}
+
+/* ── Motywy: kolor ringu/kropki/wypełnienia dobrany pod tło sekcji pod kursorem ── */
+.koda-cursor[data-cursor-theme="dark"] {
+  --cur-dot: #cf43b8;
+  --cur-ring: rgba(245, 245, 247, 0.32);
+  --cur-fill: rgba(245, 245, 247, 0.1);
+}
+.koda-cursor[data-cursor-theme="light"] {
+  --cur-dot: #cf43b8;
+  --cur-ring: rgba(15, 15, 17, 0.34); /* na bieli (kontakt / otwarte menu) ring musi być widoczny */
+  --cur-fill: rgba(15, 15, 17, 0.09);
+}
+.koda-cursor[data-cursor-theme="pink"] {
+  --cur-dot: #ffffff;
+  --cur-ring: rgba(255, 255, 255, 0.5);
+  --cur-fill: rgba(255, 255, 255, 0.16);
+}
+
+/* ── Lenis smooth-scroll (darkroomengineering/lenis) ──────────────────── */
+html.lenis,
+html.lenis body            { height: auto; }
+.lenis.lenis-smooth        { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped       { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
 /* ── Layout utilities ─────────────────────────────────────────────── */
 
 /* Portfolio: right column stagger (zero on mobile, offset on md+) */
@@ -155,7 +295,7 @@
 }
 @media (min-width: 768px) {
   .work-right-stagger {
-    margin-top: clamp(80px, 12vw, 140px);
+    margin-top: clamp(40px, 6vw, 80px);
   }
 }
 
@@ -179,32 +319,48 @@
 
 /* ── Typography utilities ─────────────────────────────────────────── */
 
-/* Label style: wide-tracked eyebrow, e.g. "KODA" → renders "K O D A" */
+/* Label / eyebrow — used SPARINGLY (an eyebrow over every section reads as
+   AI scaffolding). Refined tracking, pink accent. */
 .label-koda {
   font-family:    var(--font-heading);
-  font-size:      0.6875rem;  /* 11px */
-  font-weight:    800;
-  letter-spacing: 0.45em;
+  font-size:      0.72rem;
+  font-weight:    700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color:          var(--color-pink);
+  color:          var(--color-accent);
 }
 
-/* Display heading — hero scale */
+/* Display heading — hero scale (capped ≤ ~5.25rem; ls floor ≥ -0.04em) */
 .text-display {
   font-family:    var(--font-heading);
-  font-size:      clamp(2.75rem, 9vw, 9rem);
-  font-weight:    800;
-  line-height:    1.0;
+  font-size:      clamp(2.5rem, 6vw, 5.25rem);
+  font-weight:    600;
+  line-height:    1.03;
   letter-spacing: -0.03em;
-  color:          var(--color-white);
+  color:          var(--color-ink);
+  text-wrap:      balance;
 }
 
 /* Section heading */
 .text-section-title {
   font-family:    var(--font-heading);
-  font-size:      clamp(2rem, 4vw, 3.5rem);
-  font-weight:    800;
-  line-height:    1.1;
+  font-size:      clamp(1.9rem, 4vw, 3.35rem);
+  font-weight:    600;
+  line-height:    1.06;
   letter-spacing: -0.025em;
-  color:          var(--color-white);
+  color:          var(--color-ink);
+  text-wrap:      balance;
 }
+
+/* Lead paragraph — section intros (caps line length, muted-but-legible ink) */
+.text-lead {
+  font-family:    var(--font-body);
+  font-size:      clamp(1.05rem, 1.35vw, 1.25rem);
+  line-height:    1.55;
+  letter-spacing: -0.01em;
+  color:          var(--color-ink-muted);
+  max-width:      58ch;
+  text-wrap:      pretty;
+}
+
+/* (custom cursor styles: patrz sekcja „Custom cursor" wyżej) */

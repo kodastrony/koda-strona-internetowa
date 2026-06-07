@@ -30,7 +30,7 @@ export function ScrollProgress() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed top-0 right-0 z-[var(--z-scrollbar)] hidden h-screen w-[3px] sm:block"
+      className="pointer-events-none fixed top-0 right-0 z-[var(--z-scrollbar)] block h-screen w-[2px] sm:w-[3px]"
     >
       {/* tor — ledwo widoczny, neutralny (działa na ciemnym i jasnym) */}
       <div

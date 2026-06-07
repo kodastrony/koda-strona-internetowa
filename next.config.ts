@@ -17,7 +17,7 @@ const nextConfig: NextConfig = isStaticExport
       output: "export", // build → statyczny folder out/ (czysty HTML/CSS/JS)
       trailingSlash: true, // /kontakt/ → out/kontakt/index.html (Apache-friendly na OVH)
       images: { unoptimized: true }, // brak serwera Next = brak optymalizacji obrazów w locie
-      experimental: { optimizePackageImports: ["lucide-react", "motion"] },
+      experimental: { optimizePackageImports: ["motion"] },
     }
   : {
       images: {
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = isStaticExport
         deviceSizes: [640, 750, 828, 1080, 1200, 1920],
         imageSizes: [16, 32, 64, 96, 128, 256],
       },
-      experimental: { optimizePackageImports: ["lucide-react", "motion"] },
+      experimental: { optimizePackageImports: ["motion"] },
     };
 
 export default nextConfig;

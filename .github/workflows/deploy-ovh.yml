@@ -34,6 +34,7 @@ jobs:
         run: npm run build
         env:
           STATIC_EXPORT: "true"
+          # Formularz leadów używa FormSubmit.co (natywny POST, BEZ klucza/env).
 
       - name: Deploy out/ → OVH www/ (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

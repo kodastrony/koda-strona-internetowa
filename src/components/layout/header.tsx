@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
@@ -16,8 +15,9 @@ import { MenuOverlay, type Origin } from "@/components/layout/menu-overlay";
 const CLR_EASE = cssBezier(EASE.expo);
 const CLR_DUR  = "500ms";
 
-// Siła magnesu: przycisk podąża za kursorem o 35% jego odległości od środka.
-const MAGNET_STRENGTH = 0.35;
+// Siła magnesu: przycisk DOJEŻDŻA do kursora o 50% odległości od środka (to
+// przycisk nachodzi na kursor — nie odwrotnie; ring kursora tylko ramkuje ikonę).
+const MAGNET_STRENGTH = 0.5;
 const MAGNET_SPRING = { stiffness: 180, damping: 14, mass: 0.4 } as const;
 
 export function Header() {
@@ -69,6 +69,10 @@ export function Header() {
     mvy.set((e.clientY - cy) * MAGNET_STRENGTH);
   };
   const onMagnetLeave = () => { mvx.set(0); mvy.set(0); };
+
+  // Stabilny handler zamknięcia (identyczna referencja) → efekt focus-trapu w
+  // MenuOverlay nie re-uruchamia się przy każdym renderze.
+  const closeMenu = useCallback(() => setOpen(false), []);
 
   // ── Toggle menu — mierzy środek przycisku jako origin koła ─────────
   const toggle = () => {
@@ -136,7 +140,6 @@ export function Header() {
                   style={{
                     transformOrigin: "left center",
                     pointerEvents:   hideLogo ? "none" : "auto",
-                    willChange:      "opacity, transform",
                   }}
                 >
                   <Link
@@ -173,7 +176,7 @@ export function Header() {
                 className={cn(
                   "hidden items-center justify-center rounded-full md:inline-flex",
                   "font-heading text-[12px] font-bold uppercase tracking-[0.14em]",
-                  "px-5 py-2.5 hover:-translate-y-px",
+                  "min-h-[44px] px-5 py-2.5 hover:-translate-y-px",
                   pillShadow,
                 )}
                 style={{
@@ -227,7 +230,20 @@ export function Header() {
                       open ? "scale-100 opacity-100" : "scale-75 opacity-0",
                     )}
                   >
-                    <X size={18} strokeWidth={1.5} style={{ color: iconColor }} />
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={iconColor}
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ transition: `stroke ${CLR_DUR} ${CLR_EASE}` }}
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
                   </span>
                 </motion.button>
               </div>
@@ -237,7 +253,12 @@ export function Header() {
       </header>
 
       {/* ── Full-screen menu (expanding circle) ── */}
-      <MenuOverlay open={open} origin={origin} onClose={() => setOpen(false)} />
+      <MenuOverlay
+        open={open}
+        origin={origin}
+        onClose={closeMenu}
+        triggerRef={btnRef as RefObject<HTMLElement | null>}
+      />
     </>
   );
 }

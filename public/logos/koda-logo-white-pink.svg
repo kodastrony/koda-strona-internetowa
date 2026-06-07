@@ -13,13 +13,8 @@
   aria-label="KODA Studio"
 >
   <title>KODA Studio</title>
-  <defs>
-    <style>
-      <![CDATA[
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap');
-      ]]>
-    </style>
-  </defs>
+  <!-- Brak zewnętrznego @import (Syne) — pliki nieużywane w aplikacji (logo = inline
+       SVG w koda-logo.tsx). Usunięto odwołanie do Google Fonts (CSP font-src 'self' / prywatność). -->
   <text
     font-family="'Syne', 'Helvetica Neue', Arial, sans-serif"
     font-weight="800"

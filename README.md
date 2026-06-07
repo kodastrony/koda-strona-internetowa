@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KODA Studio — kodastrony.pl
 
-## Getting Started
+Strona agencji KODA Studio. Statyczny eksport Next.js 16 hostowany na OVH.
 
-First, run the development server:
+## Stack
+
+| Warstwa | Technologia |
+|---|---|
+| Framework | Next.js 16 (App Router, static export) |
+| Styling | Tailwind CSS v4 |
+| Animacje | Framer Motion (motion/react v12) |
+| Czcionki | Geologica (nagłówki) + Inter (body) + Syne (logo), przez next/font |
+| Hosting | OVH shared hosting (Apache) |
+| Deploy | GitHub Actions → FTP (deploy-ovh.yml) |
+
+## Uruchamianie
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd koda-site
+npm install
+npm run dev        # dev server (localhost:3000)
+npm run build      # pełny Next.js build (SSR, lokalne testy)
+npm run lint       # ESLint
+npm run type-check # TypeScript
+npm run format     # Prettier
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aby zbudować statyczny eksport (tak jak CI):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+STATIC_EXPORT=true npm run build
+# → out/ (gotowy do uploadu na OVH)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Struktura
 
-## Learn More
+```
+src/
+  app/              # Next.js App Router — strony i metadane
+  components/
+    layout/         # Header, Footer, MenuOverlay, ScrollProgress
+    sections/       # Hero, Services, Work, WhyKoda, Statement, Contact
+    motion/         # FadeUp, Reveal, MotionProvider, SmoothScroll, Magnetic
+    ui/             # KodaLogo, PillLink, IntroAnimation, ComingSoon, CustomCursor, Marquee
+  hooks/            # useHeaderTheme (provider), useLogoHidden
+  lib/              # constants.ts, motion.ts, utils.ts, intro-state.ts
+public/
+  .htaccess         # Apache: HTTPS redirect, security headers, cache
+  logos/            # SVG logo (różne warianty kolorystyczne)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Zmienne środowiskowe
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Zmienna | Wartość w CI | Opis |
+|---|---|---|
+| `STATIC_EXPORT` | `"true"` | Włącza `output: "export"` w next.config.ts |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Formularz leadów używa FormSubmit.co (natywny POST) — **bez kluczy ani zmiennych środowiskowych**.
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Każdy push na `main` uruchamia `.github/workflows/deploy-ovh.yml`:
+1. `npm ci` → `STATIC_EXPORT=true npm run build` → `out/`
+2. `SamKirkland/FTP-Deploy-Action` uploaduje `out/` → OVH `www/`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sekrety GitHub (ustawione w Settings → Secrets):
+- `FTP_USERNAME` — login FTP do konta OVH
+- `FTP_PASSWORD` — hasło FTP
+
+## Kontakt / formularz
+
+Formularz kontaktowy (`/kontakt`) ma walidację po stronie klienta i **wysyła leady
+przez [FormSubmit.co](https://formsubmit.co)** — darmowo, bez konta i bez kluczy,
+z obsługą **załącznika (brief) do 10 MB** (free tier Web3Forms plików nie wysyła).
+Mechanizm: po walidacji formularz robi natywny `multipart/form-data` POST na
+`https://formsubmit.co/kodastrony@gmail.com`, FormSubmit wysyła maila z załącznikiem
+i przekierowuje na `/dziekujemy`. Honeypot (`_honey`) chroni przed spamem.
+
+⚠️ **Aktywacja (jednorazowo)**: przy pierwszej wysyłce FormSubmit wyśle na
+kodastrony@gmail.com mail „Activate Form" — kliknij raz, żeby potwierdzić adres.
+Od tego momentu wszystkie zgłoszenia dochodzą. (Można też podmienić adres w
+`action` formularza na zahaszowany alias z FormSubmit, by nie pokazywać e-maila.)
