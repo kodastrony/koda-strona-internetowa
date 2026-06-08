@@ -23,10 +23,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* ── Backend leadów: FormSubmit.co — DARMOWY, obsługuje ZAŁĄCZNIKI ≤10 MB ──────
    (Web3Forms free nie wysyła plików; user chce dosyłać brief z formularza.)
-   Wysyłka = NATYWNY multipart POST (NIE fetch — tryb AJAX FormSubmit nie wspiera
-   plików). Po walidacji formularz robi zwykły submit → FormSubmit wysyła maila
-   z załącznikiem i przekierowuje na `_next` (/dziekujemy). Honeypot = pole `_honey`.
-   Zero kluczy/env. CSP `form-action` musi zawierać https://formsubmit.co.
+   Wysyłka = GRACEFUL `fetch` multipart (z plikiem) — endpoint FormSubmit zwraca CORS
+   (Allow-Origin: *), więc cross-origin fetch działa, a my obsługujemy sukces/błąd
+   PŁYNNIE na własnej stronie. Sukces → /dziekujemy/; awaria (np. 521) → komunikat +
+   e-mail, dane zostają. Bez JS: natywny <form> POST (action/method/enctype = fallback).
+   Honeypot = pole `_honey`. Zero kluczy/env. CSP `form-action` ma https://formsubmit.co,
+   a `connect-src` https://formsubmit.co (fetch = connect-src).
    ⚠️ AKTYWACJA: pierwsza wysyłka wyśle na CONTACT.email mail „Activate Form" —
    kliknąć RAZ; od tego momentu wszystkie leady dochodzą. */
 const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/${CONTACT.email}`;
@@ -38,7 +40,7 @@ interface FieldState {
   touched: boolean;
 }
 type FieldKey = "name" | "email" | "phone" | "message";
-type FormStatus = "idle" | "loading";
+type FormStatus = "idle" | "loading" | "error";
 
 /* ── Walidacja (prosta) — wszystkie 4 pola wymagane ──────────────── */
 const VALIDATORS: Record<FieldKey, (v: string) => string | null> = {
@@ -385,8 +387,8 @@ export function Contact() {
     if (nextRef.current) nextRef.current.value = `${window.location.origin}/dziekujemy/`;
   }, []);
 
-  // Ref do formularza — submit wywołujemy NATYWNIE (formRef.submit()), nie przez
-  // domyślną akcję, by zawsze poszedł realny multipart POST do FormSubmit.
+  // Ref do formularza — z niego budujemy FormData (pola + plik) do graceful fetcha.
+  // Atrybuty <form action/method/enctype> zostają = natywny POST jako fallback bez JS.
   const formRef = useRef<HTMLFormElement>(null);
 
   const update = (key: FieldKey, value: string) =>
@@ -419,11 +421,13 @@ export function Contact() {
     return true;
   };
 
-  // Walidacja klienta, potem NATYWNY multipart POST do FormSubmit (z plikiem).
-  // ZAWSZE preventDefault, a przy poprawnych danych wołamy natywne formRef.submit()
-  // — gwarantuje realny POST + nawigację niezależnie od semantyki React 19 dla
-  // string `action` (poleganie na „braku preventDefault" potrafi nie wysłać).
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Wysyłka leadu: walidacja → GRACEFUL fetch (multipart, z plikiem) do FormSubmit.
+  // Dlaczego fetch, a nie natywna nawigacja: gdy FormSubmit ma awarię (np. błąd 521),
+  // natywny POST wyrzuciłby użytkownika na OBCĄ stronę błędu i lead by przepadł. fetch
+  // pozwala obsłużyć błąd PŁYNNIE na naszej stronie (komunikat + e-mail), a wpisane dane
+  // zostają. Endpoint FormSubmit zwraca CORS (Allow-Origin: *), więc cross-origin fetch
+  // z plikiem działa. Sukces → /dziekujemy/. Bez JS: natywny <form> POST (fallback).
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return; // już wysyłamy — ignoruj powtórne kliknięcia (anty-podwójny submit)
     const nextErrors = {} as Record<FieldKey, string | null>;
@@ -445,8 +449,24 @@ export function Contact() {
     }
     if (honeypot) return; // bot wypełnił pułapkę → nie wysyłaj
 
+    const form = formRef.current;
+    if (!form) return;
     setStatus("loading");
-    formRef.current?.submit(); // natywny multipart POST → mail + redirect na /dziekujemy
+    try {
+      const res = await fetch(FORMSUBMIT_ENDPOINT, {
+        method: "POST",
+        body: new FormData(form), // wszystkie pola + plik (multipart)
+        redirect: "manual", // 302 z FormSubmit traktujemy jako sukces (opaqueredirect)
+      });
+      // Sukces = serwer przyjął zgłoszenie (200 strona aktywacji / 302 redirect). Awaria
+      // (np. 521) → CORS-reject (throw) albo status błędu → łapiemy w catch.
+      if (!res.ok && res.type !== "opaqueredirect") {
+        throw new Error(`FormSubmit ${res.status}`);
+      }
+      window.location.assign(`${window.location.origin}/dziekujemy/`);
+    } catch {
+      setStatus("error"); // płynny komunikat na stronie zamiast obcej strony błędu
+    }
   };
 
   // Pomocnik kaskady wejścia — kolejne elementy formularza.
@@ -651,7 +671,7 @@ export function Contact() {
                     </>
                   ) : (
                     <>
-                      Wyślij wiadomość
+                      {status === "error" ? "Spróbuj ponownie" : "Wyślij wiadomość"}
                       <span
                         aria-hidden="true"
                         className="transition-transform duration-300 group-hover:translate-x-1"
@@ -666,6 +686,22 @@ export function Contact() {
                   Odpowiemy w ciągu 24 godzin.
                 </p>
               </div>
+              {status === "error" && (
+                <p
+                  role="alert"
+                  className="mt-4 font-body text-[13.5px] leading-snug text-[#cc2b5e]"
+                >
+                  Nie udało się wysłać — serwer formularza jest chwilowo niedostępny. Spróbuj
+                  ponownie za chwilę lub napisz bezpośrednio na{" "}
+                  <a
+                    href={`mailto:${CONTACT.email}`}
+                    className="font-semibold underline underline-offset-2"
+                  >
+                    {CONTACT.email}
+                  </a>
+                  .
+                </p>
+              )}
             </FadeUp>
           </form>
         </div>

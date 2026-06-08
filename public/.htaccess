@@ -35,9 +35,10 @@
   #     (__NEXT_DATA__) and dynamic chunk imports in the static export.
   #   • style-src: 'unsafe-inline' needed because Framer Motion applies animation
   #     state as inline `style` attributes (cannot be hashed).
-  #   • form-action: includes formsubmit.co — the lead form does a native multipart
-  #     POST there (FormSubmit handles email + file attachment). Native POST is
-  #     governed by form-action (not connect-src), so connect-src stays 'self'.
+  #   • connect-src: includes formsubmit.co — the lead form submits via fetch()
+  #     (multipart, with the file). fetch is governed by connect-src.
+  #   • form-action: also includes formsubmit.co — the <form> keeps its native
+  #     action/method/enctype as a no-JS fallback (native POST = form-action).
   #   • object-src/frame-src 'none': the site embeds no plugins or iframes.
   #   • frame-ancestors 'none' replaces X-Frame-Options for CSP-aware browsers.
   Header always set Content-Security-Policy "\
@@ -46,7 +47,7 @@ script-src 'self' 'unsafe-inline'; \
 style-src 'self' 'unsafe-inline'; \
 img-src 'self' data:; \
 font-src 'self'; \
-connect-src 'self'; \
+connect-src 'self' https://formsubmit.co; \
 object-src 'none'; \
 frame-src 'none'; \
 frame-ancestors 'none'; \
