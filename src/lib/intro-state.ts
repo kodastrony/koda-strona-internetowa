@@ -1,16 +1,42 @@
 /**
- * Współdzielona flaga „intro odegrane w tym załadowaniu strony".
+ * Współdzielona flaga „intro odegrane".
  *
- * Module-scoped → resetuje się przy twardym odświeżeniu (F5), ale TRWA przez
- * nawigację SPA. Dzięki temu Hero wie, czy intro w ogóle się odegra:
- *  • pierwsze (twarde) wejście, bez reduced-motion → intro gra → Hero czeka
- *    (delay = INTRO_DURATION), żeby tekst wszedł zsynchronizowany z intro.
- *  • nawigacja SPA z innej podstrony / reduced-motion → intro NIE gra → Hero
- *    pokazuje treść NATYCHMIAST (delay 0), zamiast ~2.4 s pustego kadru.
+ * Dwie warstwy:
+ *  • module-scoped `played` — TRWA przez nawigację SPA (intro nie powtarza się
+ *    przy przejściu między podstronami w tej samej sesji).
+ *  • sessionStorage — TRWA też przez TWARDE odświeżenie (F5) i powrót na stronę
+ *    w obrębie tej samej karty/sesji. Dzięki temu intro gra DOKŁADNIE RAZ na
+ *    sesję (audyt: replay intro po reloadzie irytował zabieganych/powracających).
+ *    Nowa karta / nowa sesja → intro znów gra (pierwsze, „wow" wejście).
+ *
+ * Hero/Header czytają to, by zdecydować, czy czekać na intro (delay =
+ * INTRO_DURATION), czy pokazać treść natychmiast (delay 0).
  */
+const KEY = "koda-intro-played";
 let played = false;
 
-export const introHasPlayed = (): boolean => played;
+export const introHasPlayed = (): boolean => {
+  if (played) return true;
+  if (typeof window !== "undefined") {
+    try {
+      if (window.sessionStorage.getItem(KEY) === "1") {
+        played = true;
+        return true;
+      }
+    } catch {
+      /* sessionStorage niedostępny (tryb prywatny itp.) → tylko flaga modułowa */
+    }
+  }
+  return false;
+};
+
 export const markIntroPlayed = (): void => {
   played = true;
+  if (typeof window !== "undefined") {
+    try {
+      window.sessionStorage.setItem(KEY, "1");
+    } catch {
+      /* noop */
+    }
+  }
 };

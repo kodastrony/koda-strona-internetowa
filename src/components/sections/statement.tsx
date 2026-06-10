@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { EASE, type Bezier } from "@/lib/motion";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -201,6 +201,10 @@ export function Statement() {
   // the copy cascades, as ONE beat the user is actually looking at.
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-18% 0px -18% 0px" });
+  // clip-path NIE jest transformem — MotionConfig reducedMotion="user" go nie
+  // wyłącza (gasi tylko transform/layout). Wipe i nagłówki gate'ujemy ręcznie,
+  // jak w shared <Reveal> (duration 0 → stan końcowy od razu).
+  const reduce = useReducedMotion();
 
   // Content lands as the pink wipe sweeps across (wipe ≈ 1.15s; centre ≈ 0.55s).
   const BASE = 0.45;
@@ -255,26 +259,47 @@ export function Statement() {
     <section
       ref={sectionRef}
       data-header-theme="pink"
+      data-canvas="statement"
       className="relative isolate flex min-h-[78svh] flex-col items-center justify-center overflow-hidden"
-      style={{ backgroundColor: "var(--color-bg)" }}
     >
       {/* ── Pink WIPE — the signature left→right reveal (the one the owner liked).
-          The section starts dark (continuous with the black above); as it enters
-          view the pink gradient PAINTS ITSELF IN from the left via an animating
-          clip-path on a strong ease-out. ───────────────────────────────────── */}
+          Sekcja startuje na plum canvasie (PageCanvas hold „statement" #521648 —
+          FAQ-owy foreshadow już go zapowiedział); wipe maluje się od lewej.
+          Gradient = pełna ścieżka H335 (plum → magenta → bright), gęste stopy
+          w jednym hue → zero błotnistego dołka, jaki robił 2-stopowy sRGB. ── */}
       <motion.div
         aria-hidden="true"
         data-reveal
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
-            "linear-gradient(150deg, var(--color-accent-deep) 0%, var(--color-accent) 130%)",
+            "linear-gradient(155deg, #78276b 0%, #a03390 38%, #cf43b8 82%, #e750bf 100%)",
           willChange: "clip-path",
         }}
         initial={{ clipPath: "inset(0 100% 0 0)" }}
         animate={inView ? { clipPath: "inset(0 0% 0 0)" } : undefined}
-        transition={{ duration: 1.15, ease: EASE.out }}
+        transition={reduce ? { duration: 0 } : { duration: 1.15, ease: EASE.out }}
       >
+        {/* Hot core — „podświetlenie od tyłu": gorący, jaśniejszy rdzeń u
+            góry-prawej nadaje płaskiemu panelowi głębię sceny. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 62% 52% at 72% 16%, oklch(0.8 0.19 348 / 0.14) 0%, oklch(0.8 0.19 348 / 0.05) 45%, oklch(0.8 0.19 348 / 0) 72%)",
+          }}
+        />
+        {/* Spill — łuna z FAQ „kontynuuje się" na panelu: górna krawędź wipe'a
+            łapie to samo światło, którym FAQ zapowiadał róż → zero stopnia
+            luminancji na szwie. */}
+        <div
+          className="absolute inset-x-0 top-0"
+          style={{
+            height: "30%",
+            background:
+              "linear-gradient(to bottom, oklch(0.62 0.215 335 / 0.22) 0%, oklch(0.62 0.215 335 / 0.07) 55%, oklch(0.62 0.215 335 / 0) 100%)",
+          }}
+        />
         {/* dot texture rides in with the pink */}
         <div
           className="absolute inset-0"
@@ -285,11 +310,15 @@ export function Statement() {
         />
       </motion.div>
 
-      {/* Settle into the footer below */}
+      {/* Zejście do stopki — róż UMIERA wzdłuż H335 (plum → ciepła czerń
+          #0a0609 = hold stopki), nigdy przez zimną szarość. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-44"
-        style={{ background: "linear-gradient(to top, var(--color-bg-deep) 0%, transparent 100%)" }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-56"
+        style={{
+          background:
+            "linear-gradient(to top, #0a0609 0%, rgba(24,13,22,0.82) 24%, rgba(48,19,42,0.45) 52%, rgba(82,22,72,0.16) 76%, rgba(82,22,72,0) 100%)",
+        }}
       />
 
       {/* ── Decorations — own pop-in + scroll-parallax drift (subtle, white on pink) ── */}
@@ -380,7 +409,11 @@ export function Statement() {
                 className="block"
                 initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
                 animate={inView ? { clipPath: "inset(0 0% 0 0)", opacity: 1 } : undefined}
-                transition={{ duration: 0.85, ease: EASE.smooth, delay: BASE + i * 0.12 }}
+                transition={
+                  reduce
+                    ? { duration: 0 }
+                    : { duration: 0.85, ease: EASE.smooth, delay: BASE + i * 0.12 }
+                }
               >
                 {line}
               </motion.span>
@@ -396,14 +429,14 @@ export function Statement() {
               fontFamily: "var(--font-body)",
               fontSize: "clamp(1rem, 1.2vw, 1.18rem)",
               lineHeight: 1.6,
-              color: "rgba(255,255,255,0.92)",
+              color: "#ffffff",
             }}
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.7, ease: EASE.expo, delay: BASE + 0.34 }}
           >
-            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24 godziny.
-            Bez zobowiązań.
+            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24
+            godziny. Bez zobowiązań.
           </motion.p>
 
           {/* CTA — the white "Darmowa wycena" pill + a secondary email link */}
@@ -415,13 +448,14 @@ export function Statement() {
             transition={{ duration: 0.6, ease: EASE.back, delay: BASE + 0.5 }}
           >
             <Magnetic strength={0.35}>
-              <QuoteButton href="/kontakt" label="Darmowa wycena" />
+              <QuoteButton href="/kontakt" label="Zacznijmy projekt" />
             </Magnetic>
+            {/* Pełna biel — white/85 spadał pod 4.5:1 na jasnym końcu gradientu. */}
             <a
               href={`mailto:${CONTACT.email}`}
-              className="text-[14px] text-white/85 underline-offset-4 transition-colors hover:text-white hover:underline"
+              className="text-[14px] text-white underline-offset-4 transition-[text-decoration-color] hover:underline"
             >
-              lub napisz: {CONTACT.email}
+              Napisz: {CONTACT.email}
             </a>
           </motion.div>
         </div>

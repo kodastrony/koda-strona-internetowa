@@ -23,9 +23,8 @@ export const SERVICES: Service[] = [
     n: "01",
     id: "projektowanie",
     title: "Projektowanie UX/UI",
-    short:
-      "Interfejsy, które prowadzą użytkownika prosto do kontaktu i zakupu. Każdy ekran ma zadanie.",
-    lead: "Zaczynamy od celu biznesowego, nie od ładnych pikseli. Projektujemy ścieżki, które prowadzą odwiedzającego dokładnie tam, gdzie chcesz — do zapytania, telefonu albo zakupu.",
+    short: "Układ i ścieżki, które prowadzą odwiedzającego prosto do kontaktu.",
+    lead: "Określamy cel i projektujemy stronę internetową, która reprezentuje Twój biznes i przynosi klientów.",
     points: [
       "Analiza celów i grupy docelowej",
       "Architektura informacji i ścieżki konwersji",
@@ -36,36 +35,36 @@ export const SERVICES: Service[] = [
   {
     n: "02",
     id: "strony",
-    title: "Strony i sklepy",
+    title: "Strony internetowe 2D i 3D",
     short:
-      "Szybkie, nowoczesne strony i sklepy na solidnym kodzie. Pod Twój biznes, nie pod szablon.",
+      "Szybkie strony na autorskim kodzie. Budowane pod Twój biznes, nie pod szablon.",
     lead: "Budujemy na czystym, wydajnym kodzie — nie na ciężkich szablonach. Efekt: strona, która ładuje się błyskawicznie, dobrze wygląda na każdym ekranie i łatwo się rozwija.",
     points: [
-      "Strony firmowe, landing page i sklepy",
+      "Strony firmowe, landing page i wizytówki",
+      "Efekty 2D i 3D — nowoczesny, wyróżniający się charakter",
       "Kod skrojony pod projekt — zero zbędnych wtyczek",
-      "Responsywność od 320 do 2560 px",
-      "Integracje: płatności, formularze, analityka",
+      "Dobrze wygląda na każdym telefonie i ekranie",
     ],
   },
   {
     n: "03",
     id: "optymalizacja",
-    title: "Optymalizacja i SEO",
-    short: "Szybkość, widoczność w Google i analityka, żeby strona realnie przyciągała klientów.",
+    title: "SEO (Pozycjonowanie strony)",
+    short: "Szybkość, widoczność w Google i analityka, która mówi wprost, co przynosi klientów.",
     lead: "Najpiękniejsza strona nic nie da, jeśli nikt jej nie znajdzie i wolno się ładuje. Dbamy o techniczne fundamenty: szybkość, widoczność w wyszukiwarce i dane, które mówią, co działa.",
     points: [
-      "Optymalizacja szybkości i Core Web Vitals",
-      "SEO techniczne i dane strukturalne",
-      "Konfiguracja analityki i celów",
-      "Dostępność (WCAG) i poprawna semantyka",
+      "Błyskawiczne ładowanie (Core Web Vitals — Google to docenia)",
+      "Lepsza widoczność w Google (SEO techniczne)",
+      "Analityka — widzisz, co działa, a co nie",
+      "Dostępność — z Twojej strony skorzysta każdy, też na telefonie (WCAG)",
     ],
   },
   {
     n: "04",
     id: "wsparcie",
-    title: "Wsparcie i rozwój",
+    title: "Wsparcie i opieka",
     short:
-      "Po wdrożeniu zostajemy: aktualizacje, opieka techniczna i rozwój, gdy Twój biznes rośnie.",
+      "Po starcie zostajemy: aktualizacje, bezpieczeństwo i rozwój, gdy firma rośnie.",
     lead: "Wdrożenie to początek, nie koniec. Zostajemy na pokładzie: aktualizujemy, pilnujemy bezpieczeństwa i rozwijamy stronę razem z Twoim biznesem.",
     points: [
       "Aktualizacje i opieka techniczna",
@@ -77,28 +76,28 @@ export const SERVICES: Service[] = [
 ];
 
 /**
- * "Jak pracujemy" — the process, shown on /uslugi and /o-nas. Four honest
- * steps, no buzzwords.
+ * "Jak pracujemy" — the process, shown on the homepage, /uslugi and /o-nas.
+ * Four honest steps, no buzzwords.
  */
 export const PROCESS: { n: string; title: string; desc: string }[] = [
   {
     n: "01",
-    title: "Rozmowa i cel",
+    title: "Rozmawiamy o celu",
     desc: "Poznajemy Twój biznes i ustalamy, co strona ma realnie osiągnąć. Bez tego reszta nie ma sensu.",
   },
   {
     n: "02",
-    title: "Projekt",
-    desc: "Projektujemy strukturę i wygląd. Widzisz makiety, zanim cokolwiek powstanie w kodzie.",
+    title: "Projektujemy razem",
+    desc: "Widzisz makiety i akceptujesz je, zanim cokolwiek powstanie w kodzie.",
   },
   {
     n: "03",
-    title: "Wdrożenie",
-    desc: "Budujemy na szybkim, czystym kodzie i testujemy na każdym urządzeniu. Ty opiniujesz na bieżąco.",
+    title: "Budujemy i testujemy",
+    desc: "Szybki, czysty kod, sprawdzony na każdym urządzeniu. Opiniujesz na bieżąco.",
   },
   {
     n: "04",
     title: "Start i rozwój",
-    desc: "Publikujemy, mierzymy efekty i rozwijamy stronę dalej — tak długo, jak tego potrzebujesz.",
+    desc: "Publikujemy, mierzymy wyniki i rozwijamy stronę razem z Twoim biznesem.",
   },
 ];

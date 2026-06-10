@@ -6,7 +6,7 @@ import { CTABand } from "@/components/sections/cta-band";
 export const metadata: Metadata = {
   title: "O nas",
   description:
-    "KODA to niewielki zespół projektantów i programistów z Polski. Tworzymy szybkie, skuteczne strony dla polskich firm — pod cel, nie pod szablon.",
+    "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce. Bezpośredni kontakt, jasne zasady i opieka po starcie — pod konkretny cel, nie pod szablon.",
   alternates: { canonical: "/o-nas/" },
 };
 
@@ -16,8 +16,8 @@ export default function ONasPage() {
       <PageHero
         label="Kim jesteśmy"
         title="O nas"
-        lead="Małe studio z Polski, które robi strony nie po to, żeby ładnie wyglądały, tylko żeby realnie przynosiły klientów."
-        glow="rgba(100,120,240,0.13)"
+        lead="Studio web-design z Polski. Projekt, kod i opieka — wszystko u nas."
+        hue={340}
       />
       <ONasContent />
       <CTABand />

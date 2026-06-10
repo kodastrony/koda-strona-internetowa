@@ -3,6 +3,8 @@ import { Syne, Inter, Geologica } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
+import { PageCanvas } from "@/components/fx/page-canvas";
+import { Grain } from "@/components/fx/grain";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { CustomCursor } from "@/components/ui/custom-cursor";
@@ -78,12 +80,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "KODA Studio — Strony internetowe dla biznesów w Polsce",
-    template: "%s | KODA Studio",
+    default: "KODA — strony internetowe dla firm w Polsce",
+    template: "%s | KODA",
   },
   description:
-    "Tworzymy niestandardowe strony internetowe dla polskich firm. Szybkie, skuteczne, dopasowane do Twojego biznesu.",
-  keywords: ["strony internetowe", "web design", "Polska", "agencja", "KODA", "Warsaw"],
+    "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z zakresem i terminem w umowie. Odpowiadamy w 24 godziny.",
+  keywords: [
+    "strony internetowe",
+    "strona internetowa dla firmy",
+    "sklep internetowy",
+    "projektowanie stron",
+    "Polska",
+    "Warszawa",
+    "KODA",
+  ],
   authors: [{ name: "KODA Studio", url: "https://kodastrony.pl" }],
   creator: "KODA Studio",
   openGraph: {
@@ -91,14 +101,15 @@ export const metadata: Metadata = {
     locale: "pl_PL",
     url: "https://kodastrony.pl",
     siteName: "KODA Studio",
-    title: "KODA Studio — Strony internetowe dla biznesów w Polsce",
+    title: "KODA — strony internetowe dla firm w Polsce",
     description:
-      "Tworzymy niestandardowe strony internetowe dla polskich firm. Szybkie, skuteczne, dopasowane do Twojego biznesu.",
+      "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z zakresem i terminem w umowie. Odpowiadamy w 24 godziny.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KODA Studio",
-    description: "Tworzymy niestandardowe strony internetowe dla polskich firm.",
+    title: "KODA — strony internetowe dla firm",
+    description:
+      "Projektujemy i kodujemy strony oraz sklepy dla polskich firm — pod konkretny cel biznesowy, z zakresem w umowie. Odpowiadamy w 24 godziny.",
   },
   metadataBase: new URL("https://kodastrony.pl"),
   robots: {
@@ -141,6 +152,12 @@ export default function RootLayout({
         <SmoothScroll>
           <MotionProvider>
             <HeaderThemeProvider>
+              {/* ⚠ PageCanvas/Grain: NIE owijać ich (ani tego poddrzewa) we
+                  wrappery z transform/filter/własnym tłem — fixed canvas
+                  straciłby viewport albo zniknął pod tłem (patrz komentarz
+                  w page-canvas.tsx). */}
+              <PageCanvas />
+              <Grain />
               <Header />
               <ScrollProgress />
               <main id="main" className="flex-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { FadeUp } from "@/components/motion";
+import { FadeUp, Parallax } from "@/components/motion";
 
 /* ── "Dlaczego KODA" — bold manifesto ─────────────────────────────────────
    Replaces the pale thin-rule columns. A confident headline + three value props
@@ -11,21 +11,27 @@ import { FadeUp } from "@/components/motion";
 const VALUES = [
   {
     n: "01",
-    title: "Budujemy zaufanie",
-    desc: "Dopracowany wygląd i błyskawiczne ładowanie budują wiarygodność, zanim klient przeczyta pierwsze zdanie.",
+    title: "Pod konkretny cel, nie pod szablon",
+    desc: "Projektujemy i piszemy od zera, wokół jednego celu biznesowego. Twoja strona nie wygląda jak tysiąc innych.",
     color: "var(--color-pink-bright)",
   },
   {
     n: "02",
-    title: "Przyciągamy klientów",
-    desc: "Projektujemy pod konkretną akcję, więc strona zamienia odwiedzających w realne zapytania.",
+    title: "Projekt i kod w jednych rękach",
+    desc: "Bez podwykonawców i przekazywania projektu dalej. Piszesz do KODA — rozmawiasz z KODA, nie z account managerem.",
     color: "var(--color-accent-3)",
   },
   {
     n: "03",
-    title: "Zwiększamy sprzedaż",
-    desc: "Łączymy design z SEO i analityką, żeby strona pracowała na Twój wynik finansowy.",
+    title: "Wszystko ustalone w umowie",
+    desc: "Zakres, termin i zasady masz na piśmie, zanim zaczniemy.",
     color: "var(--color-accent-2)",
+  },
+  {
+    n: "04",
+    title: "Zostajemy po starcie",
+    desc: "Większość agencji znika po wdrożeniu. My zostajemy — aktualizacje, bezpieczeństwo i rozwój strony, gdy firma rośnie.",
+    color: "var(--color-accent-4)",
   },
 ];
 
@@ -47,15 +53,18 @@ export function WhyKoda() {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40"
         style={{ background: "linear-gradient(to top, var(--color-bg), transparent)" }}
       />
-      {/* Rich pink atmosphere (right) — keeps it from feeling flat/pale */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 50% 62% at 96% 48%, rgba(207,67,184,0.13) 0%, transparent 60%)",
-        }}
-      />
+      {/* Rich pink atmosphere (right) — keeps it from feeling flat/pale; drifts
+          gently on scroll (opposite direction to the Services glow → layered depth). */}
+      <Parallax speed={-70} className="pointer-events-none absolute inset-0 z-0">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 50% 62% at 96% 48%, rgba(207,67,184,0.13) 0%, transparent 60%)",
+          }}
+        />
+      </Parallax>
 
       <div className="container-koda section-y relative z-10">
         <FadeUp inView>
@@ -72,8 +81,8 @@ export function WhyKoda() {
               textWrap: "balance",
             }}
           >
-            Nie robimy ładnych stron.{" "}
-            <span style={{ color: "var(--color-pink-bright)" }}>Robimy skuteczne.</span>
+            Jedno studio.{" "}
+            <span style={{ color: "var(--color-pink-bright)" }}>Pełna odpowiedzialność.</span>
           </h2>
         </FadeUp>
         <FadeUp inView delay={0.14}>
@@ -86,20 +95,20 @@ export function WhyKoda() {
               color: "var(--color-ink-muted)",
             }}
           >
-            Każdy projekt zaczynamy od jednego pytania: co ta strona ma realnie osiągnąć dla Twojego
-            biznesu.
+            Projekt, kod i wsparcie prowadzimy u siebie — od pierwszej rozmowy po start strony i
+            przez całą jej pracę.
           </p>
         </FadeUp>
 
-        <div className="mt-[clamp(50px,6vw,90px)] grid grid-cols-1 gap-x-12 gap-y-14 md:grid-cols-3">
+        <div className="mt-[clamp(50px,6vw,90px)] grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {VALUES.map((v, i) => (
-            <FadeUp inView key={v.n} delay={0.1 * i} y={28}>
+            <FadeUp inView key={v.n} delay={0.08 * i} y={28}>
               <div>
                 <div
                   aria-hidden="true"
                   className="mb-5 font-heading font-bold"
                   style={{
-                    fontSize: "clamp(3rem,5vw,4.6rem)",
+                    fontSize: "clamp(2.6rem,4vw,3.6rem)",
                     lineHeight: 1,
                     letterSpacing: "-0.04em",
                     color: v.color,
@@ -110,7 +119,7 @@ export function WhyKoda() {
                 <h3
                   className="mb-3 font-heading font-semibold"
                   style={{
-                    fontSize: "clamp(1.4rem,2.1vw,1.85rem)",
+                    fontSize: "clamp(1.3rem,1.8vw,1.6rem)",
                     letterSpacing: "-0.02em",
                     lineHeight: 1.12,
                     color: "var(--color-ink)",

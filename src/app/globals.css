@@ -28,8 +28,23 @@
   --color-graphite: #141417; /* section variant (services) */
   --color-surface-1: #1a1a1f; /* cards, raised panels       */
   --color-surface-2: #232329; /* hover / inner panels       */
+  --color-surface-warm: #21171e; /* warm-zone cards (FAQ) — oklch(.22 .02 335) */
   --color-line: rgba(255, 255, 255, 0.08); /* hairline borders */
   --color-line-strong: rgba(255, 255, 255, 0.15);
+
+  /* ── Canvas holds — scroll-scrubbed page background (PageCanvas) ──────
+     The page is ONE morphing canvas; sections are transparent and only
+     declare which "hold" they sit on via data-canvas="<id>". The hue walks
+     an analogous arc (286 → 300 → 275 → 335): cool, professional middle,
+     warming toward the pink ask. All values sit at L 0.13–0.19, C ≤ 0.02
+     except the plum buildup under the Statement. See PageCanvas. */
+  --color-canvas-base: #0b0b0d; /* hero / work / neutral content      */
+  --color-canvas-tint: #15121b; /* violet graphite — services moods    */
+  --color-canvas-process: #11131c; /* indigo — coolest point           */
+  --color-canvas-faq: #1a1017; /* the warm turn — first H335 surface  */
+  --color-canvas-plum: #30132a; /* plum buildup (sub-page CTA hold)    */
+  --color-canvas-plum-deep: #521648; /* under the Statement wipe        */
+  --color-canvas-footer: #0a0609; /* warm-black — pink dies INTO it    */
 
   /* Legacy aliases — existing components (bg-dark, text-off-white…) keep working. */
   --color-dark: #0b0b0d;
@@ -92,6 +107,14 @@
   --color-graphite: #141417;
   --color-surface-1: #1a1a1f;
   --color-surface-2: #232329;
+  --color-surface-warm: #21171e;
+  --color-canvas-base: #0b0b0d;
+  --color-canvas-tint: #15121b;
+  --color-canvas-process: #11131c;
+  --color-canvas-faq: #1a1017;
+  --color-canvas-plum: #30132a;
+  --color-canvas-plum-deep: #521648;
+  --color-canvas-footer: #0a0609;
   --color-line: rgba(255, 255, 255, 0.08);
   --color-line-strong: rgba(255, 255, 255, 0.15);
   --color-ink: #f5f5f7;
@@ -112,6 +135,7 @@
    across components. Use in JSX via Tailwind arbitrary values:
    `className="z-[var(--z-header)]"`. Within a section, bg = z-0, content = z-10. */
 :root {
+  --z-grain: 50; /* film-grain overlay — above section content, below UI */
   --z-scrollbar: 60; /* custom scroll-progress bar (right edge)            */
   --z-intro: 200; /* intro overlay (covers hero bg during the entrance) */
   --z-hero-content: 210; /* hero text — ABOVE the intro so it reveals mid-sweep */
@@ -132,6 +156,50 @@
   }
 }
 
+/* ── Ambient drift — glow fields breathe sub-threshold ───────────────
+   Transform-only (kompozytor, zero paint). `alternate` = brak skoku pętli.
+   Czasy per-instancja przez --blob-dur (19/26/33s — niewspółmierne, nigdy
+   się nie synchronizują). Globalny reduced-motion (wyżej) i tak by to
+   zabił, ale jawna reguła nie zostawia wątpliwości. */
+@keyframes koda-drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(5%, 4%, 0) scale(1.12);
+  }
+}
+.koda-blob {
+  animation: koda-drift var(--blob-dur, 26s) ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .koda-blob {
+    animation: none;
+  }
+}
+
+/* ── Film grain — the glue of the "one world" ────────────────────────
+   Jedna globalna, NIERUCHOMA warstwa szumu (feTurbulence w data-URI;
+   CSP `img-src data:` już to dopuszcza). ZWYKŁA alfa, NIE mix-blend-mode:
+   soft-light to „advanced blend" = na Windows (ANGLE/D3D11) i mobile pełny
+   backdrop-copy + shader-pass CAŁEGO viewportu na każdą klatkę kompozycji —
+   a klatki lecą ciągle (drift blobów). Szary szum przy 0.04 alfa ditheruje
+   banding ciemnych gradientów praktycznie identycznie, za darmo (fixed-func
+   HW blending). Statyczna celowo — animowany szum kosztuje wielką warstwę
+   kompozytora przy marginalnym zysku.
+   ZNANY WYJĄTEK (świadomie): treść hero (z-210, nad intro z-200) maluje się
+   NAD grainem (z-50) — solidne litery/CTA i tak nie pokazują ziarna;
+   podniesienie grainu nad intro psułoby jego białą fazę. */
+.koda-grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
 /* ── Base reset & global styles — inside @layer base so Tailwind ──
    utilities (in @layer utilities) can override these when needed   */
 @layer base {
@@ -147,6 +215,10 @@
     /* scroll-behavior managed by Lenis smooth-scroll (SmoothScroll provider);
        native smooth removed so anchor jumps don't double-smooth. */
     scroll-padding-top: clamp(84px, 12vw, 130px); /* anchory (#main itd.) czyszczą fixed-header */
+    /* Sekcje nie mają już overflow-hidden (glowy świecą przez szwy) — poziomy
+       nadmiar ucina clip NA ROOCIE (z body nie propaguje do viewportu).
+       `clip`, nie `hidden`: nie tworzy scroll-containera → sticky działa. */
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -216,6 +288,12 @@
     outline: 2px solid var(--color-pink);
     outline-offset: 4px;
     border-radius: 4px;
+  }
+
+  /* Na różowym panelu Statement różowy ring ≈ 1:1 z tłem (niewidoczny) —
+     biały daje ≥3.2:1 na całym gradiencie wipe'a (WCAG 1.4.11). */
+  [data-canvas="statement"] :focus-visible {
+    outline-color: #ffffff;
   }
 }
 

@@ -4,3 +4,4 @@
  */
 export { Reveal } from "./reveal";
 export { FadeUp } from "./fade-up";
+export { Parallax } from "./parallax";

@@ -6,11 +6,7 @@ import { PROJECTS } from "@/lib/projects";
 
 export function RealizacjeContent() {
   return (
-    <section
-      data-header-theme="dark"
-      className="relative"
-      style={{ backgroundColor: "var(--color-bg)" }}
-    >
+    <section data-header-theme="dark" data-canvas="base" className="relative">
       <div className="container-koda" style={{ paddingBottom: "clamp(40px, 6vw, 90px)" }}>
         <div
           className="grid grid-cols-1 md:grid-cols-2"
@@ -21,9 +17,10 @@ export function RealizacjeContent() {
               <ProjectCard project={p} delay={(i % 2) * 0.06} />
               <FadeUp inView delay={0.08} y={18}>
                 <div className="mt-5">
+                  {/* pink-bright: accent spadał pod AA w strefie przejścia do plum CTA */}
                   <span
                     className="font-heading text-[11px] font-bold tracking-[0.18em] uppercase"
-                    style={{ color: "var(--color-accent)" }}
+                    style={{ color: "var(--color-pink-bright)" }}
                   >
                     {p.client}
                   </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import { EASE, DURATION, type Bezier } from "@/lib/motion";
 
 interface FadeUpProps {
@@ -43,6 +43,10 @@ export function FadeUp({
   scale = 1,
   inView = false,
 }: FadeUpProps) {
+  // Reduced motion: snap straight to the resting state (no slide/scale/fade time).
+  // motion/react JS animations aren't covered by the global CSS reduced-motion
+  // rule, so we gate them here — one place that covers ~every entrance on the site.
+  const reduce = useReducedMotion();
   const variants: Variants = {
     hidden: { opacity: 0, x, y, scale },
     visible: { opacity: 1, x: 0, y: 0, scale: 1 },
@@ -56,7 +60,7 @@ export function FadeUp({
       animate={inView ? undefined : "visible"}
       whileInView={inView ? "visible" : undefined}
       viewport={inView ? { once: true, margin: "0px 0px -80px 0px" } : undefined}
-      transition={{ duration, ease, delay }}
+      transition={reduce ? { duration: 0 } : { duration, ease, delay }}
     >
       {children}
     </motion.div>

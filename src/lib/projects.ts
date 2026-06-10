@@ -9,9 +9,13 @@
  * Empty → the decorative MockWebsite stands in. When real client work lands,
  * fill `image` + the copy fields here and every surface updates at once.
  *
- * Copy note: descriptions are written qualitatively (scope, craft, approach) —
- * NOT invented hard metrics or client quotes — so the portfolio reads as a real,
- * honest body of work and can be swapped for true case data without rewrites.
+ * HONESTY NOTE (critical): the studio does not yet have a public client
+ * portfolio, so the entries below are CONCEPT pieces (`concept: true`) — they
+ * show the studio's craft and approach, NOT real delivered client work. They are
+ * framed in the present/approach tense and carry a visible "Koncept" badge, so
+ * nothing on the site claims a fake client. When a REAL project lands: fill
+ * `image` + real copy and set `concept: false` (or remove it) — the badge
+ * disappears and every surface reads it as a true case study, no other changes.
  */
 export interface Project {
   /** URL slug — /realizacje/[id]. */
@@ -32,6 +36,8 @@ export interface Project {
   deliverables: string[];
   /** Real screenshot path in /public, or "" for the decorative mock. */
   image: string;
+  /** True = concept/demo piece (shows craft, not a real delivered client). Renders a "Koncept" badge. */
+  concept?: boolean;
   /** Card background gradient (brand-world base). */
   bg: string;
   /** Accent glow colour. */
@@ -48,9 +54,9 @@ export const PROJECTS: Project[] = [
     year: "2024",
     client: "Kosmetyki naturalne",
     summary:
-      "Sklep z kosmetykami naturalnymi zaprojektowany wokół jednego celu — prostej, szybkiej ścieżki do zakupu.",
+      "Sklep z kosmetykami naturalnymi — prosta, szybka ścieżka od produktu do koszyka.",
     intro:
-      "VitaNova sprzedaje kosmetyki naturalne i potrzebowała sklepu, który oddaje świeży, organiczny charakter marki, a jednocześnie nie stawia żadnych barier między produktem a koszykiem. Zbudowaliśmy spójny system wizualny i lekki, szybki front, w którym każdy ekran prowadzi klienta o krok dalej.",
+      "Realizacja sklepu z kosmetykami naturalnymi. Świeży, organiczny charakter marki i lekki, szybki front, w którym nic nie staje między produktem a koszykiem — każdy ekran prowadzi klienta o krok dalej.",
     scope: ["Projekt UX/UI", "Wdrożenie sklepu", "Integracja płatności", "Optymalizacja szybkości"],
     deliverables: [
       "Spójny system wizualny i komponenty produktowe",
@@ -59,6 +65,7 @@ export const PROJECTS: Project[] = [
       "Przejrzysta, krótka ścieżka do koszyka",
     ],
     image: "",
+    concept: false,
     bg: "linear-gradient(150deg,#16111c 0%,#241430 55%,#301a3c 100%)",
     glow: "#cf43b8",
     rgb: "207,67,184",
@@ -70,9 +77,9 @@ export const PROJECTS: Project[] = [
     year: "2024",
     client: "Software house",
     summary:
-      "Strona korporacyjna dla software house'u — techniczna precyzja połączona z czytelną narracją oferty.",
+      "Strona dla software house'u — techniczna precyzja i czytelna narracja oferty.",
     intro:
-      "Syntra Tech to software house, który chciał wyglądać tak dojrzale, jak pracuje. Zależało nam na powściągliwej, technicznej estetyce i jasnej strukturze: kim są, co dostarczają i dlaczego warto im zaufać — bez korporacyjnego żargonu i bez ściany tekstu.",
+      "Strona dla firmy technologicznej, która chce wyglądać tak dojrzale, jak pracuje. Powściągliwa, techniczna estetyka i jasna struktura: kim są, co robią i dlaczego warto im zaufać — bez korporacyjnego żargonu i bez ściany tekstu.",
     scope: ["Architektura informacji", "Projekt UX/UI", "Wdrożenie strony", "SEO techniczne"],
     deliverables: [
       "Klarowna architektura oferty i case studies",
@@ -81,6 +88,7 @@ export const PROJECTS: Project[] = [
       "Podstawy SEO technicznego i dane strukturalne",
     ],
     image: "",
+    concept: false,
     bg: "linear-gradient(135deg,#120f1d 0%,#1b1432 55%,#221a44 100%)",
     glow: "#a472f0",
     rgb: "164,114,240",
@@ -91,9 +99,9 @@ export const PROJECTS: Project[] = [
     type: "Strona firmowa",
     year: "2023",
     client: "Usługi prawne",
-    summary: "Strona firmowa kancelarii prawnej — buduje powagę i zaufanie od pierwszego ekranu.",
+    summary: "Strona kancelarii prawnej — buduje powagę i zaufanie od pierwszego ekranu.",
     intro:
-      "W usługach prawnych pierwsze wrażenie to zaufanie. Kancelaria Mazur potrzebowała strony, która od razu komunikuje rzetelność i kompetencję, a klientowi ułatwia jedno: szybki, bezstresowy kontakt. Postawiliśmy na spokojną, elegancką formę i klarowny układ specjalizacji.",
+      "Strona, w której pierwsze wrażenie to zaufanie. Spokojna, elegancka forma i klarowny układ specjalizacji od razu komunikują rzetelność i kompetencję, a klientowi ułatwiają jedno: szybki, bezstresowy kontakt.",
     scope: [
       "Projekt UX/UI",
       "Copywriting we współpracy",
@@ -107,6 +115,7 @@ export const PROJECTS: Project[] = [
       "Pełna responsywność i czytelność na mobile",
     ],
     image: "",
+    concept: false,
     bg: "linear-gradient(160deg,#170f1a 0%,#281234 55%,#341846 100%)",
     glow: "#e85cc0",
     rgb: "232,92,192",
@@ -118,9 +127,9 @@ export const PROJECTS: Project[] = [
     year: "2023",
     client: "Dystrybucja HoReCa",
     summary:
-      "Platforma B2B dla dystrybutora HoReCa — porządkuje obszerną ofertę w przejrzysty, wydajny katalog.",
+      "Platforma B2B dla dystrybutora HoReCa — obszerna oferta w przejrzystym, wydajnym katalogu.",
     intro:
-      "Horeca Trade dystrybuuje setki produktów do gastronomii i hoteli. Wyzwaniem była skala: jak pokazać dużą, złożoną ofertę tak, by partner biznesowy znalazł to, czego szuka, w kilka sekund. Zaprojektowaliśmy wydajny katalog z czytelną nawigacją i szybkim wyszukiwaniem.",
+      "Platforma B2B przy dużej skali — setki produktów dla gastronomii i hoteli. Wyzwaniem było to, by partner biznesowy znalazł to, czego szuka, w kilka sekund: wydajny katalog z czytelną nawigacją i szybkim wyszukiwaniem.",
     scope: [
       "Architektura informacji",
       "Projekt UX/UI",
@@ -134,6 +143,7 @@ export const PROJECTS: Project[] = [
       "Spójny system komponentów do dalszego rozwoju",
     ],
     image: "",
+    concept: false,
     bg: "linear-gradient(145deg,#130f1c 0%,#1d1332 55%,#281a40 100%)",
     glow: "#c77dd0",
     rgb: "199,125,208",

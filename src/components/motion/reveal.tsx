@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import { EASE, DURATION, type Bezier } from "@/lib/motion";
 
 const variants: Variants = {
@@ -36,6 +36,9 @@ export function Reveal({
   ease = EASE.smooth,
   inView = false,
 }: RevealProps) {
+  // Reduced motion: reveal instantly (no clip-path wipe), since motion/react JS
+  // animations bypass the global CSS reduced-motion rule.
+  const reduce = useReducedMotion();
   return (
     <motion.div
       data-reveal
@@ -45,7 +48,7 @@ export function Reveal({
       animate={inView ? undefined : "visible"}
       whileInView={inView ? "visible" : undefined}
       viewport={inView ? { once: true, margin: "0px 0px -80px 0px" } : undefined}
-      transition={{ duration, ease, delay }}
+      transition={reduce ? { duration: 0 } : { duration, ease, delay }}
     >
       {children}
     </motion.div>

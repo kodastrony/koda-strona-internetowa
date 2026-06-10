@@ -96,7 +96,14 @@ export function MenuOverlay({
   // triggerRef są stabilne (useCallback/ref w header) → efekt nie re-fokusuje w kółko.
   useEffect(() => {
     if (!open) return;
+    // Blokada scrolla na ROOCIE, nie tylko body: html ma w stylesheet
+    // `overflow-x: clip` (glow-bleed), a per CSS Overflow §3.3 body→viewport
+    // propagacja działa TYLKO gdy root jest `visible` w obu osiach — sam
+    // body:hidden nic by nie blokował. Inline na html wygrywa z clip i
+    // blokuje viewport wprost (zweryfikowane empirycznie).
+    const prevRootOverflow = document.documentElement.style.overflow;
     const prevOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     // Trigger (hamburger) jest stabilny i nie odmontowuje się — kopiujemy referencję
     // teraz, by użyć jej w cleanupie (i uciszyć react-hooks/exhaustive-deps).
@@ -140,6 +147,7 @@ export function MenuOverlay({
     window.addEventListener("keydown", onKey);
 
     return () => {
+      document.documentElement.style.overflow = prevRootOverflow;
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
       window.clearTimeout(focusTimer);

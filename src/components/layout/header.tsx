@@ -51,7 +51,10 @@ export function Header() {
   // „niewidzialny" focus). Logo zostaje też w drzewie a11y (czytniki zawsze mają
   // link do strony głównej).
   const [logoFocused, setLogoFocused] = useState(false);
-  const hideLogo = logoHidden && !logoFocused;
+  // Gdy menu jest otwarte, KODA MUSI być widoczne (białe menu, ciemny napis) —
+  // żeby było co kliknąć (powrót na stronę główną) i żeby nie znikało, gdy ktoś
+  // otworzy menu po zjechaniu w dół (gdzie logo jest normalnie schowane).
+  const hideLogo = logoHidden && !logoFocused && !open;
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -148,6 +151,10 @@ export function Header() {
                   <Link
                     href="/"
                     aria-label={SITE_CONFIG.name}
+                    // Klik w logo (też w otwartym menu) wraca na stronę główną —
+                    // i ZAMYKA menu. Header żyje w layoutcie, więc bez tego stan
+                    // `open` zostałby true po soft-nawigacji i menu by „wisiało".
+                    onClick={closeMenu}
                     className={cn(
                       "block",
                       // Nad różem KODA zostaje białe (róż-na-różu by zniknął); poza nim
@@ -177,7 +184,7 @@ export function Header() {
               <Link
                 href="/kontakt"
                 className={cn(
-                  "hidden items-center justify-center rounded-full md:inline-flex",
+                  "hidden items-center justify-center rounded-full sm:inline-flex",
                   "font-heading text-[12px] font-bold tracking-[0.14em] uppercase",
                   "min-h-[44px] px-5 py-2.5 hover:-translate-y-px",
                   pillShadow

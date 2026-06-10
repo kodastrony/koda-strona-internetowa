@@ -250,6 +250,21 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
               <div className="relative" style={{ paddingBottom: "66%" }}>
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
+                {/* Honest "Koncept" badge — flags demo/concept pieces so nothing
+                    reads as a fake real client. Disappears once project.concept is false. */}
+                {project.concept && (
+                  <span
+                    className="absolute top-0 left-0 z-[2] m-[clamp(10px,2vw,18px)] rounded-full border px-3 py-1 font-heading text-[10px] font-bold tracking-[0.16em] uppercase"
+                    style={{
+                      color: "rgba(255,255,255,0.92)",
+                      borderColor: "rgba(255,255,255,0.28)",
+                      backgroundColor: "rgba(0,0,0,0.4)",
+                    }}
+                  >
+                    Koncept
+                  </span>
+                )}
+
                 {project.image && (
                   <Image
                     src={project.image}
@@ -338,7 +353,7 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
                       marginTop: 5,
                     }}
                   >
-                    {project.type} · {project.year}
+                    {project.type} · {project.concept ? "Koncept" : project.year}
                   </p>
                 </div>
 

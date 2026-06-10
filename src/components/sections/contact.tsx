@@ -10,23 +10,26 @@ import { CONTACT, SITE_CONFIG } from "@/lib/constants";
 /* ════════════════════════════════════════════════════════════════════
    KONTAKT — minimal na BIAŁYM tle. Formularz po LEWEJ, po prawej wielka
    ledwo widoczna kolumna „KODA" (jak na stronie tytułowej / hero).
-   Pola wypełnione + pływające etykiety (forms-inputs). Telefon WYMAGANY.
+   Pola wypełnione + pływające etykiety (forms-inputs): imię, firma (opcj.),
+   e-mail, telefon, opis + opcjonalne pliki (można dołączyć kilka).
    Animacje: płynna kaskada wejścia, mikro-interakcje (buttons-ctas).
    ════════════════════════════════════════════════════════════════════ */
 
 const FLOAT_EASE = "cubic-bezier(0.4, 0, 0.2, 1)"; // krzywa floatu pływających etykiet (forms-inputs)
 const EXPO = cssBezier(EASE.expo);
-const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_FILES = 5; // ile plików maksymalnie
+const MAX_TOTAL_BYTES = 10 * 1024 * 1024; // 10 MB ŁĄCZNIE (limit załączników FormSubmit)
 const ACCEPT_EXTS = [".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp", ".zip"];
 const ACCEPT_ATTR = ACCEPT_EXTS.join(",");
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* ── Backend leadów: FormSubmit.co — DARMOWY, obsługuje ZAŁĄCZNIKI ≤10 MB ──────
    (Web3Forms free nie wysyła plików; user chce dosyłać brief z formularza.)
-   Wysyłka = GRACEFUL `fetch` multipart (z plikiem) — endpoint FormSubmit zwraca CORS
+   Wysyłka = GRACEFUL `fetch` multipart (z plikami) — endpoint FormSubmit zwraca CORS
    (Allow-Origin: *), więc cross-origin fetch działa, a my obsługujemy sukces/błąd
    PŁYNNIE na własnej stronie. Sukces → /dziekujemy/; awaria (np. 521) → komunikat +
    e-mail, dane zostają. Bez JS: natywny <form> POST (action/method/enctype = fallback).
+   Wiele plików = wiele części o nazwie `attachment` (FormSubmit dołącza wszystkie).
    Honeypot = pole `_honey`. Zero kluczy/env. CSP `form-action` ma https://formsubmit.co,
    a `connect-src` https://formsubmit.co (fetch = connect-src).
    ⚠️ AKTYWACJA: pierwsza wysyłka wyśle na CONTACT.email mail „Activate Form" —
@@ -39,21 +42,25 @@ interface FieldState {
   error: string | null;
   touched: boolean;
 }
-type FieldKey = "name" | "email" | "phone" | "message";
+type FieldKey = "name" | "company" | "email" | "phone" | "message";
 type FormStatus = "idle" | "loading" | "error";
 
-/* ── Walidacja (prosta) — wszystkie 4 pola wymagane ──────────────── */
+/* ── Walidacja (prosta) ──────────────────────────────────────────── */
 const VALIDATORS: Record<FieldKey, (v: string) => string | null> = {
   name: (v) =>
     !v.trim() ? "Podaj imię i nazwisko." : v.trim().length < 3 ? "To trochę za krótkie." : null,
+  // Firma jest opcjonalna — nigdy nie blokuje wysyłki.
+  company: () => null,
   email: (v) =>
     !v.trim() ? "Podaj adres e-mail." : !EMAIL_RE.test(v) ? "Sprawdź adres e-mail." : null,
-  phone: (v) =>
-    !v.trim()
+  phone: (v) => {
+    const digits = v.replace(/\D/g, "");
+    return !v.trim()
       ? "Podaj numer telefonu."
-      : v.replace(/[^\d]/g, "").length < 9
+      : digits.length < 9
         ? "Sprawdź numer telefonu."
-        : null,
+        : null;
+  },
   message: (v) =>
     !v.trim()
       ? "Napisz kilka słów o projekcie."
@@ -77,6 +84,7 @@ function FloatingField({
   required,
   multiline,
   disabled,
+  hint,
   onChange,
   onFocus,
   onBlur,
@@ -92,6 +100,8 @@ function FloatingField({
   required?: boolean;
   multiline?: boolean;
   disabled?: boolean;
+  /** Krótka podpowiedź pod polem (np. po co prosimy o telefon) — znika, gdy jest błąd. */
+  hint?: string;
   onChange: (key: FieldKey, value: string) => void;
   onFocus: (key: FieldKey) => void;
   onBlur: (key: FieldKey) => void;
@@ -104,7 +114,7 @@ function FloatingField({
     "w-full rounded-xl bg-[#f2f2f2] px-4 font-body text-[16px] text-[#0f0f0f] outline-none",
     "transition-[background-color,box-shadow] duration-200",
     "disabled:opacity-50 disabled:cursor-not-allowed",
-    multiline ? "min-h-[112px] resize-none pt-7 pb-3" : "h-[58px] pt-6 pb-1",
+    multiline ? "min-h-[120px] resize-none pt-7 pb-3" : "h-[58px] pt-6 pb-1",
     invalid
       ? "bg-[#fbeef2] shadow-[0_0_0_1.5px_rgba(204,43,94,0.45)]"
       : "focus:bg-[#ececec] focus:shadow-[0_0_0_2px_rgba(207,67,184,0.4)]"
@@ -134,7 +144,7 @@ function FloatingField({
     required,
     "aria-required": required || undefined,
     "aria-invalid": invalid,
-    "aria-describedby": invalid ? `${id}-error` : undefined,
+    "aria-describedby": invalid ? `${id}-error` : hint ? `${id}-hint` : undefined,
     value: field.value,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange(name, e.target.value),
@@ -147,7 +157,7 @@ function FloatingField({
     <div className="flex flex-col gap-1.5">
       <div className="relative">
         {multiline ? (
-          <textarea {...shared} rows={3} />
+          <textarea {...shared} rows={4} />
         ) : (
           <input {...shared} type={type} inputMode={inputMode} autoComplete={autoComplete} />
         )}
@@ -170,93 +180,115 @@ function FloatingField({
           {field.error}
         </motion.p>
       )}
+      {!invalid && hint && (
+        <p id={`${id}-hint`} className="pl-1 font-body text-[12px] leading-snug text-black/45">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   Brief — przeprojektowana strefa załączania (dashed + mikro-interakcje).
+   FileAttach — strefa załączania na KILKA plików (dashed + mikro-interakcje).
    buttons-ctas: hover lift, ikona jako akcja drugorzędna, ease 0.4,0,0.2,1.
    ════════════════════════════════════════════════════════════════════ */
 function FileAttach({
   id,
-  file,
+  files,
   error,
   disabled,
-  onPick,
-  onClear,
+  onAdd,
+  onRemove,
 }: {
   id: string;
-  file: File | null;
+  files: File[];
   error: string | null;
   disabled: boolean;
-  /** Waliduje + zapisuje plik; zwraca true gdy zaakceptowany (wtedy zostaje w <input>). */
-  onPick: (f: File) => boolean;
-  onClear: () => void;
+  onAdd: (list: FileList | File[]) => void;
+  onRemove: (index: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const reduce = useReducedMotion();
 
-  const sizeLabel = file
-    ? file.size < 1024 * 1024
-      ? `${Math.round(file.size / 1024)} KB`
-      : `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-    : "";
+  // Trzymaj prawdziwy <input type=file multiple name=attachment> ZSYNCHRONIZOWANY
+  // ze stanem (DataTransfer) — żeby natywny multipart POST (fallback bez JS) też
+  // niósł wszystkie pliki. Ścieżka JS i tak buduje FormData ze stanu (poniżej).
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    input.files = dt.files;
+  }, [files]);
+
+  const sizeLabel = (size: number) =>
+    size < 1024 * 1024
+      ? `${Math.round(size / 1024)} KB`
+      : `${(size / (1024 * 1024)).toFixed(1)} MB`;
+
+  const atMax = files.length >= MAX_FILES;
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Prawdziwy <input type=file name=attachment> — MUSI trzymać plik, bo to on
-          jedzie z natywnym multipart POST do FormSubmit (sr-only, ale w <form>). */}
+    <div className="flex flex-col gap-2.5">
       <input
         ref={inputRef}
         id={id}
         name="attachment"
         type="file"
+        multiple
         accept={ACCEPT_ATTR}
         className="sr-only"
         aria-describedby={error ? `${id}-error` : undefined}
         disabled={disabled}
         onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f && !onPick(f)) e.target.value = ""; // odrzucony walidacją → wyczyść
+          if (e.target.files?.length) onAdd(e.target.files);
+          e.target.value = ""; // pozwala ponownie dodać wcześniej usunięty plik
         }}
       />
 
-      {file ? (
-        <motion.div
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: EASE.expo }}
-          className="flex items-center gap-3.5 rounded-xl border border-pink/30 bg-pink/[0.05] px-4 py-3.5"
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink/15 text-pink">
-            <FileIcon />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-body text-[14.5px] text-[#0f0f0f]">{file.name}</p>
-            <p className="font-body text-[12px] text-black/55">{sizeLabel} · gotowe do wysłania</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (inputRef.current) inputRef.current.value = "";
-              onClear();
-            }}
-            disabled={disabled}
-            aria-label="Usuń załączony plik"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-black/45 transition-colors duration-200 hover:bg-black/5 hover:text-black/80"
-          >
-            <svg width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-              <path
-                d="M4 4L11 11M11 4L4 11"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </motion.div>
-      ) : (
+      {/* ── Lista dołączonych plików ── */}
+      {files.length > 0 && (
+        <ul className="flex flex-col gap-2" role="list">
+          {files.map((f, i) => (
+            <motion.li
+              key={`${f.name}-${f.size}-${i}`}
+              initial={reduce ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.25, ease: EASE.expo }}
+              className="flex items-center gap-3.5 rounded-xl border border-pink/30 bg-pink/[0.05] px-4 py-3"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-pink/15 text-pink">
+                <FileIcon />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-body text-[14px] text-[#0f0f0f]">{f.name}</p>
+                <p className="font-body text-[12px] text-black/55">{sizeLabel(f.size)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemove(i)}
+                disabled={disabled}
+                aria-label={`Usuń plik ${f.name}`}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-black/45 transition-colors duration-200 hover:bg-black/5 hover:text-black/80"
+              >
+                <svg width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+                  <path
+                    d="M4 4L11 11M11 4L4 11"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </motion.li>
+          ))}
+        </ul>
+      )}
+
+      {/* ── Dodaj plik(i) — dashed dropzone (znika po osiągnięciu limitu) ── */}
+      {!atMax ? (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -268,15 +300,7 @@ function FileAttach({
           onDrop={(e) => {
             e.preventDefault();
             setDragOver(false);
-            const f = e.dataTransfer.files?.[0];
-            if (!f || disabled) return;
-            // drop nie trafia do <input> — jeśli zaakceptowany, wstaw plik ręcznie
-            // (DataTransfer), żeby pojechał z natywnym multipart POST.
-            if (onPick(f) && inputRef.current) {
-              const dt = new DataTransfer();
-              dt.items.add(f);
-              inputRef.current.files = dt.files;
-            }
+            if (!disabled && e.dataTransfer.files?.length) onAdd(e.dataTransfer.files);
           }}
           disabled={disabled}
           className={cn(
@@ -302,14 +326,22 @@ function FileAttach({
           </span>
           <span className="flex flex-col">
             <span className="font-body text-[15px] text-[#0f0f0f]">
-              {dragOver ? "Upuść plik tutaj" : "Załącz brief"}
-              <span className="text-black/55"> (opcjonalne)</span>
+              {dragOver
+                ? "Upuść pliki tutaj"
+                : files.length > 0
+                  ? "Dodaj kolejny plik"
+                  : "Dołącz pliki"}
+              <span className="text-black/55"> (opcjonalnie)</span>
             </span>
             <span className="font-body text-[12px] text-black/55">
-              Przeciągnij lub kliknij · PDF, DOC, JPG, ZIP · do 10 MB
+              Zdjęcia, logo, stara strona, brief · PDF, DOC, JPG, ZIP · do 10 MB łącznie
             </span>
           </span>
         </button>
+      ) : (
+        <p className="pl-1 font-body text-[12px] leading-snug text-black/45">
+          Dodano maksymalną liczbę plików ({MAX_FILES}).
+        </p>
       )}
 
       {error && (
@@ -363,12 +395,13 @@ export function Contact() {
 
   const [fields, setFields] = useState<Record<FieldKey, FieldState>>({
     name: { value: "", error: null, touched: false },
+    company: { value: "", error: null, touched: false },
     email: { value: "", error: null, touched: false },
     phone: { value: "", error: null, touched: false },
     message: { value: "", error: null, touched: false },
   });
   const [focusedKey, setFocusedKey] = useState<FieldKey | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [status, setStatus] = useState<FormStatus>("idle");
   // Honeypot — pole-pułapka niewidoczne dla ludzi (`_honey`); jeśli bot je wypełni,
@@ -387,15 +420,19 @@ export function Contact() {
     if (nextRef.current) nextRef.current.value = `${window.location.origin}/dziekujemy/`;
   }, []);
 
-  // Ref do formularza — z niego budujemy FormData (pola + plik) do graceful fetcha.
+  // Ref do formularza — z niego budujemy FormData (pola + pliki) do graceful fetcha.
   // Atrybuty <form action/method/enctype> zostają = natywny POST jako fallback bez JS.
   const formRef = useRef<HTMLFormElement>(null);
 
-  const update = (key: FieldKey, value: string) =>
+  const update = (key: FieldKey, value: string) => {
+    // Gdy poprzednia wysyłka się nie powiodła, pierwsza edycja czyści stan błędu
+    // (przycisk wraca do „Wyślij wiadomość", znika czerwony komunikat).
+    if (status === "error") setStatus("idle");
     setFields((prev) => ({
       ...prev,
       [key]: { ...prev[key], value, error: prev[key].touched ? null : prev[key].error },
     }));
+  };
 
   const handleFocus = (key: FieldKey) => setFocusedKey(key);
   const handleBlur = (key: FieldKey) => {
@@ -406,27 +443,42 @@ export function Contact() {
     }));
   };
 
-  const pickFile = (f: File): boolean => {
-    if (f.size > MAX_FILE_BYTES) {
-      setFileError("Plik jest za duży (max 10 MB).");
-      return false;
+  // Dodaje pliki do listy: waliduje format, łączny rozmiar i limit liczby; dedupe.
+  const addFiles = (incoming: FileList | File[]) => {
+    const next = [...files];
+    let error: string | null = null;
+    for (const f of Array.from(incoming)) {
+      const ext = "." + (f.name.split(".").pop()?.toLowerCase() ?? "");
+      if (!ACCEPT_EXTS.includes(ext)) {
+        error = "Nieobsługiwany format pliku.";
+        continue;
+      }
+      if (next.some((p) => p.name === f.name && p.size === f.size)) continue; // już dodany
+      if (next.length >= MAX_FILES) {
+        error = `Możesz dołączyć maksymalnie ${MAX_FILES} plików.`;
+        break;
+      }
+      if (next.reduce((s, p) => s + p.size, 0) + f.size > MAX_TOTAL_BYTES) {
+        error = "Pliki są za duże — łącznie do 10 MB.";
+        continue;
+      }
+      next.push(f);
     }
-    const ext = "." + (f.name.split(".").pop()?.toLowerCase() ?? "");
-    if (!ACCEPT_EXTS.includes(ext)) {
-      setFileError("Nieobsługiwany format pliku.");
-      return false;
-    }
-    setFileError(null);
-    setFile(f);
-    return true;
+    setFiles(next);
+    setFileError(error);
   };
 
-  // Wysyłka leadu: walidacja → GRACEFUL fetch (multipart, z plikiem) do FormSubmit.
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFileError(null);
+  };
+
+  // Wysyłka leadu: walidacja → GRACEFUL fetch (multipart, z plikami) do FormSubmit.
   // Dlaczego fetch, a nie natywna nawigacja: gdy FormSubmit ma awarię (np. błąd 521),
   // natywny POST wyrzuciłby użytkownika na OBCĄ stronę błędu i lead by przepadł. fetch
   // pozwala obsłużyć błąd PŁYNNIE na naszej stronie (komunikat + e-mail), a wpisane dane
   // zostają. Endpoint FormSubmit zwraca CORS (Allow-Origin: *), więc cross-origin fetch
-  // z plikiem działa. Sukces → /dziekujemy/. Bez JS: natywny <form> POST (fallback).
+  // z plikami działa. Sukces → /dziekujemy/. Bez JS: natywny <form> POST (fallback).
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return; // już wysyłamy — ignoruj powtórne kliknięcia (anty-podwójny submit)
@@ -453,9 +505,14 @@ export function Contact() {
     if (!form) return;
     setStatus("loading");
     try {
+      // Buduj FormData ze stanu (pewne, niezależne od synchronizacji <input>):
+      // pola tekstowe + ukryte z formularza, a załączniki ze stanu `files`.
+      const fd = new FormData(form);
+      fd.delete("attachment");
+      files.forEach((f) => fd.append("attachment", f));
       const res = await fetch(FORMSUBMIT_ENDPOINT, {
         method: "POST",
-        body: new FormData(form), // wszystkie pola + plik (multipart)
+        body: fd, // wszystkie pola + pliki (multipart)
         redirect: "manual", // 302 z FormSubmit traktujemy jako sukces (opaqueredirect)
       });
       // Sukces = serwer przyjął zgłoszenie (200 strona aktywacji / 302 redirect). Awaria
@@ -471,7 +528,7 @@ export function Contact() {
 
   // Pomocnik kaskady wejścia — kolejne elementy formularza.
   let step = 0;
-  const delay = () => 0.18 + step++ * 0.06;
+  const delay = () => 0.18 + step++ * 0.05;
 
   return (
     <section
@@ -496,10 +553,15 @@ export function Contact() {
         {/* data-logo-hide-anchor: czoło tej kolumny = eyebrow „Kontakt"/nagłówek.
             Logo widoczne na wejściu /kontakt, znika gdy nagłówek dojedzie do niego
             na scrollu (koniec zasłaniania pól, zob. zrzut „E-mail") i zostaje schowane. */}
-        <div data-logo-hide-anchor className="mx-auto w-full max-w-[620px] lg:mx-0 lg:w-[54%]">
+        <div data-logo-hide-anchor className="mx-auto w-full max-w-[640px] lg:mx-0 lg:w-[56%]">
           {/* ── Nagłówek ── */}
           <FadeUp inView x={-14} y={0} duration={0.6}>
-            <span className="flex items-center gap-2.5 font-heading text-[11px] font-bold tracking-[0.4em] text-black/55 uppercase">
+            {/* Eyebrow = ten sam token co na pozostałych stronach (.label-koda),
+                ale ciemny kolor pod białe tło kontaktu (accent-róż na bieli był < AA). */}
+            <span
+              className="label-koda flex items-center gap-2.5"
+              style={{ color: "rgba(15,15,15,0.6)" }}
+            >
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-pink" />
               Kontakt
             </span>
@@ -509,8 +571,8 @@ export function Contact() {
               id="contact-heading"
               className="mt-5 font-heading font-extrabold text-[#0f0f0f]"
               style={{
-                fontSize: "clamp(1.95rem, 7vw, 4.25rem)",
-                lineHeight: 1.04,
+                fontSize: "clamp(2.4rem, 7vw, 5rem)",
+                lineHeight: 1.02,
                 letterSpacing: "-0.035em",
                 textWrap: "balance",
               }}
@@ -519,8 +581,8 @@ export function Contact() {
             </h1>
           </FadeUp>
           <FadeUp inView delay={0.13}>
-            <p className="mt-5 max-w-[440px] font-body text-[16px] leading-relaxed text-black/60">
-              Opowiedz nam o projekcie, a wrócimy z propozycją i wyceną w ciągu 24 godzin. Wolisz
+            <p className="mt-5 max-w-[460px] font-body text-[16px] leading-relaxed text-black/60">
+              Opowiedz nam o projekcie, a wrócimy z pomysłem i wyceną w ciągu 24 godzin. Wolisz
               e-mail?{" "}
               <a
                 href={`mailto:${CONTACT.email}`}
@@ -570,55 +632,79 @@ export function Contact() {
                 pointerEvents: "none",
               }}
             />
-            <FadeUp inView delay={delay()} y={18}>
-              <FloatingField
-                id={id("name")}
-                name="name"
-                label="Imię i nazwisko"
-                field={fields.name}
-                focused={focusedKey === "name"}
-                autoComplete="name"
-                required
-                disabled={isLoading}
-                onChange={update}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-              />
-            </FadeUp>
-            <FadeUp inView delay={delay()} y={18}>
-              <FloatingField
-                id={id("email")}
-                name="email"
-                label="E-mail"
-                field={fields.email}
-                focused={focusedKey === "email"}
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                required
-                disabled={isLoading}
-                onChange={update}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-              />
-            </FadeUp>
-            <FadeUp inView delay={delay()} y={18}>
-              <FloatingField
-                id={id("phone")}
-                name="phone"
-                label="Telefon"
-                field={fields.phone}
-                focused={focusedKey === "phone"}
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                required
-                disabled={isLoading}
-                onChange={update}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-              />
-            </FadeUp>
+
+            {/* Imię i nazwisko + Firma (opcjonalnie) */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <FadeUp inView delay={delay()} y={18}>
+                <FloatingField
+                  id={id("name")}
+                  name="name"
+                  label="Imię i nazwisko"
+                  field={fields.name}
+                  focused={focusedKey === "name"}
+                  autoComplete="name"
+                  required
+                  disabled={isLoading}
+                  onChange={update}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                />
+              </FadeUp>
+              <FadeUp inView delay={delay()} y={18}>
+                <FloatingField
+                  id={id("company")}
+                  name="company"
+                  label="Firma (opcjonalnie)"
+                  field={fields.company}
+                  focused={focusedKey === "company"}
+                  autoComplete="organization"
+                  disabled={isLoading}
+                  onChange={update}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                />
+              </FadeUp>
+            </div>
+
+            {/* E-mail + Telefon (oba wymagane) */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <FadeUp inView delay={delay()} y={18}>
+                <FloatingField
+                  id={id("email")}
+                  name="email"
+                  label="E-mail"
+                  field={fields.email}
+                  focused={focusedKey === "email"}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  required
+                  disabled={isLoading}
+                  onChange={update}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                />
+              </FadeUp>
+              <FadeUp inView delay={delay()} y={18}>
+                <FloatingField
+                  id={id("phone")}
+                  name="phone"
+                  label="Telefon"
+                  field={fields.phone}
+                  focused={focusedKey === "phone"}
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  required
+                  hint="Czasem szybciej omówić projekt przez telefon."
+                  disabled={isLoading}
+                  onChange={update}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                />
+              </FadeUp>
+            </div>
+
             <FadeUp inView delay={delay()} y={18}>
               <FloatingField
                 id={id("message")}
@@ -637,14 +723,11 @@ export function Contact() {
             <FadeUp inView delay={delay()} y={18}>
               <FileAttach
                 id={id("file")}
-                file={file}
+                files={files}
                 error={fileError}
                 disabled={isLoading}
-                onPick={pickFile}
-                onClear={() => {
-                  setFile(null);
-                  setFileError(null);
-                }}
+                onAdd={addFiles}
+                onRemove={removeFile}
               />
             </FadeUp>
 
@@ -683,9 +766,20 @@ export function Contact() {
                   )}
                 </button>
                 <p className="font-body text-[12.5px] text-black/55">
-                  Odpowiemy w ciągu 24 godzin.
+                  Odpowiadamy w ciągu 24 godzin · Bez zobowiązań.
                 </p>
               </div>
+              {/* RODO — krótko, dokładnie w momencie decyzji */}
+              <p className="mt-4 max-w-[460px] font-body text-[12px] leading-snug text-black/45">
+                Twoje dane wykorzystamy tylko do przygotowania wyceny. Bez spamu. Więcej w{" "}
+                <a
+                  href="/polityka-prywatnosci/"
+                  className="underline decoration-black/25 underline-offset-2 transition-colors hover:decoration-pink hover:text-black/70"
+                >
+                  polityce prywatności
+                </a>
+                .
+              </p>
               {status === "error" && (
                 <p
                   role="alert"
@@ -712,20 +806,24 @@ export function Contact() {
 
 /* ── Ikony / spinner ─────────────────────────────────────────────── */
 function Spinner() {
+  const reduce = useReducedMotion();
+  const ringStyle: React.CSSProperties = {
+    width: 15,
+    height: 15,
+    border: "2px solid rgba(15,15,15,0.3)",
+    borderTopColor: "#0f0f0f",
+    borderRadius: "50%",
+    flexShrink: 0,
+  };
+  // Reduced motion → static ring (no perpetual rotation).
+  if (reduce) return <span aria-hidden="true" className="inline-block" style={ringStyle} />;
   return (
     <motion.span
       animate={{ rotate: 360 }}
       transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
       aria-hidden="true"
       className="inline-block"
-      style={{
-        width: 15,
-        height: 15,
-        border: "2px solid rgba(15,15,15,0.3)",
-        borderTopColor: "#0f0f0f",
-        borderRadius: "50%",
-        flexShrink: 0,
-      }}
+      style={ringStyle}
     />
   );
 }

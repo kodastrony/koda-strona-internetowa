@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeUp } from "@/components/motion";
+import { GlowField } from "@/components/fx/glow-field";
 
 const PRINCIPLES = [
   {
@@ -12,20 +13,20 @@ const PRINCIPLES = [
   {
     n: "02",
     title: "Szybkość to szacunek",
-    desc: "Nie każemy nikomu czekać. Lekki kod i optymalizacja to u nas standard, nie płatny dodatek.",
-    color: "var(--color-accent-3)",
+    desc: "Lekki kod i szybkie ładowanie to u nas standard, nie płatny dodatek.",
+    color: "var(--color-accent)",
   },
   {
     n: "03",
     title: "Pod biznes, nie pod szablon",
     desc: "Budujemy od podstaw, pod konkretny cel. Twoja strona nie wygląda jak tysiąc innych.",
-    color: "var(--color-accent-2)",
+    color: "var(--color-pink-bright)",
   },
   {
     n: "04",
     title: "Zostajemy po starcie",
-    desc: "Wdrożenie to początek współpracy. Rozwijamy stronę razem z Twoim biznesem.",
-    color: "var(--color-accent-4)",
+    desc: "Większość agencji znika po wdrożeniu. My zostajemy: szybka odpowiedź, aktualizacje i rozwój — gdy firma rośnie.",
+    color: "var(--color-accent)",
   },
 ];
 
@@ -33,50 +34,48 @@ export function ONasContent() {
   return (
     <>
       {/* ── Manifest ── */}
-      <section
-        data-header-theme="dark"
-        className="relative overflow-hidden"
-        style={{ backgroundColor: "var(--color-bg)" }}
-      >
+      <section data-header-theme="dark" data-canvas="base" className="relative">
         <div
-          className="container-koda"
-          style={{ paddingTop: "clamp(20px,3vw,48px)", paddingBottom: "clamp(60px,8vw,120px)" }}
+          className="container-koda grid grid-cols-1 gap-x-12 gap-y-9 md:grid-cols-12"
+          style={{ paddingTop: "clamp(24px,3vw,52px)", paddingBottom: "clamp(60px,8vw,120px)" }}
         >
-          <div className="max-w-[20ch]">
+          {/* Statement — the focal point, alone in its column */}
+          <div className="md:col-span-5">
             <FadeUp inView>
               <h2
-                className="font-heading font-semibold"
+                className="font-heading font-semibold md:sticky md:top-32"
                 style={{
-                  fontSize: "clamp(2rem,4.6vw,3.6rem)",
-                  lineHeight: 1.05,
+                  fontSize: "clamp(2rem,4.4vw,3.4rem)",
+                  lineHeight: 1.06,
                   letterSpacing: "-0.03em",
                   color: "var(--color-ink)",
                   textWrap: "balance",
                 }}
               >
-                Jesteśmy studiem z jedną{" "}
-                <span style={{ color: "var(--color-pink-bright)" }}>zasadą</span>: strona ma
-                działać.
+                Traktujemy każdą stronę jak{" "}
+                <span style={{ color: "var(--color-pink-bright)" }}>produkt, nie jak zlecenie</span>
+                .
               </h2>
             </FadeUp>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-x-14 gap-y-6 md:grid-cols-2">
+          {/* Supporting paragraphs — the read, set apart from the statement */}
+          <div className="flex max-w-[58ch] flex-col gap-6 md:col-span-7">
             <FadeUp inView delay={0.08}>
               <p
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
-                  lineHeight: 1.65,
-                  color: "var(--color-ink-muted)",
+                  fontSize: "clamp(1.08rem,1.35vw,1.28rem)",
+                  lineHeight: 1.6,
+                  color: "var(--color-ink)",
                 }}
               >
-                KODA to niewielki zespół projektantów i programistów z Polski. Tworzymy strony i
-                sklepy dla polskich firm — od lokalnych biznesów po rozwijające się marki. Bez
-                korporacyjnego żargonu i bez gotowych szablonów.
+                Większość stron dla polskich firm wygląda jak szablon, działa jak szablon i daje
+                wyniki jak szablon. KODA powstała z prostego przekonania: da się inaczej — i
+                pokazujemy to w każdym projekcie.
               </p>
             </FadeUp>
-            <FadeUp inView delay={0.14}>
+            <FadeUp inView delay={0.12}>
               <p
                 style={{
                   fontFamily: "var(--font-body)",
@@ -85,10 +84,22 @@ export function ONasContent() {
                   color: "var(--color-ink-muted)",
                 }}
               >
-                Wierzymy, że dobra strona to nie ta najładniejsza, tylko ta, która realnie przynosi
-                klientów. Dlatego każdy projekt zaczynamy od pytania o cel, a kończymy na stronie,
-                która szybko się ładuje, dobrze wygląda na każdym ekranie i prowadzi odwiedzającego
-                prosto do kontaktu.
+                Nie korzystamy z gotowych szablonów i nie oddajemy Twojego projektu podwykonawcom.
+                Każdy projekt prowadzimy sami — od pierwszej rozmowy, przez projekt i kod, po opiekę
+                po starcie. Piszesz do KODA — rozmawiasz z KODA, nie z account managerem.
+              </p>
+            </FadeUp>
+            <FadeUp inView delay={0.16}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink-muted)",
+                }}
+              >
+                Mamy jasne zasady i pełną odpowiedzialność za każdy projekt, który podejmujemy. Jeśli
+                szukasz strony, która ma realnie pracować na Twoją firmę — porozmawiajmy.
               </p>
             </FadeUp>
           </div>
@@ -96,30 +107,22 @@ export function ONasContent() {
       </section>
 
       {/* ── Principles ── */}
-      <section
-        data-header-theme="dark"
-        className="relative overflow-hidden"
-        style={{ backgroundColor: "var(--color-graphite)" }}
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40"
-          style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 50% 60% at 95% 30%, rgba(207,67,184,0.12) 0%, transparent 60%)",
-          }}
+      <section data-header-theme="dark" data-canvas="tint" className="relative">
+        {/* Tło = PageCanvas (fioletowy hold „tint"); światło wystaje ponad
+            sekcję i świeci przez szew w górę manifestu. */}
+        <GlowField
+          hue={300}
+          x={92}
+          y={30}
+          strength={0.8}
+          drift
+          driftDuration={27}
+          className="inset-x-0 z-0"
+          style={{ top: "-16%", height: "80%" }}
         />
 
         <div className="container-koda section-y relative z-10">
           <FadeUp inView>
-            <span className="label-koda mb-5 block">W co wierzymy</span>
-          </FadeUp>
-          <FadeUp inView delay={0.06}>
             <h2 className="text-section-title max-w-[18ch]">
               Cztery zasady, które prowadzą każdy projekt
             </h2>

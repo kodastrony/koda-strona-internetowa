@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "@/lib/motion";
-import { FadeUp } from "@/components/motion";
+import { FadeUp, Parallax } from "@/components/motion";
+import { GlowField } from "@/components/fx/glow-field";
 import { PillLink } from "@/components/ui/pill-link";
 import { ProjectCard } from "@/components/ui/project-card";
 import { PROJECTS } from "@/lib/projects";
@@ -17,6 +18,9 @@ export function Work() {
   const sectionRef = useRef<HTMLElement>(null);
   const colARef = useRef<HTMLDivElement>(null);
   const colBRef = useRef<HTMLDivElement>(null);
+  // clip-path omija reducedMotion="user" (gasi tylko transform/layout) —
+  // reveal H2 gate'ujemy ręcznie jak w shared <Reveal>.
+  const reduce = useReducedMotion();
 
   // Scroll-parallax kolumn — transform pisany BEZPOŚREDNIO, ZSYNCHRONIZOWANY ze
   // scrollem (zero CSS-transition → kolumny „przyklejone" do pozycji scrolla;
@@ -62,13 +66,19 @@ export function Work() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      data-header-theme="dark"
-      className="relative overflow-hidden"
-      style={{ backgroundColor: "var(--color-bg)" }}
-    >
-      <div className="container-koda section-y">
+    <section ref={sectionRef} data-header-theme="dark" data-canvas="work" className="relative">
+      {/* Tło = PageCanvas (powrót do neutralnej czerni). Magentowe światło
+          u góry-lewej — bez obcinania na krawędzi sekcji (cichy szew z
+          Services robi sam canvas). */}
+      <Parallax
+        speed={-55}
+        className="pointer-events-none absolute inset-x-0 z-0"
+        style={{ top: "-12%", height: "70%" }}
+      >
+        <GlowField hue={324} x={10} y={28} strength={0.8} drift driftDuration={19} className="inset-0" />
+      </Parallax>
+
+      <div className="container-koda section-y relative z-10">
         {/* ── Section header — title left, context right ── */}
         <div className="mb-[clamp(36px,4.5vw,64px)] flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
@@ -76,7 +86,7 @@ export function Work() {
               <span className="label-koda mb-5 block">Realizacje</span>
             </FadeUp>
             <h2 className="text-section-title">
-              {["Wybrane", "realizacje"].map((line, i) => (
+              {["Nasze realizacje", "stron internetowych."].map((line, i) => (
                 <motion.span
                   key={line}
                   data-reveal
@@ -84,26 +94,15 @@ export function Work() {
                   initial={{ clipPath: "inset(0 100% 0 0)" }}
                   whileInView={{ clipPath: "inset(0 0% 0 0)" }}
                   viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-                  transition={{ duration: 0.85, ease: EASE.out, delay: 0.06 + i * 0.1 }}
+                  transition={
+                    reduce ? { duration: 0 } : { duration: 0.85, ease: EASE.out, delay: 0.06 + i * 0.1 }
+                  }
                 >
                   {line}
                 </motion.span>
               ))}
             </h2>
           </div>
-
-          <FadeUp inView delay={0.2} y={18} className="md:max-w-[360px] md:pb-2 md:text-right">
-            <p
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "clamp(0.95rem, 1.05vw, 1.05rem)",
-                color: "var(--color-ink-muted)",
-                lineHeight: 1.6,
-              }}
-            >
-              Projekty, które łączą dopracowany design z realnymi wynikami w sprzedaży.
-            </p>
-          </FadeUp>
         </div>
 
         {/* ── Two-column staggered grid (kolumny z parallaxem na scroll) ── */}
@@ -136,7 +135,7 @@ export function Work() {
               border="var(--color-line-strong)"
               className="px-9 py-4"
             >
-              Sprawdź wszystkie realizacje
+              Zobacz wszystkie realizacje
             </PillLink>
           </FadeUp>
         </div>

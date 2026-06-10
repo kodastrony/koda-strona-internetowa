@@ -37,7 +37,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       <ProjectDetail project={project} prev={prev} next={next} />
       <CTABand
         title="Zróbmy coś takiego dla Ciebie"
-        subtitle="Masz podobny projekt na oku? Opowiedz nam o nim — wrócimy z propozycją i wyceną w 24 godziny."
+        subtitle="Masz podobny projekt na oku? Opowiedz nam o nim — wrócimy z pomysłem i wyceną w ciągu 24 godzin."
       />
     </>
   );

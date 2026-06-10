@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FadeUp, Reveal } from "@/components/motion";
+import { GlowField } from "@/components/fx/glow-field";
 import { EASE } from "@/lib/motion";
 import { MockWebsite } from "@/components/ui/project-card";
 import type { Project } from "@/lib/projects";
@@ -42,9 +43,9 @@ export function ProjectDetail({
       {/* ── Hero ── */}
       <section
         data-header-theme="dark"
-        className="relative overflow-hidden"
+        data-canvas="hero"
+        className="relative"
         style={{
-          backgroundColor: "var(--color-bg)",
           paddingTop: "clamp(128px, 16vw, 210px)",
           paddingBottom: "clamp(28px, 4vw, 56px)",
         }}
@@ -81,7 +82,7 @@ export function ProjectDetail({
               className="font-heading text-[12px] font-bold tracking-[0.2em] uppercase"
               style={{ color: "var(--color-accent)" }}
             >
-              {project.client} · {project.year}
+              {project.concept ? "Projekt koncepcyjny" : `${project.client} · ${project.year}`}
             </span>
           </FadeUp>
 
@@ -108,11 +109,7 @@ export function ProjectDetail({
       </section>
 
       {/* ── Showcase visual ── */}
-      <section
-        data-header-theme="dark"
-        className="relative"
-        style={{ backgroundColor: "var(--color-bg)" }}
-      >
+      <section data-header-theme="dark" className="relative">
         <div
           className="container-koda"
           style={{ paddingTop: "clamp(24px,3vw,40px)", paddingBottom: "clamp(48px,6vw,96px)" }}
@@ -157,15 +154,18 @@ export function ProjectDetail({
       </section>
 
       {/* ── Facts + scope + deliverables ── */}
-      <section
-        data-header-theme="dark"
-        className="relative overflow-hidden"
-        style={{ backgroundColor: "var(--color-graphite)" }}
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40"
-          style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
+      <section data-header-theme="dark" data-canvas="tint" className="relative">
+        {/* Tło = PageCanvas (fioletowy hold „tint"); delikatne światło od
+            prawej, wystaje ponad sekcję. */}
+        <GlowField
+          hue={300}
+          x={90}
+          y={22}
+          strength={0.55}
+          drift
+          driftDuration={33}
+          className="inset-x-0 z-0"
+          style={{ top: "-14%", height: "75%" }}
         />
 
         <div className="container-koda section-y relative z-10">
@@ -176,9 +176,11 @@ export function ProjectDetail({
               style={{ borderColor: "var(--color-line)" }}
             >
               {[
-                { k: "Branża", v: project.client },
+                { k: project.concept ? "Przykład dla" : "Branża", v: project.client },
                 { k: "Typ projektu", v: project.type },
-                { k: "Rok", v: project.year },
+                project.concept
+                  ? { k: "Status", v: "Projekt koncepcyjny" }
+                  : { k: "Rok", v: project.year },
               ].map((f) => (
                 <div key={f.k}>
                   <p
@@ -243,7 +245,7 @@ export function ProjectDetail({
                   color: "var(--color-ink)",
                 }}
               >
-                Co dostarczyliśmy
+                {project.concept ? "Co obejmuje taki projekt" : "Co dostarczyliśmy"}
               </h2>
               <ul className="flex flex-col gap-3" role="list">
                 {project.deliverables.map((d) => (
@@ -268,11 +270,7 @@ export function ProjectDetail({
       </section>
 
       {/* ── Prev / next ── */}
-      <section
-        data-header-theme="dark"
-        className="relative"
-        style={{ backgroundColor: "var(--color-bg)" }}
-      >
+      <section data-header-theme="dark" data-canvas="base" className="relative">
         <div
           className="container-koda"
           style={{ paddingTop: "clamp(48px,6vw,90px)", paddingBottom: "clamp(48px,6vw,90px)" }}
@@ -280,7 +278,7 @@ export function ProjectDetail({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Link
               href={`/realizacje/${prev.id}`}
-              className="group rounded-2xl p-6 transition-colors duration-300"
+              className="group rounded-2xl px-6 py-[clamp(20px,2.8vw,32px)] transition-colors duration-300"
               style={{
                 border: "1px solid var(--color-line)",
                 backgroundColor: "var(--color-surface-1)",
@@ -305,7 +303,7 @@ export function ProjectDetail({
             </Link>
             <Link
               href={`/realizacje/${next.id}`}
-              className="group rounded-2xl p-6 text-right transition-colors duration-300"
+              className="group rounded-2xl px-6 py-[clamp(20px,2.8vw,32px)] text-right transition-colors duration-300"
               style={{
                 border: "1px solid var(--color-line)",
                 backgroundColor: "var(--color-surface-1)",

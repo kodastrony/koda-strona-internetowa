@@ -1,16 +1,37 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import { FadeUp } from "@/components/motion";
-import { SERVICES, PROCESS } from "@/lib/services-data";
+import { GlowField } from "@/components/fx/glow-field";
+import { ProcessSteps } from "@/components/sections/process-steps";
+import { EASE } from "@/lib/motion";
+import { SERVICES } from "@/lib/services-data";
 
-const NUM_COLORS = [
-  "var(--color-pink-bright)",
-  "var(--color-accent-3)",
-  "var(--color-accent-2)",
-  "var(--color-accent-4)",
-];
+const PINK = "var(--color-pink-bright)";
 
-function CheckIcon({ color }: { color: string }) {
+/* Duża cyfra 01–04: BIAŁA, a gdy wjedzie na środek ekranu (czyli gdy odwiedzający
+   ją czyta) — płynnie ZAPALA SIĘ na różowo. Reduced-motion → od razu różowa. */
+function StepNumber({ n }: { n: string }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      aria-hidden="true"
+      className="mb-4 font-heading font-bold"
+      style={{ fontSize: "clamp(2.6rem,4.4vw,4rem)", lineHeight: 1, letterSpacing: "-0.04em" }}
+      initial={reduce ? false : { color: "#f5f5f7" }}
+      whileInView={{ color: "#ff5ec8" }}
+      viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
+      transition={reduce ? { duration: 0 } : { duration: 0.55, ease: EASE.out }}
+    >
+      {n}
+    </motion.div>
+  );
+}
+
+/* Ptaszek, który RYSUJE SIĘ (pathLength) po wjeździe w widok — z opóźnieniem,
+   więc w obrębie usługi zapalają się po kolei („beng, beng"). Różowy. */
+function AnimatedCheck({ delay }: { delay: number }) {
+  const reduce = useReducedMotion();
   return (
     <svg
       width="15"
@@ -20,12 +41,16 @@ function CheckIcon({ color }: { color: string }) {
       aria-hidden="true"
       className="mt-1 shrink-0"
     >
-      <path
+      <motion.path
         d="M3 8.5L6.5 12L13 4.5"
-        stroke={color}
-        strokeWidth="1.8"
+        stroke={PINK}
+        strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={reduce ? false : { pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
+        transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}
       />
     </svg>
   );
@@ -35,37 +60,22 @@ export function UslugiContent() {
   return (
     <>
       {/* ── Detailed services ── */}
-      <section
-        data-header-theme="dark"
-        className="relative"
-        style={{ backgroundColor: "var(--color-bg)" }}
-      >
+      <section data-header-theme="dark" data-canvas="base" className="relative">
         <div className="container-koda" style={{ paddingBottom: "clamp(60px, 8vw, 120px)" }}>
-          {SERVICES.map((s, i) => (
+          {SERVICES.map((s) => (
             <article
               key={s.id}
               id={s.id}
               className="grid scroll-mt-28 grid-cols-1 gap-y-6 md:grid-cols-12 md:gap-x-12"
               style={{
                 borderTop: "1px solid var(--color-line)",
-                paddingTop: "clamp(36px,5vw,72px)",
-                paddingBottom: "clamp(36px,5vw,72px)",
+                paddingTop: "clamp(48px,6vw,96px)",
+                paddingBottom: "clamp(48px,6vw,96px)",
               }}
             >
               <div className="md:col-span-5">
                 <FadeUp inView>
-                  <div
-                    aria-hidden="true"
-                    className="mb-4 font-heading font-bold"
-                    style={{
-                      fontSize: "clamp(2.6rem,4.4vw,4rem)",
-                      lineHeight: 1,
-                      letterSpacing: "-0.04em",
-                      color: NUM_COLORS[i % NUM_COLORS.length],
-                    }}
-                  >
-                    {s.n}
-                  </div>
+                  <StepNumber n={s.n} />
                 </FadeUp>
                 <FadeUp inView delay={0.06}>
                   <h2
@@ -97,8 +107,8 @@ export function UslugiContent() {
                   </p>
                 </FadeUp>
                 <FadeUp inView delay={0.16}>
-                  <ul className="mt-7 grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2" role="list">
-                    {s.points.map((p) => (
+                  <ul className="mt-7 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2" role="list">
+                    {s.points.map((p, idx) => (
                       <li
                         key={p}
                         className="flex items-start gap-3"
@@ -109,7 +119,7 @@ export function UslugiContent() {
                           color: "var(--color-ink)",
                         }}
                       >
-                        <CheckIcon color={NUM_COLORS[i % NUM_COLORS.length]} />
+                        <AnimatedCheck delay={idx * 0.12} />
                         <span>{p}</span>
                       </li>
                     ))}
@@ -121,24 +131,83 @@ export function UslugiContent() {
         </div>
       </section>
 
-      {/* ── Process — "Jak pracujemy" ── */}
-      <section
-        data-header-theme="dark"
-        className="relative overflow-hidden"
-        style={{ backgroundColor: "var(--color-graphite)" }}
-      >
+      {/* ── Wycena — uczciwa rama ceny bez cennika ── */}
+      <section data-header-theme="dark" className="relative">
         <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40"
-          style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0"
+          className="container-koda grid grid-cols-1 gap-y-6 md:grid-cols-12 md:gap-x-12"
           style={{
-            background:
-              "radial-gradient(ellipse 55% 55% at 8% 12%, rgba(100,120,240,0.10) 0%, transparent 58%)",
+            borderTop: "1px solid var(--color-line)",
+            paddingTop: "clamp(48px,6vw,96px)",
+            paddingBottom: "clamp(60px,8vw,120px)",
           }}
+        >
+          <div className="md:col-span-5">
+            <FadeUp inView>
+              <span className="label-koda mb-5 block">Wycena</span>
+            </FadeUp>
+            <FadeUp inView delay={0.06}>
+              <h2
+                className="font-heading font-semibold"
+                style={{
+                  fontSize: "clamp(1.7rem,3vw,2.6rem)",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.08,
+                  color: "var(--color-ink)",
+                }}
+              >
+                Ile kosztuje strona?
+              </h2>
+            </FadeUp>
+          </div>
+          <div className="md:col-span-7">
+            <FadeUp inView delay={0.1}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.02rem,1.25vw,1.18rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink-muted)",
+                  maxWidth: "56ch",
+                }}
+              >
+                To zależy od zakresu: liczby podstron, treści, integracji i terminu. Dlatego nie
+                podajemy cen z sufitu — opisz nam krótko projekt, a wrócimy z konkretną kwotą.
+                Bezpłatnie i bez zobowiązań.
+              </p>
+            </FadeUp>
+            <FadeUp inView delay={0.16}>
+              <p
+                className="mt-5"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.02rem,1.25vw,1.18rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink)",
+                  maxWidth: "56ch",
+                }}
+              >
+                Kreator i gotowy szablon są tanie na start, ale wyglądają jak tysiąc innych stron i
+                trudno je rozwijać. U nas dostajesz coś innego: kod pisany pod Twój konkretny biznes,
+                bezpośredni kontakt z osobami, które go tworzą, i zakres ustalony w umowie.
+              </p>
+            </FadeUp>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Process — "Jak pracujemy" ── */}
+      <section data-header-theme="dark" data-canvas="process" className="relative">
+        {/* Tło = PageCanvas (indygowy hold „process", jak na home). Indygowe
+            światło wystaje ponad sekcję — świeci przez szew w górę. */}
+        <GlowField
+          hue={273}
+          x={10}
+          y={26}
+          strength={0.6}
+          drift
+          driftDuration={31}
+          className="inset-x-0 z-0"
+          style={{ top: "-18%", height: "80%" }}
         />
 
         <div className="container-koda section-y relative z-10">
@@ -149,47 +218,7 @@ export function UslugiContent() {
             <h2 className="text-section-title max-w-[16ch]">Jak pracujemy</h2>
           </FadeUp>
 
-          <div className="mt-[clamp(44px,5.5vw,80px)] grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-            {PROCESS.map((step, i) => (
-              <FadeUp inView key={step.n} delay={0.08 * i} y={26}>
-                <div>
-                  <div
-                    aria-hidden="true"
-                    className="mb-4 font-heading font-bold"
-                    style={{
-                      fontSize: "clamp(2.2rem,3vw,3rem)",
-                      lineHeight: 1,
-                      letterSpacing: "-0.04em",
-                      color: "var(--color-accent)",
-                    }}
-                  >
-                    {step.n}
-                  </div>
-                  <h3
-                    className="mb-2.5 font-heading font-semibold"
-                    style={{
-                      fontSize: "clamp(1.2rem,1.7vw,1.5rem)",
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.15,
-                      color: "var(--color-ink)",
-                    }}
-                  >
-                    {step.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "0.97rem",
-                      lineHeight: 1.6,
-                      color: "var(--color-ink-muted)",
-                    }}
-                  >
-                    {step.desc}
-                  </p>
-                </div>
-              </FadeUp>
-            ))}
-          </div>
+          <ProcessSteps />
         </div>
       </section>
     </>

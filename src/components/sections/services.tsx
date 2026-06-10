@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FadeUp } from "@/components/motion";
+import { FadeUp, Reveal, Parallax } from "@/components/motion";
+import { GlowField } from "@/components/fx/glow-field";
 import { SERVICES } from "@/lib/services-data";
 
 /* ── "Co robimy" — interactive hover-wipe list ───────────────────────────
@@ -79,31 +80,19 @@ function ServiceRow({
 
 export function Services() {
   return (
-    <section
-      data-header-theme="dark"
-      className="relative overflow-hidden"
-      style={{ backgroundColor: "var(--color-graphite)" }}
-    >
-      {/* Smooth fades — graphite melts into the black sections above/below */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40"
-        style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40"
-        style={{ background: "linear-gradient(to top, var(--color-bg), transparent)" }}
-      />
-      {/* Section mood — soft violet atmosphere */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 55% 50% at 88% 2%, rgba(154,99,239,0.10) 0%, transparent 58%)",
-        }}
-      />
+    <section data-header-theme="dark" data-canvas="services" className="relative">
+      {/* Tło sekcji = PageCanvas (hold „services" #15121b) — zero własnego bg,
+          zero mostków. Atmosfera: fioletowe pole światła, które WYSTAJE ponad
+          górę sekcji (top -22%) i świeci przez szew w głąb hero — światło
+          zapowiada sekcję, zanim ta nadjedzie. Brak overflow-hidden (poziomy
+          nadmiar tnie globalny body overflow-x: clip). */}
+      <Parallax
+        speed={65}
+        className="pointer-events-none absolute inset-x-0 z-0"
+        style={{ top: "-22%", height: "88%" }}
+      >
+        <GlowField hue={300} x={85} y={28} strength={0.9} drift driftDuration={33} className="inset-0" />
+      </Parallax>
 
       <div className="container-koda section-y relative z-10">
         {/* ── Header ── */}
@@ -112,9 +101,9 @@ export function Services() {
             <FadeUp inView>
               <span className="label-koda mb-5 block">Usługi</span>
             </FadeUp>
-            <FadeUp inView delay={0.06}>
+            <Reveal inView delay={0.06}>
               <h2 className="text-section-title">Co robimy</h2>
-            </FadeUp>
+            </Reveal>
           </div>
           <FadeUp inView delay={0.14} className="md:max-w-[330px] md:pb-2 md:text-right">
             <p
@@ -125,7 +114,7 @@ export function Services() {
                 lineHeight: 1.6,
               }}
             >
-              Od pierwszego pomysłu po działającą stronę, która zarabia. Wszystko w jednym miejscu.
+              Bez podwykonawców. Piszesz do nas — odpowiadamy my, nie żaden account manager.
             </p>
           </FadeUp>
         </div>

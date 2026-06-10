@@ -7,8 +7,25 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t border-white/5 bg-dark-2">
-      <div className="container-koda py-16 md:py-20">
+    // Tło = PageCanvas (hold „footer" #0a0609 — ciepła czerń H335: róż
+    // Statementu „umiera" W stopkę zamiast zderzać się z zimnym #070709).
+    <footer data-canvas="footer" className="relative mt-auto">
+      {/* Poświata — róż ledwo dogasa u górnej krawędzi (ostatni takt color story) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-64"
+        style={{
+          background:
+            "radial-gradient(ellipse 75% 100% at 50% 0%, oklch(0.62 0.215 335 / 0.07) 0%, oklch(0.62 0.215 335 / 0.025) 45%, oklch(0.62 0.215 335 / 0) 75%)",
+        }}
+      />
+      {/* Ciepły hairline zamiast zimnego white/5 — spójny z H335 */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{ backgroundColor: "rgba(255, 94, 200, 0.09)" }}
+      />
+      <div className="container-koda relative z-10 py-16 md:py-20">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           {/* Brand */}
           <div className="flex flex-col gap-5">
@@ -26,9 +43,11 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Nav */}
+          {/* Nav — pink-bright: #cf43b8 spada do ~3.1:1 w strefie plum→stopka */}
           <nav aria-label="Nawigacja stopki">
-            <p className="label-koda mb-5">Strony</p>
+            <p className="label-koda mb-5" style={{ color: "var(--color-pink-bright)" }}>
+              Strony
+            </p>
             <ul className="flex flex-col gap-3" role="list">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
@@ -43,16 +62,23 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* Contact */}
-          <div className="flex flex-col gap-5">
-            <p className="label-koda">Kontakt</p>
+          {/* Contact — pasek odpowiedzialności: realne, sprawdzalne sygnały zaufania */}
+          <div className="flex flex-col gap-4">
+            <p className="label-koda" style={{ color: "var(--color-pink-bright)" }}>
+              Kontakt
+            </p>
             <a
               href={`mailto:${CONTACT.email}`}
               className="text-sm text-ink-muted transition-colors duration-300 hover:text-pink"
             >
               {CONTACT.email}
             </a>
-            <p className="text-sm text-ink-muted">Warszawa, Polska</p>
+            <p className="text-sm text-ink-muted">{CONTACT.city}, Polska</p>
+            <p className="text-sm text-ink-muted">Odpowiadamy w 24 h</p>
+            <p className="text-sm text-ink-muted">
+              Pracujemy na umowie z ustalonym zakresem i terminem
+            </p>
+            {CONTACT.nip && <p className="text-sm text-ink-muted">NIP: {CONTACT.nip}</p>}
           </div>
         </div>
 

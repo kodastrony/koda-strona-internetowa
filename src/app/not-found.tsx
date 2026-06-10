@@ -5,7 +5,8 @@ export default function NotFound() {
   return (
     <section
       data-header-theme="dark"
-      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-dark px-6 text-center"
+      data-canvas="base"
+      className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 text-center"
     >
       {/* Dot grid + pink glow — matches the hero's atmosphere */}
       <div

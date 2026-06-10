@@ -1,43 +1,40 @@
 "use client";
 
-import { FadeUp } from "@/components/motion";
+import { FadeUp, Parallax } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
-import { PillLink } from "@/components/ui/pill-link";
 import { CONTACT } from "@/lib/constants";
+import { PillLink } from "@/components/ui/pill-link";
 
 /* ── CTABand — shared closing call-to-action ───────────────────────────────
    The conversion close for every sub-page. A calmer cousin of the homepage
-   Statement: the brand pink BLOOMS out of the deepest dark (radial, not a
-   slab), a confident line, and the signature pink "Darmowa wycena" pill
-   (magnetic) + a quieter email link. Reveals on scroll. */
+   Statement: PageCanvas wchodzi w plum (hold „cta" #30132a), a różowy BLOOM
+   wybija od dołu po ścieżce H335 i przelewa się przez szew do stopki —
+   ten sam finałowy akord co na home, tylko ściszony. Reveals on scroll. */
 export function CTABand({
-  title = "Zróbmy stronę, która naprawdę sprzedaje",
-  subtitle = "Opowiedz nam o projekcie — wrócimy z propozycją i wyceną w ciągu 24 godzin.",
+  title = "Porozmawiajmy o Twoim projekcie",
+  subtitle = "Wstępny pomysł i wycenę odsyłamy w ciągu 24 godzin. Bez zobowiązań.",
 }: {
   title?: string;
   subtitle?: string;
 }) {
   return (
-    <section
-      data-header-theme="dark"
-      className="relative overflow-hidden"
-      style={{ backgroundColor: "var(--color-bg-deep)" }}
-    >
-      {/* Pink bloom rising out of the dark (radial, soft — not a flashbang slab) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 75% at 50% 112%, rgba(207,67,184,0.22) 0%, rgba(207,67,184,0.06) 38%, transparent 68%)",
-        }}
-      />
-      {/* Top fade so it melts out of the section above */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-32"
-        style={{ background: "linear-gradient(to bottom, var(--color-bg), transparent)" }}
-      />
+    <section data-header-theme="dark" data-canvas="cta" className="relative">
+      {/* Pink bloom — pełna ścieżka H335 (taper alfa w jednym hue, zero
+          szarego dołka), wystaje pod sekcję w stronę stopki. */}
+      <Parallax
+        speed={52}
+        className="pointer-events-none absolute inset-x-0 z-0"
+        style={{ top: 0, height: "118%" }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 72% 78% at 50% 100%, oklch(0.62 0.215 335 / 0.30) 0%, oklch(0.52 0.18 335 / 0.12) 38%, oklch(0.42 0.14 335 / 0.045) 56%, oklch(0.42 0.14 335 / 0) 74%)",
+          }}
+        />
+      </Parallax>
 
       <div
         className="container-koda relative z-10 flex flex-col items-center text-center"
@@ -47,7 +44,10 @@ export function CTABand({
         }}
       >
         <FadeUp inView>
-          <span className="label-koda mb-6 block">Porozmawiajmy</span>
+          {/* Na plum (hold „cta") mały różowy tekst = pink-bright (AA). */}
+          <span className="label-koda mb-6 block" style={{ color: "var(--color-pink-bright)" }}>
+            Porozmawiajmy
+          </span>
         </FadeUp>
         <FadeUp inView delay={0.06}>
           <h2
@@ -91,7 +91,7 @@ export function CTABand({
               border="#cf43b8"
               className="px-9 py-4 text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
             >
-              Darmowa wycena
+              Bezpłatna wycena
             </PillLink>
           </Magnetic>
           <a

@@ -115,21 +115,21 @@ export function IntroAnimation() {
       await animate(
         "[data-pink-letter]",
         { opacity: [0, 1], y: ["50%", "0%"] },
-        { duration: 0.85, ease: REVEAL, delay: stagger(0.14) }
+        { duration: 0.7, ease: REVEAL, delay: stagger(0.1) }
       );
       if (cancelled) return;
-      await wait(100); // krótki oddech — widz rejestruje logo
+      await wait(60); // krótki oddech — widz rejestruje logo
       if (cancelled) return;
 
       // ── PHASE 3: DWIE LINIE (1.0s), spotkanie w środku KODA ──────────
       // Baza #1c1c1c widoczna (wciąż zakryta różem), róż zdejmowany P→L.
       baseEl.style.opacity = "1";
       await Promise.all([
-        animate(bgEl, { scaleX: [0, 1] }, { duration: 0.85, ease: EASE.crossing }),
+        animate(bgEl, { scaleX: [0, 1] }, { duration: 0.7, ease: EASE.crossing }),
         animate(
           pinkEl,
           { clipPath: ["inset(0% 0% 0% 0%)", "inset(0% 100% 0% 0%)"] },
-          { duration: 0.85, ease: "linear" }
+          { duration: 0.7, ease: "linear" }
         ),
       ]);
       if (cancelled) return;
@@ -202,6 +202,10 @@ export function IntroAnimation() {
           pointerEvents: "none",
           y: kodaY,
           willChange: "transform",
+          // Ta sama maska co kolumna KODA w hero (stopy w svh = identyczna
+          // absolutna geometria) → handoff bez przeskoku przy dolnych literach.
+          maskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
         }}
       >
         {LETTERS.map((l) => (
@@ -210,6 +214,16 @@ export function IntroAnimation() {
           </div>
         ))}
       </motion.div>
+
+      {/* Widoczna afordancja „pomiń" — kliknięcie GDZIEKOLWIEK i tak skipuje
+          (onClick na overlayu); to tylko sygnał, że można pominąć. Biały tekst na
+          półprzezroczystej pigułce → czytelny i na białym, i na ciemnym tle sweepu. */}
+      <span
+        className="absolute right-5 bottom-5 z-[5] rounded-full px-3.5 py-1.5 font-heading text-[10px] font-bold tracking-[0.2em] uppercase"
+        style={{ color: "#ffffff", backgroundColor: "rgba(0,0,0,0.38)" }}
+      >
+        Pomiń →
+      </span>
 
       {/* L3 — RÓŻ: KODA #cf43b8 — litery zapełniają się (Phase 1), potem
               zdejmowane clipem P→L (Phase 3). width:max-content = clip nie
@@ -226,6 +240,9 @@ export function IntroAnimation() {
           willChange: "transform, clip-path",
           pointerEvents: "none",
           y: kodaY,
+          // Spójnie z bazą i hero — patrz komentarz przy warstwie bazowej.
+          maskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
         }}
       >
         {LETTERS.map((l) => (

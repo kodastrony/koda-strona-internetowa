@@ -6,7 +6,7 @@ import { CTABand } from "@/components/sections/cta-band";
 export const metadata: Metadata = {
   title: "Realizacje",
   description:
-    "Wybrane projekty KODA — sklepy internetowe, strony korporacyjne i firmowe oraz platformy B2B dla polskich marek.",
+    "Wybrane realizacje KODA — strony firmowe i korporacyjne oraz platformy B2B dla polskich marek.",
   alternates: { canonical: "/realizacje/" },
 };
 
@@ -14,10 +14,10 @@ export default function RealizacjePage() {
   return (
     <>
       <PageHero
-        label="Portfolio"
+        label="Wybrane projekty"
         title="Realizacje"
-        lead="Wybrane projekty, które łączą dopracowany design z realnymi wynikami w sprzedaży. Każdy zbudowany pod konkretny biznes — nie pod szablon."
-        glow="rgba(164,114,240,0.13)"
+        lead="Strony internetowe, które projektujemy i kodujemy od zera — pod konkretny cel i charakter każdej marki."
+        hue={324}
       />
       <RealizacjeContent />
       <CTABand

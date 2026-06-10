@@ -11,6 +11,7 @@ import {
 import { EASE, INTRO_DURATION } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
+import { GlowField } from "@/components/fx/glow-field";
 import { PillLink } from "@/components/ui/pill-link";
 import { introHasPlayed } from "@/lib/intro-state";
 
@@ -38,6 +39,11 @@ function KodaColumn() {
         width: "clamp(160px, 21vw, 340px)",
         height: "130%",
         y,
+        // Litery wygasają przed dolną krawędzią hero — overflow-hidden nie
+        // tnie glifu „żyletką" na szwie. Stopy w svh (nie %): identyczna
+        // ABSOLUTNA geometria maski jak w intro-animation → handoff 1:1.
+        maskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 78svh, transparent 96svh)",
       }}
     >
       {(["K", "O", "D", "A"] as const).map((letter) => (
@@ -139,51 +145,66 @@ export function Hero() {
   return (
     <section
       data-header-theme="dark"
+      data-canvas="hero"
       onMouseMove={onMouseMove}
-      className="relative flex min-h-svh flex-col overflow-hidden bg-dark"
+      className="relative flex min-h-svh flex-col overflow-hidden"
     >
-      {/* ── Dot grid ─────────────────────────────────────────── */}
+      {/* ── Dot grid ─────────────────────────────────────────────
+           Wszystkie warstwy dekoracyjne hero wygasają maską PRZED dolną
+           krawędzią sekcji — overflow-hidden nigdy nie tnie ich „żyletką"
+           na szwie z Services (to były te brzydkie linie). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
+          maskImage: "linear-gradient(to bottom, black 62%, transparent 97%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 62%, transparent 97%)",
         }}
       />
 
-      {/* ── Pink accent glow — bottom-left, drifts toward the cursor ── */}
+      {/* ── Pink light field — bottom-left. Wrapper = spring za kursorem,
+           dziecko (GlowField) = przepis core/halo/ambient + podprogowy dryf
+           (transform na INNYM elemencie niż spring → nic się nie gryzie). ── */}
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           x: px,
           y: py,
-          background:
-            "radial-gradient(ellipse 60% 50% at 12% 84%, rgba(207,67,184,0.22) 0%, transparent 62%)",
+          maskImage: "linear-gradient(to bottom, black 58%, transparent 96%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 58%, transparent 96%)",
         }}
-      />
+      >
+        <GlowField hue={340} x={12} y={80} strength={1.15} drift driftDuration={26} className="inset-0" />
+      </motion.div>
 
-      {/* ── Violet counter-glow — top-right, drifts the opposite way (depth) ── */}
+      {/* ── Violet counter-light — top-right, drifts the opposite way (depth) ── */}
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           x: vx,
           y: vy,
-          background:
-            "radial-gradient(ellipse 50% 60% at 92% 8%, rgba(138,110,240,0.14) 0%, transparent 60%)",
+          maskImage: "linear-gradient(to bottom, black 58%, transparent 96%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 58%, transparent 96%)",
         }}
-      />
+      >
+        <GlowField hue={300} x={92} y={8} strength={0.75} drift driftDuration={33} className="inset-0" />
+      </motion.div>
 
       {/* ── Cinematic vignette — edges sink into the deeper dark for depth, so the
-           content and header sit on a calmer field (premium, not flat). */}
+           content and header sit on a calmer field (premium, not flat).
+           Maska: winieta wygasa przed dolną krawędzią (szew = czysty canvas). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
             "radial-gradient(125% 95% at 50% 6%, transparent 52%, var(--color-bg-deep) 100%)",
+          maskImage: "linear-gradient(to bottom, black 55%, transparent 94%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 55%, transparent 94%)",
         }}
       />
 
@@ -231,32 +252,18 @@ export function Hero() {
           className="flex flex-1 flex-col justify-center"
           style={{ paddingBottom: "clamp(50px, 7vh, 90px)" }}
         >
-          {/* Label — WJEŻDŻA Z LEWEJ (slide poziomy + fade). Prowadzi kaskadę,
-              startuje najwcześniej (2.0s) — gdy linia tła zamalowała już lewą
-              stronę, więc pojawia się na ciemnym jeszcze w trakcie sweepu. */}
-          {/* data-logo-hide-anchor: gdy ten wiersz (czoło treści hero, NAD wielkim
-              nagłówkiem) dojedzie do logo na scrollu, header-owe KODA znika i zostaje
-              schowane niżej. Anchor na eyebrow → logo nie nałoży się nawet na ten
-              mały napis „KODA" (uniknięcie podwójnego KODA). */}
-          <FadeUp delay={BASE - 0.4} duration={0.7} ease={EASE.expo} x={-44} y={0}>
-            <div data-logo-hide-anchor className="mb-9 flex items-center gap-5">
-              <span className="label-koda">KODA</span>
-              <div
-                className="h-px"
-                style={{
-                  width: "clamp(40px, 14vw, 160px)",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              />
-            </div>
-          </FadeUp>
-
           {/* ── Large heading + description + CTA ───────────────
               Full width on phones/tablets (decorative KODA is hidden there);
-              constrained to ~54% on lg+ to leave room for the KODA column. */}
-          <div className="w-full lg:w-[54%] lg:max-w-[620px]">
-            {/* h1 — DWIE LINIE wjeżdżają OSOBNO z dołu (stagger 0.1s). Inny
-                ruch niż label (pion vs poziom) + per-linia = premium reveal. */}
+              constrained to ~54% on lg+ to leave room for the KODA column.
+              data-logo-hide-anchor: gdy czoło treści hero dojedzie do logo na
+              scrollu, header-owe KODA znika i zostaje schowane niżej. */}
+          <div data-logo-hide-anchor className="w-full lg:w-[54%] lg:max-w-[620px]">
+            {/* h1 — DWIE LINIE wyjeżdżają z MASKOWANYCH „kieszeni" (overflow
+                hidden na wrapperze linii, wewnętrzny span y 112%→0). Litery
+                rodzą się na linii bazowej zamiast lecieć przez ekran = czystszy,
+                bardziej premium reveal niż fade+rise. Padding/ujemny margines
+                na kieszeni chroni wywieszki (p, y, ą, przecinek) przed
+                przycięciem przy lineHeight 1.03. */}
             <h1
               style={{
                 fontFamily: "var(--font-heading)",
@@ -267,26 +274,34 @@ export function Hero() {
                 color: "var(--color-ink)",
               }}
             >
-              <motion.span
-                data-reveal
-                style={{ display: "block" }}
-                initial={{ opacity: 0, y: 52 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.28 }}
-              >
-                Robimy strony,
-              </motion.span>
-              <motion.span
-                data-reveal
-                style={{ display: "block" }}
-                initial={{ opacity: 0, y: 52 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE.primary, delay: BASE - 0.18 }}
-              >
-                które {/* słowo-klucz w różu marki (akcent), kropka w kolorze tekstu */}
-                <span style={{ color: "var(--color-accent)" }}>sprzedają</span>
-                <span style={{ color: "var(--color-ink)" }}>.</span>
-              </motion.span>
+              {[
+                <>Strona internetowa, która</>,
+                <>
+                  {/* akcent marki na biznesowym wyniku + kropka w kolorze tekstu */}
+                  <span style={{ color: "var(--color-accent)" }}>przynosi klientów</span>
+                  <span style={{ color: "var(--color-ink)" }}>.</span>
+                </>,
+              ].map((line, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: "block",
+                    overflow: "hidden",
+                    paddingBottom: "0.12em",
+                    marginBottom: "-0.12em",
+                  }}
+                >
+                  <motion.span
+                    data-reveal
+                    style={{ display: "block", willChange: "transform" }}
+                    initial={{ y: "112%" }}
+                    animate={{ y: "0%" }}
+                    transition={{ duration: 0.9, ease: EASE.expo, delay: BASE - 0.28 + i * 0.1 }}
+                  >
+                    {line}
+                  </motion.span>
+                </span>
+              ))}
             </h1>
 
             {/* Opis — łagodny rise + fade (mniejszy dystans, EASE.expo) */}
@@ -296,11 +311,11 @@ export function Hero() {
                 style={{
                   fontSize: "clamp(0.95rem, 1.15vw, 1.15rem)",
                   color: "var(--color-ink-muted)",
-                  maxWidth: "44ch",
+                  maxWidth: "46ch",
                 }}
               >
-                Projektujemy i wdrażamy strony internetowe dla polskich firm. Od pierwszego szkicu
-                po realne wyniki w sprzedaży.
+                Projektujemy i kodujemy strony internetowe dla firm w Polsce. Od zera, pod
+                konkretny cel.
               </p>
             </FadeUp>
 
@@ -323,9 +338,16 @@ export function Hero() {
                   border="#cf43b8"
                   className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
                 >
-                  Darmowa wycena
+                  Bezpłatna wycena
                 </PillLink>
               </Magnetic>
+            </FadeUp>
+
+            {/* Mikro-linia zdejmująca ryzyko — dokładnie pod CTA, gdzie pada decyzja. */}
+            <FadeUp delay={BASE + 0.2} duration={0.6} ease={EASE.expo} y={10} className="mt-5">
+              <p className="text-[13px]" style={{ color: "var(--color-ink-faint)" }}>
+                Odpowiadamy w 24 h · Bez zobowiązań
+              </p>
             </FadeUp>
           </div>
         </div>

@@ -13,9 +13,9 @@ export default function PolitykaPrywatnosciPage() {
   return (
     <section
       data-header-theme="dark"
+      data-canvas="base"
       className="min-h-svh"
       style={{
-        backgroundColor: "var(--color-bg)",
         paddingTop: "clamp(100px, 12vw, 160px)",
         paddingBottom: "clamp(60px, 8vw, 120px)",
       }}
@@ -59,8 +59,9 @@ export default function PolitykaPrywatnosciPage() {
             <li>imię i nazwisko,</li>
             <li>adres e-mail,</li>
             <li>numer telefonu,</li>
+            <li>opcjonalnie: nazwa firmy,</li>
             <li>opis projektu / wiadomość,</li>
-            <li>opcjonalnie: plik brief (PDF, DOC, JPG, ZIP — max 10 MB).</li>
+            <li>opcjonalnie: pliki (np. brief, logo, zdjęcia — PDF, DOC, JPG, ZIP — łącznie do 10 MB).</li>
           </ul>
 
           <h2 className="mt-10 mb-3 font-heading text-[1.3rem] font-bold text-[var(--color-ink)]">

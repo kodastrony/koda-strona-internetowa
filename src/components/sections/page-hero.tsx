@@ -1,12 +1,13 @@
 "use client";
 
-import { FadeUp, Reveal } from "@/components/motion";
+import { FadeUp, Reveal, Parallax } from "@/components/motion";
+import { GlowField } from "@/components/fx/glow-field";
 import { EASE } from "@/lib/motion";
 
 /* ── PageHero — shared sub-page header ─────────────────────────────────────
    One consistent, on-brand opening for every sub-page (/uslugi, /realizacje,
-   /o-nas, /blog): eyebrow + big title (pink dot) + lead, on the dark canvas
-   with a soft dot-grid and a coloured glow. Entrance plays on mount (these
+   /o-nas): eyebrow + big title (pink dot) + lead, on the shared PageCanvas
+   with a soft dot-grid and a GlowField. Entrance plays on mount (these
    pages are reached via SPA navigation, not the intro), Emil-style: label
    slides in from the left, title wipes (clip-path), lead rises — fast, layered.
    Padding clears the fixed header at every breakpoint. */
@@ -14,20 +15,20 @@ export function PageHero({
   label,
   title,
   lead,
-  /** Glow colour (rgba) — lets each page carry a slightly different mood. */
-  glow = "rgba(207,67,184,0.13)",
+  /** Hue OKLCH światła sekcji (340 pink · 324 magenta · 300 violet) — mood per page. */
+  hue = 340,
 }: {
   label: string;
   title: string;
   lead?: string;
-  glow?: string;
+  hue?: number;
 }) {
   return (
     <section
       data-header-theme="dark"
-      className="relative overflow-hidden"
+      data-canvas="hero"
+      className="relative"
       style={{
-        backgroundColor: "var(--color-bg)",
         paddingTop: "clamp(132px, 17vw, 220px)",
         paddingBottom: "clamp(36px, 5vw, 72px)",
       }}
@@ -41,20 +42,15 @@ export function PageHero({
           backgroundSize: "48px 48px",
         }}
       />
-      {/* Coloured glow — top-right */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background: `radial-gradient(ellipse 52% 60% at 90% 0%, ${glow} 0%, transparent 60%)`,
-        }}
-      />
-      {/* Bottom fade into the next (black) section — seamless world */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-32"
-        style={{ background: "linear-gradient(to top, var(--color-bg), transparent)" }}
-      />
+      {/* Light field — top-right, drifts on scroll; bleeds below the section
+          so the light carries into the content (no clipped edge). */}
+      <Parallax
+        speed={55}
+        className="pointer-events-none absolute inset-x-0 z-0"
+        style={{ top: 0, height: "130%" }}
+      >
+        <GlowField hue={hue} x={88} y={16} strength={0.9} drift driftDuration={29} className="inset-0" />
+      </Parallax>
 
       <div className="container-koda relative z-10">
         <FadeUp x={-24} y={0} duration={0.6} ease={EASE.out} delay={0.05}>

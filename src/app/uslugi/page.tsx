@@ -6,7 +6,7 @@ import { CTABand } from "@/components/sections/cta-band";
 export const metadata: Metadata = {
   title: "Usługi",
   description:
-    "Projektowanie UX/UI, strony i sklepy internetowe, optymalizacja i SEO oraz wsparcie po wdrożeniu — wszystko skrojone pod Twój biznes.",
+    "Projektowanie UX/UI, strony i sklepy internetowe, optymalizacja i SEO oraz wsparcie po starcie — pod konkretny cel, nie pod szablon.",
   alternates: { canonical: "/uslugi/" },
 };
 
@@ -16,12 +16,13 @@ export default function UslugiPage() {
       <PageHero
         label="Usługi"
         title="Co dla Ciebie zrobimy"
-        lead="Od pierwszego pomysłu po działającą stronę, która zarabia. Cztery obszary, jeden cel — realny wynik dla Twojego biznesu."
+        lead="Cztery obszary, jeden cel: strona, która dobrze wygląda i pozyskuje klientów. Od pierwszej rozmowy po wsparcie długo po starcie."
+        hue={300}
       />
       <UslugiContent />
       <CTABand
-        title="Który obszar jest dla Ciebie"
-        subtitle="Nie wiesz, od czego zacząć? Napisz w kilku słowach o swoim biznesie — podpowiemy najlepszy krok."
+        title="Zbudujemy dla Ciebie stronę"
+        subtitle="Nie wiesz, od czego zacząć? Napisz w kilku słowach o swoim biznesie — skontaktujemy się w 24 h. Bez zobowiązań i haczyków."
       />
     </>
   );
