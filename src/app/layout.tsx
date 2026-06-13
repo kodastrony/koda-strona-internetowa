@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Syne, Inter, Geologica } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -124,8 +125,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${display.variable} ${inter.variable} ${syne.variable}`}>
+    // suppressHydrationWarning: inline-skrypt motywu ustawia color-scheme /
+    // data-koda-light na <html> PRZED hydracją — różnica atrybutów <html> jest
+    // zamierzona (wzorzec next-themes), więc wyciszamy ostrzeżenie hydracji.
+    <html
+      lang="pl"
+      suppressHydrationWarning
+      className={`${display.variable} ${inter.variable} ${syne.variable}`}
+    >
       <body className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased">
+        {/* Motyw PRZED malowaniem (zero FOUC): czyta localStorage i ustawia
+            html[data-koda-light] + color-scheme zanim załaduje się bundle.
+            beforeInteractive → Next wstrzykuje skrypt do <head> statycznego HTML.
+            Klucz 'koda-theme' MUSI się zgadzać z lib/theme.ts. */}
+        <Script
+          id="koda-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('koda-theme');var d=document.documentElement;if(t==='light'){d.setAttribute('data-koda-light','');d.style.colorScheme='light';}else{d.style.colorScheme='dark';}}catch(e){}})();",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}

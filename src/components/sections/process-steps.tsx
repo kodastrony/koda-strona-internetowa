@@ -164,7 +164,8 @@ export function ProcessSteps() {
             animate={hIn ? { scaleX: 1 } : {}}
             transition={fillTransition}
             style={{
-              background: "linear-gradient(to right, var(--color-accent), var(--color-pink-bright))",
+              background:
+                "linear-gradient(to right, var(--color-accent), var(--color-pink-bright))",
             }}
           />
         </div>
@@ -197,7 +198,8 @@ export function ProcessSteps() {
             animate={vIn ? { scaleY: 1 } : {}}
             transition={fillTransition}
             style={{
-              background: "linear-gradient(to bottom, var(--color-accent), var(--color-pink-bright))",
+              background:
+                "linear-gradient(to bottom, var(--color-accent), var(--color-pink-bright))",
             }}
           />
         </div>

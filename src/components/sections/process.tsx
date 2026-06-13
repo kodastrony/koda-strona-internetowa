@@ -24,7 +24,15 @@ export function Process() {
         className="pointer-events-none absolute inset-x-0 z-0"
         style={{ top: "-20%", height: "85%" }}
       >
-        <GlowField hue={273} x={90} y={26} strength={0.6} drift driftDuration={31} className="inset-0" />
+        <GlowField
+          hue={273}
+          x={90}
+          y={26}
+          strength={0.6}
+          drift
+          driftDuration={31}
+          className="inset-0"
+        />
       </Parallax>
 
       <div className="container-koda section-y relative z-10">
@@ -59,7 +67,7 @@ export function Process() {
               href="/kontakt"
               bg="var(--color-surface-1)"
               border="var(--color-line-strong)"
-              className="px-9 py-4"
+              className="px-9 py-4 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
             >
               Porozmawiajmy
             </PillLink>

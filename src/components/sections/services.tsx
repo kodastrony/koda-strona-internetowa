@@ -91,7 +91,15 @@ export function Services() {
         className="pointer-events-none absolute inset-x-0 z-0"
         style={{ top: "-22%", height: "88%" }}
       >
-        <GlowField hue={300} x={85} y={28} strength={0.9} drift driftDuration={33} className="inset-0" />
+        <GlowField
+          hue={300}
+          x={85}
+          y={28}
+          strength={0.9}
+          drift
+          driftDuration={33}
+          className="inset-0"
+        />
       </Parallax>
 
       <div className="container-koda section-y relative z-10">

@@ -98,8 +98,8 @@ export function ONasContent() {
                   color: "var(--color-ink-muted)",
                 }}
               >
-                Mamy jasne zasady i pełną odpowiedzialność za każdy projekt, który podejmujemy. Jeśli
-                szukasz strony, która ma realnie pracować na Twoją firmę — porozmawiajmy.
+                Mamy jasne zasady i pełną odpowiedzialność za każdy projekt, który podejmujemy.
+                Jeśli szukasz strony, która ma realnie pracować na Twoją firmę — porozmawiajmy.
               </p>
             </FadeUp>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getTheme, subscribeTheme } from "@/lib/theme";
 
 /* ── Custom cursor — KODA (odwzorowanie baunfire.com) ──────────────────────
    NATYWNY kursor (biała strzałka) ZOSTAJE — to on jest wskaźnikiem. My dokładamy
@@ -68,7 +69,13 @@ export function CustomCursor() {
         applyTheme("light"); // otwarte białe menu
       } else {
         const sec = el?.closest<HTMLElement>("[data-header-theme]");
-        if (sec) applyTheme((sec.dataset.headerTheme as Theme) ?? "dark");
+        if (sec) {
+          let t = (sec.dataset.headerTheme as Theme) ?? "dark";
+          // Globalny motyw jasny: „dark" sekcje są na papierze → ring/kropka
+          // muszą być atramentowe (jak w useHeaderTheme). „pink" zostaje.
+          if (t === "dark" && getTheme() === "light") t = "light";
+          applyTheme(t);
+        }
         // nad fixed-headerem (brak sekcji) → zostaw ostatni motyw
       }
       applyState(el?.closest(INTERACTIVE) ? "hover" : "idle");
@@ -174,6 +181,9 @@ export function CustomCursor() {
       menuObs.observe(menuEl, { attributes: true, attributeFilter: ["aria-hidden"] });
     }
 
+    // Przełączenie ☀/☾ bez ruchu myszy — prze-sampluj motyw spod kursora.
+    const unsubTheme = subscribeTheme(() => resolveFrom(document.elementFromPoint(px.x, px.y)));
+
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
     window.addEventListener("mousedown", onDown, { passive: true });
@@ -186,6 +196,7 @@ export function CustomCursor() {
     return () => {
       park();
       menuObs?.disconnect();
+      unsubTheme();
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mousedown", onDown);

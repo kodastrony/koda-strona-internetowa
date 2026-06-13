@@ -774,7 +774,7 @@ export function Contact() {
                 Twoje dane wykorzystamy tylko do przygotowania wyceny. Bez spamu. Więcej w{" "}
                 <a
                   href="/polityka-prywatnosci/"
-                  className="underline decoration-black/25 underline-offset-2 transition-colors hover:decoration-pink hover:text-black/70"
+                  className="underline decoration-black/25 underline-offset-2 transition-colors hover:text-black/70 hover:decoration-pink"
                 >
                   polityce prywatności
                 </a>

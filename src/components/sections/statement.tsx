@@ -6,6 +6,7 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { EASE, type Bezier } from "@/lib/motion";
 import { Magnetic } from "@/components/motion/magnetic";
+import { HorizonBackdrop } from "@/components/scene3d/scenes/horizon";
 import { CONTACT } from "@/lib/constants";
 
 /* ── Final CTA "moment" — the conversion climax before the footer ──────────
@@ -247,77 +248,40 @@ export function Statement() {
 
     apply();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", apply);
+    // resize też przez wrapper rAF (jak scroll) — koalescencja reflowów przy
+    // zmianie orientacji/rozmiaru okna (apply() czyta layout: getBoundingClientRect).
+    window.addEventListener("resize", onScroll);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", apply);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
   return (
     <section
       ref={sectionRef}
-      data-header-theme="pink"
+      data-header-theme="dark"
       data-canvas="statement"
-      className="relative isolate flex min-h-[78svh] flex-col items-center justify-center overflow-hidden"
+      className="relative isolate flex min-h-[90svh] flex-col items-center justify-center"
     >
-      {/* ── Pink WIPE — the signature left→right reveal (the one the owner liked).
-          Sekcja startuje na plum canvasie (PageCanvas hold „statement" #521648 —
-          FAQ-owy foreshadow już go zapowiedział); wipe maluje się od lewej.
-          Gradient = pełna ścieżka H335 (plum → magenta → bright), gęste stopy
-          w jednym hue → zero błotnistego dołka, jaki robił 2-stopowy sRGB. ── */}
-      <motion.div
-        aria-hidden="true"
-        data-reveal
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(155deg, #78276b 0%, #a03390 38%, #cf43b8 82%, #e750bf 100%)",
-          willChange: "clip-path",
-        }}
-        initial={{ clipPath: "inset(0 100% 0 0)" }}
-        animate={inView ? { clipPath: "inset(0 0% 0 0)" } : undefined}
-        transition={reduce ? { duration: 0 } : { duration: 1.15, ease: EASE.out }}
-      >
-        {/* Hot core — „podświetlenie od tyłu": gorący, jaśniejszy rdzeń u
-            góry-prawej nadaje płaskiemu panelowi głębię sceny. */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 62% 52% at 72% 16%, oklch(0.8 0.19 348 / 0.14) 0%, oklch(0.8 0.19 348 / 0.05) 45%, oklch(0.8 0.19 348 / 0) 72%)",
-          }}
-        />
-        {/* Spill — łuna z FAQ „kontynuuje się" na panelu: górna krawędź wipe'a
-            łapie to samo światło, którym FAQ zapowiadał róż → zero stopnia
-            luminancji na szwie. */}
-        <div
-          className="absolute inset-x-0 top-0"
-          style={{
-            height: "30%",
-            background:
-              "linear-gradient(to bottom, oklch(0.62 0.215 335 / 0.22) 0%, oklch(0.62 0.215 335 / 0.07) 55%, oklch(0.62 0.215 335 / 0) 100%)",
-          }}
-        />
-        {/* dot texture rides in with the pink */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
-            backgroundSize: "42px 42px",
-          }}
-        />
-      </motion.div>
+      {/* ── ŚWIT NAD PLANETĄ — finałowy klimaks: ciemny kosmos na plumowym
+          holdzie kanwy (#521648), a różowo-biały świt WSCHODZI i ROZJAŚNIA SIĘ
+          im głębiej zjedziesz (uProg ze scrolla). To sekcja, którą user
+          pamięta jako „świecącą się". Sekcja = ciemna wyspa w OBU motywach
+          (LIGHT_HOLDS.statement też plum) — biały tekst czytelny, świt gra. ── */}
+      <HorizonBackdrop />
 
-      {/* Zejście do stopki — róż UMIERA wzdłuż H335 (plum → ciepła czerń
-          #0a0609 = hold stopki), nigdy przez zimną szarość. */}
+      {/* Zejście do stopki — ciemne dno horyzontu wtapia się w ciepłą czerń
+          stopki (#0a0609 = hold footer), zero plumowego paska na szwie. Wysokość
+          viewport-relative (clamp): na wysokich ekranach świt sięga wyżej, więc
+          ciemny wash MUSI dosięgnąć tam, gdzie różowe światło gaśnie (bez stopnia). */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-56"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(192px,28vh,440px)]"
         style={{
           background:
-            "linear-gradient(to top, #0a0609 0%, rgba(24,13,22,0.82) 24%, rgba(48,19,42,0.45) 52%, rgba(82,22,72,0.16) 76%, rgba(82,22,72,0) 100%)",
+            "linear-gradient(to top, #0a0609 0%, rgba(10,6,9,0.6) 42%, rgba(10,6,9,0) 100%)",
         }}
       />
 
@@ -435,8 +399,8 @@ export function Statement() {
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.7, ease: EASE.expo, delay: BASE + 0.34 }}
           >
-            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24
-            godziny. Bez zobowiązań.
+            Opowiedz nam o swoim projekcie. Darmową wycenę i pierwszy pomysł dostajesz w 24 godziny.
+            Bez zobowiązań.
           </motion.p>
 
           {/* CTA — the white "Darmowa wycena" pill + a secondary email link */}

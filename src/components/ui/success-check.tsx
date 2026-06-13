@@ -36,7 +36,9 @@ export function SuccessCheck() {
         style={{ boxShadow: "0 12px 34px -10px rgba(207,67,184,0.55)" }}
         initial={reduce ? false : { scale: 0.4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 280, damping: 15, delay: 0.1 }}
+        transition={
+          reduce ? { duration: 0 } : { type: "spring", stiffness: 280, damping: 15, delay: 0.1 }
+        }
       >
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <motion.path

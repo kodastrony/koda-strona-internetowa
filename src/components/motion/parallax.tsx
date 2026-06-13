@@ -1,13 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-  type MotionStyle,
-} from "motion/react";
+import { motion, useScroll, useTransform, useReducedMotion, type MotionStyle } from "motion/react";
 
 /* ── Parallax — scroll-linked drift for depth ─────────────────────────────
    As the element travels through the viewport, it translates on Y (and
@@ -33,7 +27,14 @@ interface ParallaxProps {
   style?: React.CSSProperties;
 }
 
-export function Parallax({ children, speed = 60, scaleFrom, fade = false, className, style }: ParallaxProps) {
+export function Parallax({
+  children,
+  speed = 60,
+  scaleFrom,
+  fade = false,
+  className,
+  style,
+}: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 

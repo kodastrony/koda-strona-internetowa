@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/sections/hero";
+import { Hero3D } from "@/components/sections/hero-3d";
 import { Services } from "@/components/sections/services";
 import { Work } from "@/components/sections/work";
 import { Process } from "@/components/sections/process";
 import { Faq } from "@/components/sections/faq";
 import { Statement } from "@/components/sections/statement";
-import { IntroAnimation } from "@/components/ui/intro-animation";
+import { OrbitsAccent } from "@/components/scene3d/home/accents";
 import { FAQS } from "@/lib/faq";
 
 // Strona główna — jawne metadane (nie tylko dziedziczenie z layoutu): tytuł
@@ -39,11 +39,24 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
       />
-      <IntroAnimation />
-      <Hero />
-      <Services />
+      <Hero3D />
+
+      {/* Usługi — PLANETA z orbitami (świetlny węzeł prowadzony scrollem) gra
+          POD treścią; sekcja zostaje przezroczysta (data-canvas). */}
+      <div className="relative">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <OrbitsAccent />
+        </div>
+        <Services />
+      </div>
+
       <Work />
+
+      {/* Jak pracujemy — tylko oryginalna oś czasu (różowy progress bar 01–04
+          w <Process/>); bez kosmicznego akcentu konstelacji (był drugą, „fancy"
+          animacją progress baru i kreską na gładkim tle). */}
       <Process />
+
       <Faq />
       <Statement />
     </>

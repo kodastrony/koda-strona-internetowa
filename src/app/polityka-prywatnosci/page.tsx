@@ -61,7 +61,9 @@ export default function PolitykaPrywatnosciPage() {
             <li>numer telefonu,</li>
             <li>opcjonalnie: nazwa firmy,</li>
             <li>opis projektu / wiadomość,</li>
-            <li>opcjonalnie: pliki (np. brief, logo, zdjęcia — PDF, DOC, JPG, ZIP — łącznie do 10 MB).</li>
+            <li>
+              opcjonalnie: pliki (np. brief, logo, zdjęcia — PDF, DOC, JPG, ZIP — łącznie do 10 MB).
+            </li>
           </ul>
 
           <h2 className="mt-10 mb-3 font-heading text-[1.3rem] font-bold text-[var(--color-ink)]">

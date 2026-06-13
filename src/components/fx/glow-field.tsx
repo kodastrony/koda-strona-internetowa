@@ -78,11 +78,7 @@ export function GlowField({
   }, [drift]);
 
   return (
-    <div
-      aria-hidden="true"
-      className={cn("pointer-events-none absolute", className)}
-      style={style}
-    >
+    <div aria-hidden="true" className={cn("pointer-events-none absolute", className)} style={style}>
       <div
         ref={blobRef}
         className={cn("absolute", drift && "koda-blob")}

@@ -5,21 +5,27 @@ import { FadeUp } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
 import { ProcessSteps } from "@/components/sections/process-steps";
 import { EASE } from "@/lib/motion";
+import { useThemeValue } from "@/lib/theme";
 import { SERVICES } from "@/lib/services-data";
 
 const PINK = "var(--color-pink-bright)";
 
-/* Duża cyfra 01–04: BIAŁA, a gdy wjedzie na środek ekranu (czyli gdy odwiedzający
-   ją czyta) — płynnie ZAPALA SIĘ na różowo. Reduced-motion → od razu różowa. */
+/* Duża cyfra 01–04: stonowana, a gdy wjedzie na środek ekranu (czyli gdy
+   odwiedzający ją czyta) — płynnie ZAPALA SIĘ na różowo. Theme-aware: w ciemnym
+   biel→żywy róż, w jasnym atrament→głębszy róż (AA na porcelanie; biel→jasny
+   róż byłby niewidoczny). Reduced-motion → od razu w kolorze docelowym. */
 function StepNumber({ n }: { n: string }) {
   const reduce = useReducedMotion();
+  const light = useThemeValue() === "light";
+  const from = light ? "#cdbfd6" : "#f5f5f7";
+  const to = light ? "#b32a9d" : "#ff5ec8";
   return (
     <motion.div
       aria-hidden="true"
       className="mb-4 font-heading font-bold"
       style={{ fontSize: "clamp(2.6rem,4.4vw,4rem)", lineHeight: 1, letterSpacing: "-0.04em" }}
-      initial={reduce ? false : { color: "#f5f5f7" }}
-      whileInView={{ color: "#ff5ec8" }}
+      initial={reduce ? false : { color: from }}
+      whileInView={{ color: to }}
       viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
       transition={reduce ? { duration: 0 } : { duration: 0.55, ease: EASE.out }}
     >
@@ -187,8 +193,8 @@ export function UslugiContent() {
                 }}
               >
                 Kreator i gotowy szablon są tanie na start, ale wyglądają jak tysiąc innych stron i
-                trudno je rozwijać. U nas dostajesz coś innego: kod pisany pod Twój konkretny biznes,
-                bezpośredni kontakt z osobami, które go tworzą, i zakres ustalony w umowie.
+                trudno je rozwijać. U nas dostajesz coś innego: kod pisany pod Twój konkretny
+                biznes, bezpośredni kontakt z osobami, które go tworzą, i zakres ustalony w umowie.
               </p>
             </FadeUp>
           </div>

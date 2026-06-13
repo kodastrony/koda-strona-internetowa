@@ -8,6 +8,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
 import { useLogoHidden } from "@/hooks/use-logo-hide";
 import { KodaLogo } from "@/components/ui/koda-logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { EASE, INTRO_DURATION, cssBezier } from "@/lib/motion";
 import { introHasPlayed } from "@/lib/intro-state";
 import { MenuOverlay, type Origin } from "@/components/layout/menu-overlay";
@@ -175,11 +176,14 @@ export function Header() {
                  wjeżdża gdy linia dochodzi do prawej krawędzi) */}
             <motion.div
               data-reveal
-              className="flex items-center gap-6"
+              className="flex items-center gap-3 sm:gap-5"
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.02 }}
             >
+              {/* ── Przełącznik motywu (jasny/ciemny) — dostępny też na mobile ── */}
+              <ThemeToggle />
+
               {/* ── KONTAKT pill (główne CTA do kontaktu) ── */}
               <Link
                 href="/kontakt"

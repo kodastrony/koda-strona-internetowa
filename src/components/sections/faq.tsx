@@ -150,7 +150,15 @@ export function Faq() {
         className="pointer-events-none absolute inset-x-0 z-0"
         style={{ top: "-14%", height: "70%" }}
       >
-        <GlowField hue={335} x={8} y={26} strength={0.85} drift driftDuration={27} className="inset-0" />
+        <GlowField
+          hue={335}
+          x={8}
+          y={26}
+          strength={0.85}
+          drift
+          driftDuration={27}
+          className="inset-0"
+        />
       </Parallax>
 
       {/* Różowa łuna-zapowiedź nad dolną krawędzią (H335, taper alfa — nigdy
@@ -204,8 +212,8 @@ export function Faq() {
                   color: "var(--color-ink-muted)",
                 }}
               >
-                Najczęstsze wątpliwości, zanim ruszymy. Nie ma tu Twojego pytania? Napisz — wracamy z
-                odpowiedzią w ciągu 24 godzin.
+                Najczęstsze wątpliwości, zanim ruszymy. Nie ma tu Twojego pytania? Napisz — wracamy
+                z odpowiedzią w ciągu 24 godzin.
               </p>
             </FadeUp>
             <FadeUp inView delay={0.18} className="mt-8 hidden lg:block">
@@ -214,7 +222,7 @@ export function Faq() {
                   href="/kontakt"
                   bg="var(--color-surface-1)"
                   border="var(--color-line-strong)"
-                  className="px-8 py-3.5"
+                  className="px-8 py-3.5 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
                 >
                   Zadaj pytanie
                 </PillLink>

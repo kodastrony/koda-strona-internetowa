@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { getTheme, subscribeTheme } from "@/lib/theme";
 
 export type HeaderTheme = "dark" | "light" | "pink";
 
@@ -66,6 +67,10 @@ export function HeaderThemeProvider({
       for (const s of sections) {
         if (s.top <= checkY && s.bottom > checkY) found = s.theme;
       }
+      // Globalny motyw jasny: sekcje deklarujące „dark" stają się „light"
+      // (różowy Statement zostaje „pink" w obu motywach — to klimaks). Bez
+      // mutowania DOM: provider mapuje, sekcje trzymają swój atrybut.
+      if (getTheme() === "light" && found === "dark") found = "light";
       setTheme((prev) => (prev === found ? prev : found));
     };
 
@@ -85,10 +90,14 @@ export function HeaderThemeProvider({
     });
     ro.observe(document.documentElement);
 
+    // Przełączenie ☀/☾ bez scrolla — przelicz motyw headera natychmiast.
+    const unsubTheme = subscribeTheme(compute);
+
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       ro.disconnect();
+      unsubTheme();
     };
   }, [headerHeight]);
 

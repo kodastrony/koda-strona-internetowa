@@ -49,7 +49,15 @@ export function PageHero({
         className="pointer-events-none absolute inset-x-0 z-0"
         style={{ top: 0, height: "130%" }}
       >
-        <GlowField hue={hue} x={88} y={16} strength={0.9} drift driftDuration={29} className="inset-0" />
+        <GlowField
+          hue={hue}
+          x={88}
+          y={16}
+          strength={0.9}
+          drift
+          driftDuration={29}
+          className="inset-0"
+        />
       </Parallax>
 
       <div className="container-koda relative z-10">

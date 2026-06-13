@@ -53,8 +53,7 @@ export const PROJECTS: Project[] = [
     type: "Sklep internetowy",
     year: "2024",
     client: "Kosmetyki naturalne",
-    summary:
-      "Sklep z kosmetykami naturalnymi — prosta, szybka ścieżka od produktu do koszyka.",
+    summary: "Sklep z kosmetykami naturalnymi — prosta, szybka ścieżka od produktu do koszyka.",
     intro:
       "Realizacja sklepu z kosmetykami naturalnymi. Świeży, organiczny charakter marki i lekki, szybki front, w którym nic nie staje między produktem a koszykiem — każdy ekran prowadzi klienta o krok dalej.",
     scope: ["Projekt UX/UI", "Wdrożenie sklepu", "Integracja płatności", "Optymalizacja szybkości"],
@@ -76,8 +75,7 @@ export const PROJECTS: Project[] = [
     type: "Strona korporacyjna",
     year: "2024",
     client: "Software house",
-    summary:
-      "Strona dla software house'u — techniczna precyzja i czytelna narracja oferty.",
+    summary: "Strona dla software house'u — techniczna precyzja i czytelna narracja oferty.",
     intro:
       "Strona dla firmy technologicznej, która chce wyglądać tak dojrzale, jak pracuje. Powściągliwa, techniczna estetyka i jasna struktura: kim są, co robią i dlaczego warto im zaufać — bez korporacyjnego żargonu i bez ściany tekstu.",
     scope: ["Architektura informacji", "Projekt UX/UI", "Wdrożenie strony", "SEO techniczne"],

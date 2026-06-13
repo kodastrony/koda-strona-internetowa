@@ -129,6 +129,71 @@
   --color-pink-bright: #ff5ec8;
 }
 
+/* ── LIGHT MODE — porcelana z nutą śliwki (trust dla SMB) ─────────────
+   Globalny motyw jasny: atrybut html[data-koda-light] (ustawiany inline-
+   skryptem PRZED malowaniem — patrz layout.tsx + lib/theme.ts) nadpisuje
+   semantyczne tokeny. NIE czysta biel: porcelana #f7f4f8 = papier, nie
+   ekran; karty czysto białe na porcelanie (elewacja przez kontrast+cień),
+   linie = atrament z alfą. Akcent różowy CIEMNIEJSZY w tekście (#b32a9d
+   ≈5.1:1 AA); wypełnienia CTA zostają żywe (#cf43b8 hardcoded w pillach).
+   Specyfika html[data-koda-light] (0,1,1) bije :root i @theme (0,1,0). */
+html[data-koda-light] {
+  --color-bg: #f7f4f8;
+  --color-bg-deep: #eee9f1;
+  --color-graphite: #f1ecf4;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f6f0f6;
+  --color-surface-warm: #fbeef6;
+  --color-line: rgba(26, 16, 34, 0.1);
+  --color-line-strong: rgba(26, 16, 34, 0.18);
+  --color-ink: #16101f;
+  --color-ink-muted: #4e4459;
+  --color-ink-faint: #6f6379;
+  --color-off-white: #16101f;
+  --color-gray-muted: #857a8f;
+  --color-pink: #b32a9d;
+  --color-accent: #b32a9d;
+  --color-pink-bright: #bd2fa4;
+  --color-pink-light: #bd2fa4;
+  --color-accent-bright: #bd2fa4;
+  --color-pink-lighter: #d667b8;
+  --color-accent-2: #a93bb4;
+  --color-accent-3: #7a4cd6;
+  --color-accent-4: #4d62e0;
+  /* Legacy aliasy używane przez bg-dark/text-off-white itd. */
+  --color-dark: #f7f4f8;
+  --color-dark-2: #eee9f1;
+  --color-dark-3: #e7e0ec;
+  --color-dark-card: #ffffff;
+}
+
+/* Papier od pierwszej klatki (PageCanvas i tak maluje pogodę, ale gdyby
+   się nie zamontował, edge/overscroll nie błyska czernią). */
+html[data-koda-light] body {
+  background-color: #f7f4f8;
+}
+
+/* STOPKA = CIEMNA WYSPA (klasyczny wzorzec zaufania): lokalnie przywracamy
+   ciemne tokeny, więc tekst/logo stopki działają bez zmian. */
+html[data-koda-light] footer {
+  background-color: #14101b;
+  --color-ink: #f5f5f7;
+  --color-ink-muted: #b2b2ba;
+  --color-ink-faint: #94949d;
+  --color-pink: #cf43b8;
+  --color-accent: #cf43b8;
+  --color-pink-bright: #ff5ec8;
+  --color-line: rgba(255, 255, 255, 0.08);
+}
+/* Grain prawie niewidoczny na papierze (na ciemnym ditheruje banding). */
+html[data-koda-light] .koda-grain {
+  opacity: 0.025;
+}
+/* Uwaga: ciche pigułki „surface" (PillLink bg=var(--color-surface-1)) dostają
+   kolor tekstu z tokenów BEZPOŚREDNIO w miejscu użycia (text-ink-muted/ink) —
+   działa w obu motywach. Pigułki o stałym ciemnym tle (#1a1a1a, np. /dziekujemy)
+   trzymają biały tekst i są czytelne na porcelanie bez żadnego nadpisania. */
+
 /* ── Z-index scale — SINGLE SOURCE OF TRUTH for layering ─────────────
    The whole stacking order lives here so the intro ↔ hero ↔ menu ↔ header
    relationship is explicit and never drifts into magic numbers scattered

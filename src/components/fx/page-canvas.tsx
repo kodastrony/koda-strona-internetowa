@@ -3,6 +3,7 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValue } from "motion/react";
+import { useThemeValue } from "@/lib/theme";
 
 /* ══════════════════════════════════════════════════════════════════════════
    PageCanvas — ONE scroll-scrubbed background for the whole page.
@@ -30,21 +31,50 @@ import { motion, useMotionValue } from "motion/react";
    scrollu wyłącznie repaint tego diva.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/** data-canvas id → hold color. Wartości = tokeny --color-canvas-* (globals.css). */
+/** data-canvas id → hold color. Bazowy kolor CAŁEGO tła (sceny 3D malują już
+ *  TYLKO światło NA tym — patrz cosmos/accents). Dark = analogiczny łuk hue
+ *  z WYRAŹNĄ tożsamością każdego beatu (żeby zjazd „żył", a nie był jednolitą
+ *  czernią), ale wciąż niska luminancja (zero „PowerPointu"/flashbangu):
+ *  kosmos → fiolet (usługi) → chłodny indygo (proces, najzimniejszy punkt) →
+ *  ciepła róża (FAQ) → plumowy świt (statement) → ciepła czerń (stopka).
+ *  hero MUSI = SCENE_DARK.bg (#0b0b0d): mgławica odejmuje uBg, więc puste pole
+ *  sceny = ten hold (zero szwu). */
 const HOLDS: Record<string, string> = {
   hero: "#0b0b0d",
   base: "#0b0b0d",
-  services: "#15121b",
-  tint: "#15121b",
-  work: "#0b0b0d",
-  process: "#11131c",
-  faq: "#1a1017",
-  statement: "#521648",
+  services: "#16111f",
+  tint: "#16111f",
+  work: "#0e0b13",
+  process: "#0b1120",
+  faq: "#1b0f16",
+  // Statement = ŚWIT NAD PLANETĄ: deep plum-black (NIE jasny plum slab) — finał
+  // płynnie CIEMNIEJE faq → statement → footer #0a0609 (zero plumowego „garbu"
+  // /szwów), a różowy świt horyzontu świeci na czystym ciemnym kosmosie.
+  statement: "#1d0a18",
   cta: "#30132a",
   footer: "#0a0609",
 };
 
+/** Jasny motyw: odpowiedniki holdów (subtelne pastele — papier z światłem).
+ *  PageCanvas wchłonął dawny LightWeather: JEDEN element tła dla obu motywów. */
+const LIGHT_HOLDS: Record<string, string> = {
+  hero: "#f7f4f8",
+  base: "#f7f4f8",
+  services: "#f3eef8",
+  tint: "#f3eef8",
+  work: "#f7f4f8",
+  process: "#eff0f8",
+  faq: "#f9eef5",
+  // Statement = ciemna wyspa „świtu nad planetą" w OBU motywach (jak stopka):
+  // horyzont (ciemny kosmos + różowy świt) potrzebuje ciemnego tła, a biały
+  // tekst klimaksu jest czytelny. Finał: ciemny horyzont → ciemna stopka.
+  statement: "#160a14",
+  cta: "#f2e3ee",
+  footer: "#efe9f1",
+};
+
 const FALLBACK = "#0b0b0d";
+const FALLBACK_LIGHT = "#f7f4f8";
 
 /* ── OKLCH math (wystarczająco mała, żeby nie ciągnąć biblioteki) ────────── */
 
@@ -115,15 +145,18 @@ interface Stops {
   lch: Lch[];
 }
 
-function colorAt(stops: Stops | null, p: number): string {
-  if (!stops || !stops.at.length) return FALLBACK;
+function colorAt(stops: Stops | null, p: number, fallback: string): string {
+  if (!stops || !stops.at.length) return fallback;
   const { at, lch } = stops;
   if (p <= at[0]) return lchToHex(lch[0]);
   for (let i = 1; i < at.length; i++) {
     if (p <= at[i]) {
       const span = at[i] - at[i - 1];
       const t = span > 0 ? (p - at[i - 1]) / span : 1;
-      return lchToHex(mixOklch(lch[i - 1], lch[i], t));
+      // smoothstep: kolor rusza i dochodzi MIĘKKO (slow-in/slow-out), więc
+      // przejścia nie mają wyczuwalnego startu/stopu — „ściemniacz", nie slajd.
+      const e = t * t * (3 - 2 * t);
+      return lchToHex(mixOklch(lch[i - 1], lch[i], e));
     }
   }
   return lchToHex(lch[lch.length - 1]);
@@ -131,15 +164,19 @@ function colorAt(stops: Stops | null, p: number): string {
 
 export function PageCanvas() {
   const pathname = usePathname();
+  const theme = useThemeValue();
+  const light = theme === "light";
   const stopsRef = useRef<Stops | null>(null);
-  const bg = useMotionValue<string>(FALLBACK);
+  const bg = useMotionValue<string>(light ? FALLBACK_LIGHT : FALLBACK);
 
   const measure = useCallback(() => {
+    const holds = light ? LIGHT_HOLDS : HOLDS;
+    const fallback = light ? FALLBACK_LIGHT : FALLBACK;
     const els = Array.from(document.querySelectorAll<HTMLElement>("[data-canvas]"));
     const total = document.documentElement.scrollHeight - window.innerHeight;
     if (!els.length || total <= 0) {
       stopsRef.current = null;
-      bg.set(FALLBACK);
+      bg.set(fallback);
       return;
     }
 
@@ -147,11 +184,11 @@ export function PageCanvas() {
     const scrollY = window.scrollY;
     const colorOf = (el: HTMLElement): string => {
       const id = el.dataset.canvas ?? "";
-      const c = HOLDS[id];
+      const c = holds[id];
       if (!c && process.env.NODE_ENV !== "production") {
         console.warn(`[PageCanvas] nieznane data-canvas="${id}" — używam fallbacku`);
       }
-      return c ?? FALLBACK;
+      return c ?? fallback;
     };
 
     const at: number[] = [0];
@@ -162,12 +199,13 @@ export function PageCanvas() {
       const next = colorOf(els[i]);
       if (next === prev) continue; // ten sam hold — brak szwu
 
-      // Strefa przejścia: zaczyna się gdy szew jest 55% wysokości viewportu nad
-      // dołem ekranu, kończy gdy dociera blisko góry — nowy kolor „przychodzi"
-      // gdy granica mija środek ekranu (zmierzch, nie pstryczek).
+      // Strefa przejścia ≈ CAŁY viewport: kolor wędruje przez prawie cały ekran
+      // scrolla (zaczyna gdy szew jest ~0.92vh nad dołem, kończy tuż przy górze)
+      // — bardzo stopniowy „świt"/zmierzch, nigdy pstryczek. + smoothstep w
+      // colorAt = miękki start i koniec. Razem: zero „prezentacji PowerPoint".
       const seamY = els[i].getBoundingClientRect().top + scrollY;
-      let aY = seamY - 0.55 * vh;
-      let bY = seamY - 0.1 * vh;
+      let aY = seamY - 0.92 * vh;
+      let bY = seamY - 0.06 * vh;
       // Szwy przy końcu dokumentu (stopka) wypadają za maks. scrollem — dosuń
       // okno w górę, żeby ostatni hold ZDĄŻYŁ w pełni przyjść.
       if (bY > total) {
@@ -193,8 +231,8 @@ export function PageCanvas() {
     }
 
     stopsRef.current = { at, lch: colors.map(hexToLch) };
-    bg.set(colorAt(stopsRef.current, scrollY));
-  }, [bg]);
+    bg.set(colorAt(stopsRef.current, scrollY, fallback));
+  }, [bg, light]);
 
   // useLayoutEffect: pierwszy pomiar PRZED malowaniem klatki (deep-linki typu
   // /#faq dostają od razu właściwy kolor zamiast błysku czerni).
@@ -203,8 +241,9 @@ export function PageCanvas() {
 
     // Własny listener scrolla (passive) zamiast useScroll: progi i odczyt są
     // w TEJ SAMEJ skali (px dokumentu) — żaden cudzy „total" się nie rozjedzie.
+    const fallback = light ? FALLBACK_LIGHT : FALLBACK;
     const onScroll = () => {
-      bg.set(colorAt(stopsRef.current, window.scrollY));
+      bg.set(colorAt(stopsRef.current, window.scrollY, fallback));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -232,13 +271,26 @@ export function PageCanvas() {
       window.removeEventListener("resize", remeasure);
       window.visualViewport?.removeEventListener("resize", remeasure);
     };
-  }, [measure, bg, pathname]);
+  }, [measure, bg, pathname, light]);
 
   return (
     <motion.div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10"
       style={{ backgroundColor: bg }}
-    />
+    >
+      {/* Jasny motyw: dwa miękkie pastelowe pola — papier ma światło, nie jest
+          płaski (dawny LightWeather). Crossfade opacity przy przełączeniu ☀/☾. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 transition-opacity duration-700 ease-out"
+        style={{
+          opacity: light ? 1 : 0,
+          background:
+            "radial-gradient(52% 38% at 16% 8%, rgba(207,67,184,0.07) 0%, rgba(207,67,184,0) 70%)," +
+            "radial-gradient(46% 34% at 88% 14%, rgba(122,76,214,0.06) 0%, rgba(122,76,214,0) 70%)",
+        }}
+      />
+    </motion.div>
   );
 }

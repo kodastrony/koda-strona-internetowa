@@ -36,8 +36,7 @@ export const SERVICES: Service[] = [
     n: "02",
     id: "strony",
     title: "Strony internetowe 2D i 3D",
-    short:
-      "Szybkie strony na autorskim kodzie. Budowane pod Twój biznes, nie pod szablon.",
+    short: "Szybkie strony na autorskim kodzie. Budowane pod Twój biznes, nie pod szablon.",
     lead: "Budujemy na czystym, wydajnym kodzie — nie na ciężkich szablonach. Efekt: strona, która ładuje się błyskawicznie, dobrze wygląda na każdym ekranie i łatwo się rozwija.",
     points: [
       "Strony firmowe, landing page i wizytówki",
@@ -63,8 +62,7 @@ export const SERVICES: Service[] = [
     n: "04",
     id: "wsparcie",
     title: "Wsparcie i opieka",
-    short:
-      "Po starcie zostajemy: aktualizacje, bezpieczeństwo i rozwój, gdy firma rośnie.",
+    short: "Po starcie zostajemy: aktualizacje, bezpieczeństwo i rozwój, gdy firma rośnie.",
     lead: "Wdrożenie to początek, nie koniec. Zostajemy na pokładzie: aktualizujemy, pilnujemy bezpieczeństwa i rozwijamy stronę razem z Twoim biznesem.",
     points: [
       "Aktualizacje i opieka techniczna",

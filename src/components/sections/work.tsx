@@ -75,7 +75,15 @@ export function Work() {
         className="pointer-events-none absolute inset-x-0 z-0"
         style={{ top: "-12%", height: "70%" }}
       >
-        <GlowField hue={324} x={10} y={28} strength={0.8} drift driftDuration={19} className="inset-0" />
+        <GlowField
+          hue={324}
+          x={10}
+          y={28}
+          strength={0.8}
+          drift
+          driftDuration={19}
+          className="inset-0"
+        />
       </Parallax>
 
       <div className="container-koda section-y relative z-10">
@@ -95,7 +103,9 @@ export function Work() {
                   whileInView={{ clipPath: "inset(0 0% 0 0)" }}
                   viewport={{ once: true, margin: "0px 0px -80px 0px" }}
                   transition={
-                    reduce ? { duration: 0 } : { duration: 0.85, ease: EASE.out, delay: 0.06 + i * 0.1 }
+                    reduce
+                      ? { duration: 0 }
+                      : { duration: 0.85, ease: EASE.out, delay: 0.06 + i * 0.1 }
                   }
                 >
                   {line}
@@ -133,7 +143,7 @@ export function Work() {
               href="/realizacje"
               bg="var(--color-surface-1)"
               border="var(--color-line-strong)"
-              className="px-9 py-4"
+              className="px-9 py-4 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
             >
               Zobacz wszystkie realizacje
             </PillLink>
