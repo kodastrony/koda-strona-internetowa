@@ -3,6 +3,12 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+/** Miękkie wygaszenie poświaty na wszystkich 4 krawędziach pudełka (≈12% pasy).
+ *  Składane przez mask-composite:intersect (iloczyn osi) — patrz <GlowField>. */
+const GLOW_EDGE_MASK =
+  "linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%), " +
+  "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)";
+
 /* ── GlowField — „oświetlenie sceny" zamiast płaskiego bloba ───────────────
    Jedno źródło światła = TRZY nałożone radialne gradienty w jednym
    background-image (zero dodatkowych warstw):
@@ -78,15 +84,28 @@ export function GlowField({
   }, [drift]);
 
   return (
-    <div aria-hidden="true" className={cn("pointer-events-none absolute", className)} style={style}>
+    <div
+      aria-hidden="true"
+      className={cn("pointer-events-none absolute", className)}
+      // ★ Maska gaśnie poświatę do ZERA na WSZYSTKICH 4 krawędziach pudełka.
+      // Bez niej radialny gradient (zwł. duży „ambient", przesunięty ku brzegowi
+      // przy x≈8/90) jest NIEZEROWY na krawędzi warstwy GPU → twardy prostokątny
+      // „outline", który dodatkowo JEŹDZIŁ z dryfem `koda-blob` (translate+scale)
+      // i parallaxem. Teraz światło wtapia się miękko w ramkę (jak źródło zza
+      // kadru) — zero prostokąta. mask-composite:intersect = iloczyn obu osi.
+      style={{
+        maskImage: GLOW_EDGE_MASK,
+        WebkitMaskImage: GLOW_EDGE_MASK,
+        maskComposite: "intersect",
+        WebkitMaskComposite: "source-in",
+        ...style,
+      }}
+    >
       <div
         ref={blobRef}
         className={cn("absolute", drift && "koda-blob")}
         style={{
-          // Bleed wewnątrz wrappera TYLKO pionowy: poziomy robiłby overflow-x
-          // dokumentu (sekcje nie mają już overflow-hidden). Gradienty i tak
-          // wygasają do alfy 0 przed krawędzią (stopy ≤80%), więc dryf ±5%
-          // nigdy nie pokazuje „krawędzi" światła.
+          // Bleed pionowy daje dryfowi zapas; krawędzie i tak gasi maska wrappera.
           inset: drift ? "-8% 0" : "0",
           backgroundImage: glowBackground(hue, x, y, strength),
           ...(drift ? ({ "--blob-dur": `${driftDuration}s` } as React.CSSProperties) : null),
