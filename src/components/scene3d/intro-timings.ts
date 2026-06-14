@@ -81,8 +81,15 @@ export const P5_INTRO = {
   sweepStart: 0.96,
   /** Czas obiegu (azymut −80°→+36°). */
   sweep: 0.82,
-  /** Kotwica treści hero. */
+  /** Kotwica treści hero (scena 3D: osiadanie światła) — czyta ją home-totem. */
   base: 0.96 + 0.82,
+  /** ⚡ Kotwica DOM-owej treści hero (H1/opis/CTA) — ŚWIADOMIE wcześniejsza niż
+      `base`. Treść H1 to element LCP strony; trzymanie jej do ~1,5 s (sync ze
+      światłem sceny) psuło Core Web Vitals przy 1. wizycie. Tu wjeżdża ~0,5 s,
+      a intro 3D gra DALEJ swój pełny czas — scena czyta `base`/`sweep`/`total`,
+      NIE to pole (patrz home-totem.tsx). Dotyczy tylko 1. wizyty; powracający
+      i tak mają 0,15 (useIntroOrchestra zwraca 0,15 przy skipped). */
+  copyBase: 0.8,
   /** Dośpiew (sprężyna jaw domyka spoczynek). */
   settle: 0.4,
   /** Pełen czas partytury. */

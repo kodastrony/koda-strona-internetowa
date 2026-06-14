@@ -164,7 +164,9 @@ function ThemedScrollHint({ base }: { base: number }) {
 }
 
 export function Hero3D() {
-  const o = useIntroOrchestra(P5_INTRO.base, { oncePerSession: true });
+  // Treść hero (H1=LCP) wjeżdża wg copyBase (~0,5 s), NIE base (~1,8 s = osiadanie
+  // światła sceny). Intro 3D gra dalej pełny czas — scena czyta P5_INTRO osobno.
+  const o = useIntroOrchestra(P5_INTRO.copyBase, { oncePerSession: true });
   const theme = useThemeValue();
   const light = theme === "light";
   const reduce = useReducedMotion();
