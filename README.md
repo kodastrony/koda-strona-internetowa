@@ -75,10 +75,10 @@ Formularz kontaktowy (`/kontakt`) ma walidację po stronie klienta i **wysyła l
 przez [FormSubmit.co](https://formsubmit.co)** — darmowo, bez konta i bez kluczy,
 z obsługą **załącznika (brief) do 10 MB** (free tier Web3Forms plików nie wysyła).
 Mechanizm: po walidacji formularz robi natywny `multipart/form-data` POST na
-`https://formsubmit.co/kodastrony@gmail.com`, FormSubmit wysyła maila z załącznikiem
+`https://formsubmit.co/kontakt@kodastrony.pl`, FormSubmit wysyła maila z załącznikiem
 i przekierowuje na `/dziekujemy`. Honeypot (`_honey`) chroni przed spamem.
 
 ⚠️ **Aktywacja (jednorazowo)**: przy pierwszej wysyłce FormSubmit wyśle na
-kodastrony@gmail.com mail „Activate Form" — kliknij raz, żeby potwierdzić adres.
+kontakt@kodastrony.pl mail „Activate Form" — kliknij raz, żeby potwierdzić adres.
 Od tego momentu wszystkie zgłoszenia dochodzą. (Można też podmienić adres w
 `action` formularza na zahaszowany alias z FormSubmit, by nie pokazywać e-maila.)

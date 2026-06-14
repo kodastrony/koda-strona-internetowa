@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   description:
     "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z jasnym zakresem w umowie i opieką po starcie.",
   url: "https://kodastrony.pl",
-  email: "kodastrony@gmail.com",
+  email: "kontakt@kodastrony.pl",
   locale: "pl_PL",
 } as const;
 
@@ -16,9 +16,9 @@ export const NAV_LINKS = [
 ] as const;
 
 export const CONTACT = {
-  email: "kodastrony@gmail.com",
+  email: "kontakt@kodastrony.pl",
   domain: "kodastrony.pl",
-  city: "Warszawa",
+  city: "Bielsko-Biała",
   // ⬇️ Opcjonalnie — po wpisaniu NIP renderuje się sam w stopce („NIP: …"). Puste = nie pokazuje się.
   nip: "" as string, // np. "0000000000"
 } as const;

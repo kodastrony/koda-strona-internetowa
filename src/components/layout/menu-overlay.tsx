@@ -320,7 +320,7 @@ export function MenuOverlay({
                 color: "rgba(15,15,15,0.7)",
               }}
             >
-              Warszawa, Polska
+              {CONTACT.city}, Polska
             </span>
             <span
               style={{

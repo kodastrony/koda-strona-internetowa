@@ -27,7 +27,7 @@ const ORG_JSON_LD = {
       logo: `${SITE_CONFIG.url}/icon.svg`,
       description: SITE_CONFIG.description,
       areaServed: "PL",
-      address: { "@type": "PostalAddress", addressLocality: "Warszawa", addressCountry: "PL" },
+      address: { "@type": "PostalAddress", addressLocality: CONTACT.city, addressCountry: "PL" },
     },
     {
       "@type": "WebSite",
@@ -92,7 +92,8 @@ export const metadata: Metadata = {
     "sklep internetowy",
     "projektowanie stron",
     "Polska",
-    "Warszawa",
+    "Bielsko-Biała",
+    "strony internetowe Bielsko-Biała",
     "KODA",
   ],
   authors: [{ name: "KODA Studio", url: "https://kodastrony.pl" }],
