@@ -193,16 +193,18 @@ export function Hero3D() {
         fadeIn={false}
       />
 
-      {/* Winieta: treść na spokojniejszym polu — papier w light, kosmos w dark. */}
+      {/* Winieta: subtelne ściemnienie POD treścią (lewa-góra), gładko gasnące do
+          zera w stronę galaktyki (prawo/dół). BEZ maski — poprzednia maska
+          „black 55% → transparent 94%" robiła TWARDĄ poziomą krawędź („jaśniejszy
+          kwadrat": ciemniona góra vs niedotknięty dół). Jeden gładki radial = zero
+          szwu; gaśnie do 0 daleko od krawędzi, więc tło jest płynne. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-svh"
         style={{
           background: light
-            ? "radial-gradient(125% 95% at 50% 6%, transparent 52%, rgba(238,233,241,0.62) 100%)"
-            : "radial-gradient(125% 95% at 50% 6%, transparent 50%, rgba(7,7,9,0.6) 100%)",
-          maskImage: "linear-gradient(to bottom, black 55%, transparent 94%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 55%, transparent 94%)",
+            ? "radial-gradient(125% 115% at 24% 30%, rgba(238,233,241,0.55) 0%, rgba(238,233,241,0.2) 38%, rgba(238,233,241,0) 70%)"
+            : "radial-gradient(125% 115% at 24% 30%, rgba(7,7,9,0.6) 0%, rgba(7,7,9,0.24) 38%, rgba(7,7,9,0) 70%)",
         }}
       />
 

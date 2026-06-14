@@ -86,11 +86,13 @@ void main() {
   float bandTex = 0.45 + 0.55 * smoothstep(-0.35, 0.8, f2);
 
   // Światła: core za kolumną (uC1 — wędruje w intro!), halo, ambient u góry.
+  // Szerokie, okrągłe spadki → światło ROZLEWA się po kadrze (jeden gładki
+  // kosmos), zamiast tworzyć skoncentrowaną jaśniejszą plamę/„kwadrat" w rogu.
   vec2 d1 = (vUv - uC1) * vec2(uAspect, 1.0);
   vec2 d2 = (vUv - uC2) * vec2(uAspect, 1.0);
-  float w1 = exp(-3.2 * length(d1 * vec2(1.35, 1.0)));
-  float w2 = exp(-4.2 * length(d2 * vec2(1.3, 1.0)));
-  float w3 = exp(-3.0 * length((vUv - vec2(0.14, 0.9)) * vec2(uAspect, 1.4)));
+  float w1 = exp(-2.2 * length(d1 * vec2(1.18, 1.0)));
+  float w2 = exp(-2.9 * length(d2 * vec2(1.18, 1.0)));
+  float w3 = exp(-2.6 * length((vUv - vec2(0.14, 0.9)) * vec2(uAspect, 1.4)));
 
   float scrollDim = 1.0 - smoothstep(0.5, 1.35, uScroll) * 0.72;
 
@@ -99,14 +101,15 @@ void main() {
   float s3 = 0.28 + 0.62 * smoothstep(-0.2, 0.9, f2);
   float sf = smoothstep(0.2, 0.95, f);
 
-  // CIEMNA formuła (addytywna — S5 bez zmian przy uLight=0).
+  // CIEMNA formuła (addytywna). Niższe piki rdzenia (różowy hotspot za kolumną)
+  // + szersze spadki = łuna rozlana, bez ostrego „lit vs dark".
   vec3 colD = uBg;
   colD += uViolet * bandW * bandTex * 0.115;
   colD += uIndigo * bandW * sf * 0.06;
-  colD += uPink * w1 * s1 * 0.6 * uC1Str;
-  colD += uPinkBright * w1 * s2 * 0.26 * uC1Str;
-  colD += uViolet * w2 * s3 * 0.4;
-  colD += uIndigo * w3 * 0.13;
+  colD += uPink * w1 * s1 * 0.44 * uC1Str;
+  colD += uPinkBright * w1 * s2 * 0.17 * uC1Str;
+  colD += uViolet * w2 * s3 * 0.32;
+  colD += uIndigo * w3 * 0.12;
 
   // JASNA formuła (akwarela — porcelana barwiona KU pastelom, nie ku bieli).
   vec3 colL = uBg;
@@ -118,7 +121,9 @@ void main() {
   colL = mix(colL, uIndigo, w3 * 0.14);
 
   // Winieta wiąże kadr; scroll ściąga światło w stronę treści (gaśnie godnie).
-  float vig = smoothstep(1.05, 0.42, length(av * vec2(0.8, 1.0)));
+  // Szeroka, łagodna (bez płaskiego plateau w środku) → przejście światło→ciemność
+  // jest stopniowe na CAŁEJ szerokości, więc nie ma wyczuwalnej krawędzi plamy.
+  float vig = smoothstep(1.32, 0.16, length(av * vec2(0.76, 1.0)));
   float vis = vig * uIntro * scrollDim;
 
   // ── PageCanvas = JEDYNE tło ────────────────────────────────────────────────

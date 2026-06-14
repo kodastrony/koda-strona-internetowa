@@ -95,7 +95,8 @@ uniform vec3 uPink;
 ${GLSL_DITHER}
 void main() {
   vec2 p = (vUv - 0.5) * 2.0;
-  float fog = exp(-dot(p, p) * 2.3);
+  // Szerszy spadek = dysk wtapia się miękko (mniej skoncentrowanej łuny u dołu).
+  float fog = exp(-dot(p, p) * 1.85);
 
   vec2 sd = normalize(uShadowDir + vec2(1e-4));
   vec2 q = p - sd * 0.2;
@@ -404,7 +405,7 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
       );
       placeDisc();
       setKey(cfg.key.azRest);
-      discMaterial.uniforms.uA.value = 0.8 * pal.disc.alphaMul;
+      discMaterial.uniforms.uA.value = 0.55 * pal.disc.alphaMul;
       discMaterial.uniforms.uShadowStr.value = 0.55 * pal.disc.shadowMul;
       discMaterial.uniforms.uShadowStretch.value = 1;
       shared.uRim.value = cfg.rim.base * pal.rimMul;
@@ -548,7 +549,7 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
     }
 
     placeDisc();
-    discMaterial.uniforms.uA.value = worldIn * (wide ? 0.9 : 0.75) * pal.disc.alphaMul;
+    discMaterial.uniforms.uA.value = worldIn * (wide ? 0.58 : 0.52) * pal.disc.alphaMul;
     discMaterial.uniforms.uShadowStr.value =
       (0.45 + 0.3 * clamp01(tIntro / P5_INTRO.base)) * (1 - s2 * 0.18) * pal.disc.shadowMul;
     discMaterial.uniforms.uShadowStretch.value = 1 + s2 * (cfg.id === "c" ? 1.6 : 0.9);
