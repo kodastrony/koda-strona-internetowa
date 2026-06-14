@@ -60,16 +60,32 @@ form-action 'self' https://formsubmit.co"
 ErrorDocument 404 /404.html
 
 # ── Caching ──────────────────────────────────────────────────────────────────
-# Next.js content-hashes its JS/CSS chunks (e.g. _next/static/chunks/abc123.js),
-# so it's safe to cache them for a full year. HTML pages are NOT hashed and must
-# be revalidated on each visit so users always get the latest deploy.
+# ⚠️ Turbopack does NOT content-hash its JS/CSS chunk filenames (verified: a real
+# code change renamed ZERO chunks across two clean builds). So .js/.css CANNOT be
+# cached "immutable" — returning visitors would be pinned to stale code/styles for
+# up to a year (they'd never see a deploy without a hard refresh). Only next/font
+# files under _next/static/media/ have true content-hashed names → safe forever.
+# Split is purely by extension (no <If>/mod_setenvif → no 500 risk on OVH shared).
 <IfModule mod_headers.c>
-  # Immutable assets — hashed filenames, safe to cache forever.
-  <FilesMatch "\.(js|css|woff2?|ttf|eot|ico|png|jpg|jpeg|webp|avif|svg)$">
+  # Fonts — content-hashed names (next/font), bytes never change → cache forever.
+  <FilesMatch "\.(woff2?|ttf|eot)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
-  # HTML pages — revalidate on every request.
+  # JS/CSS — NOT content-hashed (filenames stay stable across deploys). Short cache
+  # keeps repeat views fast (in-window cache hits, then cheap conditional 304s)
+  # while guaranteeing a deploy reaches returning visitors within ~10 minutes.
+  <FilesMatch "\.(js|css|mjs)$">
+    Header set Cache-Control "public, max-age=600, must-revalidate"
+  </FilesMatch>
+
+  # Images / icons (favicon, logos, og) — fixed or hashed names; 1-day TTL with
+  # revalidation is a safe middle ground that still picks up a deploy promptly.
+  <FilesMatch "\.(ico|png|jpe?g|webp|avif|svg|gif)$">
+    Header set Cache-Control "public, max-age=86400, must-revalidate"
+  </FilesMatch>
+
+  # HTML pages — always revalidate so users get the latest deploy immediately.
   <FilesMatch "\.html$">
     Header set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
@@ -85,4 +101,14 @@ ErrorDocument 404 /404.html
   AddOutputFilterByType DEFLATE text/html text/css application/javascript
   AddOutputFilterByType DEFLATE application/json text/xml image/svg+xml
   AddOutputFilterByType DEFLATE font/woff2 font/woff
+</IfModule>
+
+# ── Compression (Brotli — preferred when available; gzip above is the fallback) ─
+# Brotli beats gzip ~15-20% on text (notably the ~232 KB-gzip three.js chunk).
+# Wrapped in <IfModule>: a pure no-op if OVH lacks mod_brotli (block skipped),
+# and browsers that don't send 'br' use the mod_deflate gzip filter above.
+# WOFF2 is already Brotli-compressed internally → intentionally NOT re-compressed.
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/json text/xml image/svg+xml
 </IfModule>

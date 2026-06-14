@@ -5,7 +5,7 @@ import { Work } from "@/components/sections/work";
 import { Process } from "@/components/sections/process";
 import { Faq } from "@/components/sections/faq";
 import { Statement } from "@/components/sections/statement";
-import { OrbitsAccent } from "@/components/scene3d/home/accents";
+import { OrbitsAccentLazy } from "@/components/scene3d/home/orbits-accent-lazy";
 import { FAQS } from "@/lib/faq";
 
 // Strona główna — jawne metadane (nie tylko dziedziczenie z layoutu): tytuł
@@ -45,7 +45,7 @@ export default function HomePage() {
           POD treścią; sekcja zostaje przezroczysta (data-canvas). */}
       <div className="relative">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <OrbitsAccent />
+          <OrbitsAccentLazy />
         </div>
         <Services />
       </div>
