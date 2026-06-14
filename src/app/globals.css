@@ -362,6 +362,44 @@ html[data-koda-light] .koda-grain {
   }
 }
 
+/* ── Autouzupełnianie przeglądarki (Chrome/Brave/Edge) ───────────────────
+   Bez tego WebKit/Blink wstrzykuje WŁASNE tło (szary/żółty pasek) w polu,
+   nadpisując zaprojektowane jasne pole (#f2f2f2) → użytkownik widzi „brzydkie
+   szare pole" po kliknięciu zapamiętanej podpowiedzi. Klasyczny fix: solidny
+   `box-shadow` INSET w kolorze pola maskuje tło autofilla, a `text-fill-color`
+   przywraca atrament. Wybrane CELOWO zamiast triku z `transition-delay`: globalny
+   `prefers-reduced-motion` (wyżej) zeruje `transition-duration !important`, co by
+   tamten trik zabiło — box-shadow działa w każdym trybie.
+   Stany odwzorowane 1:1 z fieldCls w contact.tsx (default / :focus / błąd przez
+   [aria-invalid="true"], które komponent i tak ustawia). Pola kontaktu są zawsze
+   jasne (sekcja na bieli), więc reguła może być globalna. */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #0f0f0f;
+  caret-color: #0f0f0f;
+  -webkit-box-shadow: 0 0 0 100px #f2f2f2 inset;
+  box-shadow: 0 0 0 100px #f2f2f2 inset;
+}
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus {
+  -webkit-box-shadow:
+    0 0 0 100px #ececec inset,
+    0 0 0 2px rgba(207, 67, 184, 0.4);
+  box-shadow:
+    0 0 0 100px #ececec inset,
+    0 0 0 2px rgba(207, 67, 184, 0.4);
+}
+input[aria-invalid="true"]:-webkit-autofill,
+textarea[aria-invalid="true"]:-webkit-autofill {
+  -webkit-box-shadow:
+    0 0 0 100px #fbeef2 inset,
+    0 0 0 1.5px rgba(204, 43, 94, 0.45);
+  box-shadow:
+    0 0 0 100px #fbeef2 inset,
+    0 0 0 1.5px rgba(204, 43, 94, 0.45);
+}
+
 /* ── Custom cursor (smukły akcent nad natywnym — odwzorowanie baunfire) ────
    NATYWNY kursor (biała strzałka) ZOSTAJE. Tu: mała różowa KROPKA (stała) +
    cienki, subtelny RING, który na hover „rozkwita" w miękki półprzezroczysty
