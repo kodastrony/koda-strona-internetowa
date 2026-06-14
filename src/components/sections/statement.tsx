@@ -272,6 +272,22 @@ export function Statement() {
           (LIGHT_HOLDS.statement też plum) — biały tekst czytelny, świt gra. ── */}
       <HorizonBackdrop />
 
+      {/* ── Wejście z FAQ: kontynuacja różowej łuny PRZEZ szew ────────────────
+          FAQ ma łunę-zapowiedź H335 nad SWOJĄ dolną krawędzią (peak dokładnie na
+          szwie, gdy patrzysz na granicę → foreshadow=1). Tu LUSTRZANA łuna nad
+          GÓRNĄ krawędzią Statement schodzi tym samym różem w dół — róż nie urywa
+          się na szwie, tylko płynnie przechodzi w ciemny świt. Identyczny gradient
+          (tylko zakotwiczony u góry: 50% -2%) = przejście FAQ→Statement gładkie. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1]"
+        style={{
+          height: "52vh",
+          background:
+            "radial-gradient(ellipse 120% 86% at 50% -2%, oklch(0.62 0.215 335 / 0.26) 0%, oklch(0.5 0.17 335 / 0.11) 42%, oklch(0.4 0.13 335 / 0.04) 64%, oklch(0.4 0.13 335 / 0) 82%)",
+        }}
+      />
+
       {/* Zejście do stopki — ciemne dno horyzontu wtapia się w ciepłą czerń
           stopki (#0a0609 = hold footer), zero plumowego paska na szwie. Wysokość
           viewport-relative (clamp): na wysokich ekranach świt sięga wyżej, więc
