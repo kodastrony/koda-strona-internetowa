@@ -6,7 +6,7 @@ import { CTABand } from "@/components/sections/cta-band";
 export const metadata: Metadata = {
   title: "Realizacje",
   description:
-    "Wybrane realizacje KODA — strony firmowe i korporacyjne oraz platformy B2B dla polskich marek.",
+    "Realizacje KODA — koncepcyjne strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Zobacz, jak pracujemy.",
   alternates: { canonical: "/realizacje/" },
 };
 

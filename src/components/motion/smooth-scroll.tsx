@@ -1,7 +1,28 @@
 "use client";
 
-import { ReactLenis } from "lenis/react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { ReactLenis, useLenis } from "lenis/react";
 import { useReducedMotion } from "motion/react";
+
+/* On route change Lenis OWNS the scroll position, so Next's built-in scroll
+   reset desyncs (you land on the same offset = e.g. stuck on the "next project"
+   section after navigating to it). Reset Lenis to the top on every real pathname
+   change. Skips the initial mount (preserves back/forward restoration) and any
+   in-page #anchor navigation. Rendered inside <ReactLenis> so useLenis() works. */
+function ScrollReset() {
+  const pathname = usePathname();
+  const lenis = useLenis();
+  const prev = useRef(pathname);
+  useEffect(() => {
+    if (prev.current === pathname) return;
+    prev.current = pathname;
+    if (typeof window !== "undefined" && window.location.hash) return; // let anchors scroll
+    if (lenis) lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [pathname, lenis]);
+  return null;
+}
 
 /* ── Smooth scroll (Lenis) — the foundation of the "experience" feel ──────
    Lenis is the smooth-scroll engine top agencies use for buttery 60fps scroll.
@@ -27,6 +48,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+      <ScrollReset />
     </ReactLenis>
   );
 }

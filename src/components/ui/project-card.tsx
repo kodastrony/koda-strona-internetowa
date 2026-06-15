@@ -1,20 +1,20 @@
+/* eslint-disable @next/next/no-img-element -- Static export (images.unoptimized): we ship
+   hand-optimized webp with manual srcset/sizes; next/image can't srcset here. */
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "motion/react";
 import { EASE, cssBezier } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import type { Project } from "@/lib/projects";
 
-/* ── MockWebsite — decorative placeholder screenshot ──────────────────────
-   Stands in until a real screenshot is supplied via Project.image. Exported so
-   the /realizacje/[id] showcase can reuse the same decorative mock at scale. */
+/* ── MockWebsite — decorative fallback ─────────────────────────────────────
+   Only stands in when a project has no real screenshot (Project.image === "").
+   All current projects ship real crops, so this is a safety net. */
 export function MockWebsite({ accent }: { accent: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 select-none" aria-hidden={true}>
-      {/* Browser chrome */}
       <div
         style={{
           position: "absolute",
@@ -51,125 +51,76 @@ export function MockWebsite({ accent }: { accent: string }) {
           }}
         />
       </div>
-
-      {/* Hero block */}
       <div
         style={{
           position: "absolute",
-          top: "9.5%",
-          left: "3%",
-          right: "3%",
-          height: "36%",
-          borderRadius: "2%",
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          padding: "4% 5% 0",
-          overflow: "hidden",
+          top: "12%",
+          left: "6%",
+          width: "60%",
+          height: "9%",
+          borderRadius: 4,
+          background: "rgba(255,255,255,0.14)",
         }}
-      >
-        <div
-          style={{
-            height: "8%",
-            width: "70%",
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.16)",
-            marginBottom: "5%",
-          }}
-        />
-        <div
-          style={{
-            height: "8%",
-            width: "54%",
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.10)",
-            marginBottom: "5%",
-          }}
-        />
-        <div
-          style={{
-            height: "8%",
-            width: "40%",
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.07)",
-            marginBottom: "9%",
-          }}
-        />
-        <div
-          style={{
-            height: "15%",
-            width: "28%",
-            borderRadius: 999,
-            background: accent,
-            opacity: 0.58,
-          }}
-        />
-      </div>
-
-      {/* Feature cards row */}
+      />
       <div
         style={{
           position: "absolute",
-          left: "3%",
-          right: "3%",
-          top: "47.5%",
-          bottom: "15%",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: "2.5%",
+          top: "24%",
+          left: "6%",
+          width: "42%",
+          height: "9%",
+          borderRadius: 4,
+          background: "rgba(255,255,255,0.08)",
         }}
-      >
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            style={{
-              borderRadius: "3%",
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.045)",
-              display: "flex",
-              flexDirection: "column" as const,
-              justifyContent: "flex-end",
-              padding: "0 8% 10%",
-            }}
-          >
-            <div
-              style={{
-                height: 5,
-                width: "60%",
-                borderRadius: 3,
-                background: "rgba(255,255,255,0.12)",
-                marginBottom: 4,
-              }}
-            />
-            <div
-              style={{
-                height: 5,
-                width: "80%",
-                borderRadius: 3,
-                background: "rgba(255,255,255,0.07)",
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      />
     </div>
   );
 }
 
-/* ── ProjectCard — 3-D tilt portfolio card (shared) ───────────────────────
-   Hover: the card tilts PRECISELY toward the cursor (tight spring) and a glare
-   follows the pointer = depth + precision. Entrance: fade + rise (transform +
-   opacity only = clean GPU composite). Links to the case-study page. */
-export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: number }) {
+/* ── ProjectCard — 4:3 portfolio tile (shared) ────────────────────────────
+   Full-bleed signature screenshot (the work IS the tile). One locked ratio
+   across every card = the grid reads as one studio. Hover: precise 3-D tilt
+   toward the cursor, a cursor-following glare, image zoom and an accent arrow
+   that blooms — all reduced-motion gated. Links to the case study. */
+export function ProjectCard({
+  project,
+  delay = 0,
+  priority = false,
+}: {
+  project: Project;
+  delay?: number;
+  /** Eager-load the image (first row on /realizacje). Default lazy. */
+  priority?: boolean;
+}) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const [hovered, setHovered] = useState(false);
+
+  // Hover-to-play video preview (desktop, fine pointer, motion allowed). Lazy:
+  // the mp4 mounts only on first hover; never on touch / reduced-motion / mobile.
+  const canHoverRef = useRef(false);
+  const reducedRef = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [mountVideo, setMountVideo] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    canHoverRef.current = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    reducedRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (hovered && mountVideo && !reducedRef.current) v.play().catch(() => {});
+    else v.pause();
+  }, [hovered, mountVideo]);
 
   const mX = useMotionValue(0);
   const mY = useMotionValue(0);
 
   const TILT = { stiffness: 260, damping: 26, mass: 0.4 };
-  const rotateY = useSpring(useTransform(mX, [-0.5, 0.5], reduce ? [0, 0] : [-9, 9]), TILT);
-  const rotateX = useSpring(useTransform(mY, [-0.5, 0.5], reduce ? [0, 0] : [7, -7]), TILT);
+  const rotateY = useSpring(useTransform(mX, [-0.5, 0.5], reduce ? [0, 0] : [-8, 8]), TILT);
+  const rotateX = useSpring(useTransform(mY, [-0.5, 0.5], reduce ? [0, 0] : [6, -6]), TILT);
 
   const scaleVal = useMotionValue(1);
   const scale = useSpring(scaleVal, { stiffness: 220, damping: 26 });
@@ -177,9 +128,7 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
   const gx = useTransform(mX, [-0.5, 0.5], ["-22%", "22%"]);
   const gy = useTransform(mY, [-0.5, 0.5], ["-22%", "22%"]);
 
-  // Cache the card's rect so onMove (fires up to ~60×/s) never reads layout per
-  // frame. Refreshed on enter and — while hovered — on scroll/resize, since the
-  // parallax columns move the card under the cursor.
+  // Cache the card's rect so onMove (≈60×/s) never reads layout per frame.
   const rectRef = useRef<DOMRect | null>(null);
   const measure = useCallback(() => {
     rectRef.current = wrapperRef.current?.getBoundingClientRect() ?? null;
@@ -198,8 +147,9 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
   const onEnter = useCallback(() => {
     measure();
     setHovered(true);
-    scaleVal.set(1.03);
-  }, [measure, scaleVal]);
+    scaleVal.set(1.025);
+    if (project.video && canHoverRef.current && !reducedRef.current) setMountVideo(true);
+  }, [measure, scaleVal, project.video]);
   const onLeave = useCallback(() => {
     setHovered(false);
     mX.set(0);
@@ -208,7 +158,6 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
   }, [mX, mY, scaleVal]);
 
   // Keep the cached rect fresh while hovered (scroll/parallax shifts the card).
-  // Only attached during hover, so there's zero cost when not interacting.
   useEffect(() => {
     if (!hovered) return;
     window.addEventListener("scroll", measure, { passive: true });
@@ -219,12 +168,14 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
     };
   }, [hovered, measure]);
 
+  const src640 = project.image.replace(/\.webp$/, "-640.webp");
+
   return (
     <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>
       <Link
         href={`/realizacje/${project.id}`}
-        aria-label={`${project.title} — ${project.type}`}
-        className="block"
+        aria-label={`${project.title} — ${project.tagline}`}
+        className="group block"
       >
         <div
           ref={wrapperRef}
@@ -233,65 +184,83 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
         >
-          <motion.div
-            style={{ rotateX, rotateY, scale, transformStyle: "preserve-3d" }}
-            className="will-change-transform"
-          >
+          {/* motion/react auto-manages will-change: it promotes the layer only
+              while the tilt/scale springs are animating and releases it at rest —
+              so no idle compositor layers (no hardcoded will-change). */}
+          <motion.div style={{ rotateX, rotateY, scale, transformStyle: "preserve-3d" }}>
             <div
               className="relative overflow-hidden rounded-[22px]"
               style={{
                 border: "1px solid rgba(255,255,255,0.09)",
                 transition: `box-shadow 600ms ${cssBezier(EASE.expo)}`,
                 boxShadow: hovered
-                  ? `0 44px 90px -34px rgba(0,0,0,0.75), 0 0 80px -22px rgba(${project.rgb},0.42)`
+                  ? `0 44px 90px -34px rgba(0,0,0,0.78), 0 0 80px -22px rgba(${project.rgb},0.42)`
                   : "0 26px 60px -36px rgba(0,0,0,0.6)",
               }}
             >
-              <div className="relative" style={{ paddingBottom: "66%" }}>
+              {/* 4:3 frame — the #1 cohesion lever across all cards. */}
+              <div className="relative" style={{ paddingBottom: "75%" }}>
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
-                {/* Honest "Koncept" badge — flags demo/concept pieces so nothing
-                    reads as a fake real client. Disappears once project.concept is false. */}
-                {project.concept && (
-                  <span
-                    className="absolute top-0 left-0 z-[2] m-[clamp(10px,2vw,18px)] rounded-full border px-3 py-1 font-heading text-[10px] font-bold tracking-[0.16em] uppercase"
+                {project.image ? (
+                  <img
+                    src={project.image}
+                    srcSet={`${src640} 640w, ${project.image} 1200w`}
+                    sizes="(min-width: 768px) 45vw, 92vw"
+                    alt={`${project.title} — ${project.type}`}
+                    width={1200}
+                    height={900}
+                    loading={priority ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={priority ? "high" : "auto"}
+                    className="absolute inset-0 h-full w-full object-cover object-top"
                     style={{
-                      color: "rgba(255,255,255,0.92)",
-                      borderColor: "rgba(255,255,255,0.28)",
-                      backgroundColor: "rgba(0,0,0,0.4)",
+                      transform: hovered && !reduce ? "scale(1.045)" : "scale(1)",
+                      transition: `transform 700ms ${cssBezier(EASE.expo)}`,
+                      // Promote to its own layer only during the hover zoom (no idle layers).
+                      willChange: hovered && !reduce ? "transform" : "auto",
                     }}
-                  >
-                    Koncept
-                  </span>
+                  />
+                ) : (
+                  <MockWebsite accent={project.glow} />
                 )}
 
-                {project.image && (
-                  <Image
-                    src={project.image}
-                    alt={`${project.title} — ${project.type}`}
-                    fill
-                    sizes="(min-width: 768px) 45vw, 90vw"
-                    className="object-cover object-top"
+                {/* Hover video preview — fades in over the still once it can play */}
+                {mountVideo && project.video && (
+                  <video
+                    ref={videoRef}
+                    src={project.video}
+                    poster={project.image}
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    aria-hidden="true"
+                    onLoadedData={() => setVideoReady(true)}
+                    className="absolute inset-0 h-full w-full object-cover object-top"
+                    style={{
+                      opacity: hovered && videoReady ? 1 : 0,
+                      transition: `opacity 450ms ${cssBezier(EASE.expo)}`,
+                    }}
                   />
                 )}
 
-                {/* Ambient glow — softness baked into the gradient (no filter:blur). */}
+                {/* Ambient brand glow (softness baked in — no filter:blur). */}
                 <div
                   className="pointer-events-none absolute"
                   aria-hidden={true}
                   style={{
                     width: "82%",
-                    height: "56%",
-                    top: "4%",
+                    height: "52%",
+                    top: "3%",
                     left: "9%",
                     borderRadius: "50%",
-                    background: `radial-gradient(ellipse at center, rgba(${project.rgb},0.26) 0%, rgba(${project.rgb},0.10) 38%, transparent 72%)`,
+                    background: `radial-gradient(ellipse at center, rgba(${project.rgb},0.20) 0%, rgba(${project.rgb},0.07) 40%, transparent 72%)`,
                     opacity: hovered ? 1 : 0.7,
                     transition: `opacity 500ms ${cssBezier(EASE.expo)}`,
+                    mixBlendMode: "screen",
                   }}
                 />
-
-                {!project.image && <MockWebsite accent={project.glow} />}
 
                 {/* Cursor-following glare */}
                 <motion.div
@@ -309,7 +278,7 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
                       x: gx,
                       y: gy,
                       background:
-                        "radial-gradient(circle at center, rgba(255,255,255,0.18) 0%, transparent 55%)",
+                        "radial-gradient(circle at center, rgba(255,255,255,0.16) 0%, transparent 55%)",
                     }}
                   />
                 </motion.div>
@@ -318,43 +287,79 @@ export function ProjectCard({ project, delay = 0 }: { project: Project; delay?: 
                 <div
                   className="pointer-events-none absolute inset-x-0 bottom-0"
                   style={{
-                    height: "58%",
+                    height: "62%",
                     background:
-                      "linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.40) 42%, transparent 100%)",
+                      "linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.44) 44%, transparent 100%)",
                   }}
                 />
 
-                {/* Project info */}
+                {/* Title + category (always visible — static HTML for SEO/a11y) */}
                 <div
-                  className="absolute right-0 bottom-0 flex flex-col items-end"
-                  style={{ padding: "clamp(14px,3vw,28px)" }}
+                  className="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-3"
+                  style={{ padding: "clamp(16px,3vw,28px)" }}
                 >
-                  <h3
+                  <div className="min-w-0">
+                    <h3
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontWeight: 800,
+                        fontSize: "clamp(1.3rem, 2.3vw, 1.85rem)",
+                        letterSpacing: "-0.025em",
+                        lineHeight: 1.04,
+                        color: "#ffffff",
+                        textShadow: "0 2px 16px rgba(0,0,0,0.6)",
+                      }}
+                    >
+                      {project.title}
+                    </h3>
+                    <p
+                      className="mt-1.5 flex items-center gap-2"
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "clamp(0.64rem, 0.9vw, 0.76rem)",
+                        fontWeight: 400,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.66)",
+                      }}
+                    >
+                      <span>{project.type}</span>
+                      {project.concept && (
+                        <>
+                          <span aria-hidden="true" style={{ color: `rgba(${project.rgb},0.9)` }}>
+                            ·
+                          </span>
+                          <span>Koncept</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+
+                  {/* Arrow affordance — visible at rest (touch-friendly), blooms on hover */}
+                  <span
+                    aria-hidden="true"
+                    className="grid shrink-0 place-items-center rounded-full"
                     style={{
-                      fontFamily: "var(--font-heading)",
-                      fontWeight: 800,
-                      fontSize: "clamp(1.15rem, 2.2vw, 1.65rem)",
-                      letterSpacing: "-0.025em",
-                      lineHeight: 1.05,
-                      color: "#ffffff",
-                      textShadow: "0 2px 14px rgba(0,0,0,0.55)",
+                      width: "clamp(38px,3.4vw,46px)",
+                      height: "clamp(38px,3.4vw,46px)",
+                      color: hovered ? "#0b0b0d" : "#ffffff",
+                      background: hovered ? `rgb(${project.rgb})` : "rgba(255,255,255,0.12)",
+                      border: `1px solid ${hovered ? `rgb(${project.rgb})` : "rgba(255,255,255,0.22)"}`,
+                      backdropFilter: "blur(4px)",
+                      transition: `background 400ms ${cssBezier(EASE.expo)}, color 400ms ${cssBezier(EASE.expo)}, transform 400ms ${cssBezier(EASE.expo)}`,
+                      transform: hovered && !reduce ? "translateX(2px) scale(1.06)" : "none",
                     }}
                   >
-                    {project.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "clamp(0.6rem, 0.88vw, 0.72rem)",
-                      fontWeight: 400,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase" as const,
-                      color: "rgba(255,255,255,0.56)",
-                      marginTop: 5,
-                    }}
-                  >
-                    {project.type} · {project.concept ? "Koncept" : project.year}
-                  </p>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M5 12h14M13 6l6 6-6 6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
                 </div>
 
                 {/* Inset accent border — blooms on hover */}

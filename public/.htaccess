@@ -55,6 +55,16 @@ base-uri 'self'; \
 form-action 'self' https://formsubmit.co"
 </IfModule>
 
+# ── MIME types ────────────────────────────────────────────────────────────────
+# Guarantee correct image MIME regardless of OVH's mime.types. The portfolio
+# screenshots ship as .webp, and X-Content-Type-Options: nosniff is set above —
+# so an image served without a proper image/* type could be refused. mod_mime is
+# always present (no <IfModule> needed); AddType is a safe no-op if already mapped.
+AddType image/webp .webp
+AddType image/avif .avif
+# Portfolio signature-animation clips ship as .mp4 (H.264) — same nosniff reason.
+AddType video/mp4 .mp4
+
 # ── Custom error documents ───────────────────────────────────────────────────
 # Next.js static export generates out/404.html; Apache uses it for any 404.
 ErrorDocument 404 /404.html
@@ -82,6 +92,12 @@ ErrorDocument 404 /404.html
   # Images / icons (favicon, logos, og) — fixed or hashed names; 1-day TTL with
   # revalidation is a safe middle ground that still picks up a deploy promptly.
   <FilesMatch "\.(ico|png|jpe?g|webp|avif|svg|gif)$">
+    Header set Cache-Control "public, max-age=86400, must-revalidate"
+  </FilesMatch>
+
+  # Video clips (portfolio) — stable filenames; 1-day TTL with revalidation so a
+  # redeploy that swaps a clip still reaches returning visitors promptly.
+  <FilesMatch "\.(mp4|webm)$">
     Header set Cache-Control "public, max-age=86400, must-revalidate"
   </FilesMatch>
 
