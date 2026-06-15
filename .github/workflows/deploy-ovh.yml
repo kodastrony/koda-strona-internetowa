@@ -18,13 +18,16 @@ jobs:
     runs-on: ubuntu-latest
     name: Build static export + FTP → OVH
     steps:
+      # Akcje na Node 24 (od 16.06.2026 GitHub wymusza Node 24 dla akcji JS;
+      # Node 20 znika z runnerów 16.09.2026). v6/v4.4.0 mają `using: node24`
+      # natywnie → zero ostrzeżeń i zero niespodzianek przy wymuszeniu.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22 # LTS (Node 20 = EOL); Next 16 build OK
           cache: npm
 
       - name: Install dependencies
@@ -37,7 +40,7 @@ jobs:
           # Formularz leadów używa FormSubmit.co (natywny POST, BEZ klucza/env).
 
       - name: Deploy out/ → OVH www/ (FTP)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ftp.cluster129.hosting.ovh.net
           username: ${{ secrets.FTP_USERNAME }}
