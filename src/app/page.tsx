@@ -11,9 +11,11 @@ import { FAQS } from "@/lib/faq";
 // Strona główna — jawne metadane (nie tylko dziedziczenie z layoutu): tytuł
 // „absolute" pomija szablon „%s | KODA" (home = korzeń) + kanoniczny URL.
 export const metadata: Metadata = {
-  title: { absolute: "KODA — strony internetowe dla firm | projekt, kod, wsparcie" },
+  // Spójne z og:title i banerem OG (ten sam keyword z przodu) → mocny sygnał
+  // encyjny dla Google i AI search; „absolute" pomija szablon (home = korzeń).
+  title: { absolute: "Strony internetowe dla firm — projekt i kod | KODA Studio" },
   description:
-    "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z zakresem i terminem w umowie. Odpowiadamy w 24 godziny.",
+    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
   alternates: { canonical: "/" },
 };
 

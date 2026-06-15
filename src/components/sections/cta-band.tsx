@@ -19,22 +19,55 @@ export function CTABand({
 }) {
   return (
     <section data-header-theme="dark" data-canvas="cta" className="relative">
-      {/* Pink bloom — pełna ścieżka H335 (taper alfa w jednym hue, zero
-          szarego dołka), wystaje pod sekcję w stronę stopki. */}
+      {/* Pink bloom — różowy „moment" sekcji. CAŁY zawarty w sekcji
+          (height 100% + bottom-clip; było 118% → róż wyciekał ~18% POD szew
+          i robił jasny plamiasty PAS na czole stopki = ten brzydki błąd ze
+          screena). Peak przesunięty w GÓRĘ (za treść CTA, 50% 58%) i gaśnie
+          DO ZERA na 60% promienia → róż świeci za nagłówkiem, a nie przy szwie.
+          overflow-hidden ucina go nawet podczas parallax-driftu (nigdy poniżej
+          dołu sekcji). To finał jak na home: glow w treści, ciemno przy stopce. */}
       <Parallax
-        speed={52}
-        className="pointer-events-none absolute inset-x-0 z-0"
-        style={{ top: 0, height: "118%" }}
+        speed={38}
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-full overflow-hidden"
       >
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 72% 78% at 50% 100%, oklch(0.62 0.215 335 / 0.30) 0%, oklch(0.52 0.18 335 / 0.12) 38%, oklch(0.42 0.14 335 / 0.045) 56%, oklch(0.42 0.14 335 / 0) 74%)",
+              "radial-gradient(ellipse 70% 64% at 50% 58%, oklch(0.62 0.215 335 / 0.26) 0%, oklch(0.52 0.18 335 / 0.10) 38%, oklch(0.42 0.14 335 / 0) 60%)",
           }}
         />
       </Parallax>
+
+      {/* Zejście do stopki — dolna krawędź sekcji ściemnia plumowe tło do
+          ciepłej czerni stopki (#0a0609 = hold „footer"), DOKŁADNIE tym samym
+          gradientem co finał Statement na home (#0a0609 0% → 0.6 @42% → 0). */}
+      <div
+        aria-hidden="true"
+        className="cta-footer-wash pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(180px,26vh,400px)]"
+        style={{
+          background:
+            "linear-gradient(to top, #0a0609 0%, rgba(10,6,9,0.6) 42%, rgba(10,6,9,0) 100%)",
+        }}
+      />
+
+      {/* ŚWIATŁO ROZPIĘTE NA SZWIE — odpowiednik horyzontu z home. U dołu sekcji
+          ten sam delikatny róż co poświata stopki (`at 50% 100%`), więc po OBU
+          stronach szwu jest ciągły, miękki blask. Dzięki temu cienka różowa
+          linia stopki (hairline 0.09) blenduje się jak na stronie głównej — to
+          usuwa tę „kreskę". Faint (~0.08, == poświata stopki) → kontynuacja
+          światła, NIE jasny pas (tamten błąd to był bloom 0.30 wyciekający pod
+          sekcję). Nad washem (z-2), więc nie jest przez niego wygaszony.
+          Też dark-only — wspólna klasa `cta-footer-wash` chowa go w jasnym. */}
+      <div
+        aria-hidden="true"
+        className="cta-footer-wash pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[clamp(150px,20vh,300px)]"
+        style={{
+          background:
+            "radial-gradient(ellipse 95% 120% at 50% 100%, oklch(0.62 0.215 335 / 0.08) 0%, oklch(0.56 0.18 335 / 0.03) 46%, oklch(0.5 0.16 335 / 0) 78%)",
+        }}
+      />
 
       <div
         className="container-koda relative z-10 flex flex-col items-center text-center"

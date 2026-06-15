@@ -15,6 +15,11 @@ import "./globals.css";
 
 // Organization + WebSite structured data (JSON-LD) — helps search engines build
 // a knowledge panel and understand the brand. Static, so it ships in every page.
+// Structured data (JSON-LD @graph, węzły spięte przez @id — AI engines i Google
+// czytają graf jako jedną encję). Org (marka) → ProfessionalService (lokalny
+// biznes: usługi, obszar, adres) → WebSite. Tylko PRAWDA — bez zmyślonych ocen,
+// cen czy geo. sameAs (GitHub org) = realne potwierdzenie encji w sieci. To jest
+// najmocniejsza dźwignia pod AI search / AEO (cytowanie marki przez LLM-y).
 const ORG_JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -27,7 +32,46 @@ const ORG_JSON_LD = {
       logo: `${SITE_CONFIG.url}/icon.svg`,
       description: SITE_CONFIG.description,
       areaServed: "PL",
-      address: { "@type": "PostalAddress", addressLocality: CONTACT.city, addressCountry: "PL" },
+      sameAs: ["https://github.com/kodastrony"],
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: CONTACT.email,
+        contactType: "customer service",
+        areaServed: "PL",
+        availableLanguage: ["pl"],
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: CONTACT.city,
+        addressRegion: "śląskie",
+        addressCountry: "PL",
+      },
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": `${SITE_CONFIG.url}/#business`,
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+      parentOrganization: { "@id": `${SITE_CONFIG.url}/#organization` },
+      description: SITE_CONFIG.tagline,
+      knowsLanguage: "pl",
+      areaServed: [
+        { "@type": "Country", name: "Polska" },
+        { "@type": "City", name: CONTACT.city },
+      ],
+      serviceType: [
+        "Projektowanie stron internetowych",
+        "Tworzenie sklepów internetowych",
+        "Strony internetowe 2D i 3D",
+        "SEO i optymalizacja",
+        "Opieka i rozwój stron",
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: CONTACT.city,
+        addressRegion: "śląskie",
+        addressCountry: "PL",
+      },
     },
     {
       "@type": "WebSite",
@@ -80,21 +124,27 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // Primary keyword front-loaded, differentiator ("projekt i kod" = projekt +
+  // własny kod, bez szablonów), brand last. <title>, og:title, the H1 story and
+  // the OG banner all tell the SAME story → Google ma mniejszy powód, by
+  // przepisać tytuł (spójny encyjny sygnał, ważny też dla AI search / AEO).
   title: {
-    default: "KODA — strony internetowe dla firm w Polsce",
-    template: "%s | KODA",
+    default: "Strony internetowe dla firm — projekt i kod | KODA Studio",
+    template: "%s | KODA Studio",
   },
   description:
-    "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z zakresem i terminem w umowie. Odpowiadamy w 24 godziny.",
+    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
   keywords: [
-    "strony internetowe",
+    "strony internetowe dla firm",
+    "tworzenie stron internetowych",
+    "projektowanie stron www",
     "strona internetowa dla firmy",
     "sklep internetowy",
-    "projektowanie stron",
-    "Polska",
-    "Bielsko-Biała",
+    "strony internetowe na miarę",
+    "strony internetowe bez szablonów",
+    "agencja interaktywna",
     "strony internetowe Bielsko-Biała",
-    "KODA",
+    "KODA Studio",
   ],
   authors: [{ name: "KODA Studio", url: "https://kodastrony.pl" }],
   creator: "KODA Studio",
@@ -103,17 +153,21 @@ export const metadata: Metadata = {
     locale: "pl_PL",
     url: "https://kodastrony.pl",
     siteName: "KODA Studio",
-    title: "KODA — strony internetowe dla firm w Polsce",
+    // bez sufiksu marki — siteName już pokazuje „KODA Studio" w embedzie
+    title: "Strony internetowe dla firm — projekt i kod na miarę",
     description:
-      "Projektujemy i kodujemy strony oraz sklepy dla firm w Polsce — pod konkretny cel biznesowy, z zakresem i terminem w umowie. Odpowiadamy w 24 godziny.",
+      "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KODA — strony internetowe dla firm",
+    title: "Strony internetowe dla firm — KODA Studio",
     description:
-      "Projektujemy i kodujemy strony oraz sklepy dla polskich firm — pod konkretny cel biznesowy, z zakresem w umowie. Odpowiadamy w 24 godziny.",
+      "Projektujemy i kodujemy strony internetowe dla firm w całej Polsce. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
   },
   metadataBase: new URL("https://kodastrony.pl"),
+  alternates: {
+    canonical: "/",
+  },
   robots: {
     index: true,
     follow: true,

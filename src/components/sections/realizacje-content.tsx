@@ -1,6 +1,6 @@
 "use client";
 
-import { FadeUp } from "@/components/motion";
+import { FadeUp, Parallax } from "@/components/motion";
 import { ProjectCard } from "@/components/ui/project-card";
 import { PROJECTS } from "@/lib/projects";
 
@@ -15,22 +15,27 @@ export function RealizacjeContent() {
         >
           {PROJECTS.map((p, i) => (
             <div key={p.id} className={i % 2 === 1 ? "md:mt-[clamp(32px,5vw,72px)]" : undefined}>
-              {/* Only the first card is the LCP candidate — eager + high priority.
-                  The rest stay lazy so they don't contend for early bandwidth. */}
-              <ProjectCard project={p} delay={(i % 2) * 0.06} priority={i === 0} />
-              <FadeUp inView delay={0.08} y={18}>
-                <p
-                  className="mt-5 max-w-[44ch]"
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "1rem",
-                    lineHeight: 1.6,
-                    color: "var(--color-ink-muted)",
-                  }}
-                >
-                  {p.summary}
-                </p>
-              </FadeUp>
+              {/* Cała komórka (karta + opis) dryfuje delikatnie ze scrollem,
+                  kolumny w przeciwne strony — „żyjąca" siatka jak w sekcji Work
+                  na home (transform-only). Karta i opis ruszają się RAZEM, więc
+                  nie zbliżają się do siebie na żadnym etapie. Pierwsza karta =
+                  kandydat na LCP (eager + priority); reszta lazy. */}
+              <Parallax speed={i % 2 === 0 ? -26 : 34}>
+                <ProjectCard project={p} delay={(i % 2) * 0.06} priority={i === 0} />
+                <FadeUp inView delay={0.08} y={18}>
+                  <p
+                    className="mt-5 max-w-[44ch]"
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "1rem",
+                      lineHeight: 1.6,
+                      color: "var(--color-ink-muted)",
+                    }}
+                  >
+                    {p.summary}
+                  </p>
+                </FadeUp>
+              </Parallax>
             </div>
           ))}
         </div>

@@ -189,6 +189,14 @@ html[data-koda-light] footer {
 html[data-koda-light] .koda-grain {
   opacity: 0.025;
 }
+/* Wash cta→stopka (CTABand) jest CIEMNY (#0a0609) i ma sens tylko w trybie
+   ciemnym; w jasnym sekcja jest porcelanowa, a stopka to osobna ciemna wyspa,
+   więc ciemny wash byłby błędem. Chowamy go atrybutem motywu (ustawianym PRZED
+   malowaniem) → zero migotania ciemnego pasa na pierwszej klatce u userów
+   z zapamiętanym motywem jasnym. */
+html[data-koda-light] .cta-footer-wash {
+  display: none;
+}
 /* Uwaga: ciche pigułki „surface" (PillLink bg=var(--color-surface-1)) dostają
    kolor tekstu z tokenów BEZPOŚREDNIO w miejscu użycia (text-ink-muted/ink) —
    działa w obu motywach. Pigułki o stałym ciemnym tle (#1a1a1a, np. /dziekujemy)

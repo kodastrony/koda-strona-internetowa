@@ -17,7 +17,7 @@ export function BrowserFrame({
 }: {
   src: string;
   alt: string;
-  /** Shown in the address bar (e.g. "rikoszet-bar"). */
+  /** Shown in the address bar — full host, e.g. "rikoszet.kodastrony.pl". */
   url: string;
   width?: number;
   height?: number;
@@ -67,7 +67,7 @@ export function BrowserFrame({
             className="truncate font-body text-[11px]"
             style={{ color: "var(--color-ink-faint)", letterSpacing: "0.01em" }}
           >
-            kodastrony.github.io/{url}
+            {url}
           </span>
         </div>
       </div>

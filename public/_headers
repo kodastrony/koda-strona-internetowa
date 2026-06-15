@@ -1,0 +1,25 @@
+# ── KODA — nagłówki dla Cloudflare Pages ──────────────────────────────────────
+# Odpowiednik public/.htaccess (Apache/OVH) przełożony na format Cloudflare Pages.
+# Cloudflare robi AUTOMATYCZNIE: redirect HTTP→HTTPS, kompresję (gzip/brotli),
+# poprawne MIME (.webp/.avif/.mp4) i stronę 404 (out/404.html). Dlatego tu zostają
+# tylko nagłówki bezpieczeństwa + Cache-Control. Plik trafia do out/ (z public/)
+# i jest czytany z roota wyniku builda przez Cloudflare Pages.
+# .htaccess może zostać w repo — OVH go czyta, Cloudflare ignoruje (zero konfliktu).
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://formsubmit.co; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co
+
+# JS/CSS — Turbopack NIE hashuje nazw chunków → krótki cache (deploy dociera do
+# wracających w ~10 min) zamiast immutable, które przypięłoby ich do starego kodu.
+/_next/static/*
+  Cache-Control: public, max-age=600, must-revalidate
+
+# Fonty (next/font — nazwy z hashem, bajty się nie zmieniają) → cache na zawsze.
+# Reguła bardziej szczegółowa niż powyższa → nadpisuje ją dla /_next/static/media/*.
+/_next/static/media/*
+  Cache-Control: public, max-age=31536000, immutable

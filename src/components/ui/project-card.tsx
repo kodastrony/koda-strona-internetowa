@@ -119,8 +119,8 @@ export function ProjectCard({
   const mY = useMotionValue(0);
 
   const TILT = { stiffness: 260, damping: 26, mass: 0.4 };
-  const rotateY = useSpring(useTransform(mX, [-0.5, 0.5], reduce ? [0, 0] : [-8, 8]), TILT);
-  const rotateX = useSpring(useTransform(mY, [-0.5, 0.5], reduce ? [0, 0] : [6, -6]), TILT);
+  const rotateY = useSpring(useTransform(mX, [-0.5, 0.5], reduce ? [0, 0] : [-11, 11]), TILT);
+  const rotateX = useSpring(useTransform(mY, [-0.5, 0.5], reduce ? [0, 0] : [8, -8]), TILT);
 
   const scaleVal = useMotionValue(1);
   const scale = useSpring(scaleVal, { stiffness: 220, damping: 26 });
@@ -147,7 +147,7 @@ export function ProjectCard({
   const onEnter = useCallback(() => {
     measure();
     setHovered(true);
-    scaleVal.set(1.025);
+    scaleVal.set(1.04);
     if (project.video && canHoverRef.current && !reducedRef.current) setMountVideo(true);
   }, [measure, scaleVal, project.video]);
   const onLeave = useCallback(() => {
@@ -215,7 +215,7 @@ export function ProjectCard({
                     fetchPriority={priority ? "high" : "auto"}
                     className="absolute inset-0 h-full w-full object-cover object-top"
                     style={{
-                      transform: hovered && !reduce ? "scale(1.045)" : "scale(1)",
+                      transform: hovered && !reduce ? "scale(1.06)" : "scale(1)",
                       transition: `transform 700ms ${cssBezier(EASE.expo)}`,
                       // Promote to its own layer only during the hover zoom (no idle layers).
                       willChange: hovered && !reduce ? "transform" : "auto",

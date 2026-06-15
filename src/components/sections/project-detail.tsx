@@ -4,7 +4,7 @@
 "use client";
 
 import Link from "next/link";
-import { FadeUp, Reveal } from "@/components/motion";
+import { FadeUp, Reveal, Parallax } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { GlowField } from "@/components/fx/glow-field";
 import { EASE } from "@/lib/motion";
@@ -108,7 +108,11 @@ export function ProjectDetail({
           }}
         />
 
-        <div className="container-koda relative z-10">
+        {/* data-logo-hide-anchor: czoło case-study — logo „KODA" chowa się, gdy
+            zjedziesz poza hero, i ZOSTAJE schowane przez całą realizację (na
+            mobile inaczej zasłaniałoby treść). Powrót do gry headera: scroll w
+            górę albo otwarcie menu. Stabilny box — patrz useLogoHidden. */}
+        <div data-logo-hide-anchor className="container-koda relative z-10">
           <FadeUp x={-20} y={0} duration={0.5} ease={EASE.out}>
             <Link
               href="/realizacje"
@@ -226,7 +230,7 @@ export function ProjectDetail({
           className="container-koda"
           style={{ paddingTop: "clamp(20px,3vw,40px)", paddingBottom: "clamp(40px,5vw,72px)" }}
         >
-          <FadeUp inView y={40} duration={0.8} ease={EASE.expo}>
+          <FadeUp inView y={44} scale={0.975} duration={0.85} ease={EASE.expo}>
             <div
               className="relative overflow-hidden rounded-[24px]"
               style={{
@@ -237,15 +241,22 @@ export function ProjectDetail({
               <div className="relative" style={{ paddingBottom: "62.5%" }}>
                 <div className="absolute inset-0" style={{ background: project.bg }} />
                 {project.showcase ? (
-                  <img
-                    src={project.showcase}
-                    alt={`${project.title} — strona główna`}
-                    width={1680}
-                    height={1050}
-                    loading="eager"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover object-top"
-                  />
+                  // Parallax „oddechu" W RAMCE: subtelny zoom ze scrollem (TYLKO
+                  // scale, zero translate). Przy scale≥1 obraz nigdy nie jest
+                  // mniejszy od ramki → na żadnym ekranie (też 320px) nie odsłoni
+                  // tła za sobą. Translate odpadł: nadlanie %-em nie nadążało za
+                  // przesuwem na wąskich ekranach (wąska ramka = małe nadlanie px).
+                  <Parallax speed={0} scaleFrom={1.07} className="absolute inset-0">
+                    <img
+                      src={project.showcase}
+                      alt={`${project.title} — strona główna`}
+                      width={1680}
+                      height={1050}
+                      loading="eager"
+                      decoding="async"
+                      className="h-full w-full object-cover object-top"
+                    />
+                  </Parallax>
                 ) : (
                   <MockWebsite accent={project.glow} />
                 )}
@@ -350,24 +361,31 @@ export function ProjectDetail({
       {project.gallery[0] && (
         <section data-header-theme="dark" data-canvas="base" className="relative">
           <div className="container-koda" style={{ paddingBottom: "clamp(40px,5vw,80px)" }}>
-            <FadeUp inView y={36} duration={0.8} ease={EASE.expo}>
+            <FadeUp inView y={40} scale={0.975} duration={0.85} ease={EASE.expo}>
               <figure>
                 <div
-                  className="overflow-hidden rounded-[20px]"
+                  className="relative overflow-hidden rounded-[20px]"
                   style={{
                     border: "1px solid rgba(255,255,255,0.08)",
                     boxShadow: "0 40px 90px -44px rgba(0,0,0,0.6)",
                   }}
                 >
-                  <img
-                    src={project.gallery[0].src}
-                    alt={`${project.title} — ${project.gallery[0].caption}`}
-                    width={1440}
-                    height={900}
-                    loading="lazy"
-                    decoding="async"
-                    className="block h-auto w-full"
-                  />
+                  <div className="relative" style={{ paddingBottom: "62.5%" }}>
+                    <div className="absolute inset-0" style={{ background: project.bg }} />
+                    {/* Zoom „oddechu" (scale-only) — jak showcase: nigdy nie
+                        odsłania tła, niezależnie od szerokości ekranu. */}
+                    <Parallax speed={0} scaleFrom={1.06} className="absolute inset-0">
+                      <img
+                        src={project.gallery[0].src}
+                        alt={`${project.title} — ${project.gallery[0].caption}`}
+                        width={1440}
+                        height={900}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover object-top"
+                      />
+                    </Parallax>
+                  </div>
                 </div>
                 <figcaption
                   className="mt-4 max-w-[60ch] text-[14px]"
@@ -400,44 +418,74 @@ export function ProjectDetail({
               Dlaczego tak, a nie inaczej.
             </h2>
           </FadeUp>
-          <div className="flex flex-col" style={{ gap: "clamp(20px,2.4vw,28px)" }}>
+          <div className="flex flex-col" style={{ gap: "clamp(16px,2.2vw,26px)" }}>
             {project.decisions.map((d, i) => (
-              <FadeUp key={d.choice} inView delay={i * 0.06} y={26}>
+              <FadeUp
+                key={d.choice}
+                inView
+                delay={i * 0.09}
+                y={34}
+                duration={0.75}
+                ease={EASE.expo}
+              >
                 <div
-                  className="grid grid-cols-1 gap-x-8 gap-y-4 rounded-2xl p-[clamp(20px,2.6vw,34px)] md:grid-cols-[auto_1fr]"
+                  className="relative grid grid-cols-1 gap-x-9 gap-y-6 overflow-hidden rounded-2xl p-[clamp(24px,2.6vw,36px)] md:grid-cols-[auto_1fr] md:items-start md:gap-y-4"
                   style={{
                     background: "var(--color-surface-1)",
                     border: "1px solid var(--color-line)",
                   }}
                 >
+                  {/* Akcent krawędzi w kolorze marki tej realizacji — każde
+                      case-study czytelnie „swoje", a nie generyczne. */}
                   <span
-                    className="font-heading font-bold"
+                    aria-hidden="true"
+                    className="absolute inset-y-0 left-0 w-[3px]"
                     style={{
-                      fontSize: "clamp(1.6rem,2.4vw,2.2rem)",
+                      background: `linear-gradient(to bottom, rgba(${project.rgb},0.65), rgba(${project.rgb},0.12))`,
+                    }}
+                  />
+                  <span
+                    className="font-heading font-bold tabular-nums"
+                    style={{
+                      fontSize: "clamp(2rem,2.6vw,2.4rem)",
                       color: "var(--color-accent)",
                       lineHeight: 1,
                     }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-3">
+                  {/* Mobile: pionowa lista z hairline-dividerami między krokami
+                      (Wyzwanie → Decyzja → Efekt czyta się jako osobne kroki, nie
+                      ścianę tekstu). sm+: trzy kolumny, bez linii. */}
+                  <div className="flex flex-col gap-6 sm:grid sm:grid-cols-3 sm:gap-x-9 sm:gap-y-0">
                     {[
-                      { k: "Wyzwanie", v: d.constraint },
-                      { k: "Decyzja", v: d.choice },
-                      { k: "Efekt", v: d.benefit },
-                    ].map((col) => (
-                      <div key={col.k}>
+                      { k: "Wyzwanie", v: d.constraint, accent: false },
+                      { k: "Decyzja", v: d.choice, accent: true },
+                      { k: "Efekt", v: d.benefit, accent: false },
+                    ].map((col, ci) => (
+                      <div
+                        key={col.k}
+                        className={ci > 0 ? "border-t pt-6 sm:border-t-0 sm:pt-0" : undefined}
+                        style={ci > 0 ? { borderColor: "var(--color-line)" } : undefined}
+                      >
                         <p
-                          className="mb-1.5 font-heading text-[10px] font-bold tracking-[0.18em] uppercase"
-                          style={{ color: "var(--color-ink-faint)" }}
+                          className="mb-2 font-heading text-[11px] font-bold tracking-[0.16em] uppercase"
+                          style={{
+                            // pink-bright (nie accent): małe 11px na surface-1 —
+                            // accent #cf43b8 dawał 4.25:1 (<AA); pink-bright 6.35:1
+                            // (dark) i 5.1:1 (light) — AA w obu motywach.
+                            color: col.accent
+                              ? "var(--color-pink-bright)"
+                              : "var(--color-ink-faint)",
+                          }}
                         >
                           {col.k}
                         </p>
                         <p
                           style={{
                             fontFamily: "var(--font-body)",
-                            fontSize: "0.98rem",
-                            lineHeight: 1.5,
+                            fontSize: "1rem",
+                            lineHeight: 1.55,
                             color: "var(--color-ink)",
                           }}
                         >
@@ -475,13 +523,14 @@ export function ProjectDetail({
           </FadeUp>
           <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1.55fr_0.45fr] md:gap-6">
             <FadeUp inView y={36} duration={0.8} ease={EASE.expo}>
-              <BrowserFrame
-                src={project.gallery[1]?.src ?? project.showcase}
-                alt={`${project.title} — widok na komputerze`}
-                url={project.liveUrl
-                  .replace(/^https?:\/\/kodastrony\.github\.io\//, "")
-                  .replace(/\/$/, "")}
-              />
+              {/* Ekrany dryfują w przeciwne strony ze scrollem → głębia. */}
+              <Parallax speed={18}>
+                <BrowserFrame
+                  src={project.gallery[1]?.src ?? project.showcase}
+                  alt={`${project.title} — widok na komputerze`}
+                  url={project.liveUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                />
+              </Parallax>
             </FadeUp>
             <FadeUp
               inView
@@ -491,7 +540,12 @@ export function ProjectDetail({
               ease={EASE.expo}
               className="mx-auto w-[min(230px,72vw)] md:w-full"
             >
-              <PhoneFrame src={project.mobileImage} alt={`${project.title} — widok na telefonie`} />
+              <Parallax speed={-26}>
+                <PhoneFrame
+                  src={project.mobileImage}
+                  alt={`${project.title} — widok na telefonie`}
+                />
+              </Parallax>
             </FadeUp>
           </div>
         </div>
@@ -523,19 +577,28 @@ export function ProjectDetail({
                 Zakres prac
               </h2>
               <ul className="flex flex-col gap-3" role="list">
-                {project.scope.map((s) => (
-                  <li
-                    key={s}
-                    className="flex items-start gap-3"
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "1.02rem",
-                      lineHeight: 1.5,
-                      color: "var(--color-ink)",
-                    }}
-                  >
-                    <CheckIcon />
-                    <span>{s}</span>
+                {project.scope.map((s, si) => (
+                  <li key={s}>
+                    <FadeUp
+                      inView
+                      delay={si * 0.05}
+                      y={12}
+                      duration={0.5}
+                      ease={EASE.out}
+                      className="flex items-start gap-3"
+                    >
+                      <CheckIcon />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "1.02rem",
+                          lineHeight: 1.5,
+                          color: "var(--color-ink)",
+                        }}
+                      >
+                        {s}
+                      </span>
+                    </FadeUp>
                   </li>
                 ))}
               </ul>
@@ -553,19 +616,28 @@ export function ProjectDetail({
                 Co dostajesz
               </h2>
               <ul className="flex flex-col gap-3" role="list">
-                {project.deliverables.map((d) => (
-                  <li
-                    key={d}
-                    className="flex items-start gap-3"
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "1.02rem",
-                      lineHeight: 1.5,
-                      color: "var(--color-ink)",
-                    }}
-                  >
-                    <CheckIcon />
-                    <span>{d}</span>
+                {project.deliverables.map((d, di) => (
+                  <li key={d}>
+                    <FadeUp
+                      inView
+                      delay={di * 0.05}
+                      y={12}
+                      duration={0.5}
+                      ease={EASE.out}
+                      className="flex items-start gap-3"
+                    >
+                      <CheckIcon />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "1.02rem",
+                          lineHeight: 1.5,
+                          color: "var(--color-ink)",
+                        }}
+                      >
+                        {d}
+                      </span>
+                    </FadeUp>
                   </li>
                 ))}
               </ul>
@@ -581,37 +653,46 @@ export function ProjectDetail({
               Dowód rzemiosła — sprawdzisz to sam
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {project.metrics.map((m) => (
-                <div
+              {project.metrics.map((m, mi) => (
+                <FadeUp
                   key={m.label}
-                  className="rounded-2xl p-[clamp(18px,2.2vw,26px)]"
-                  style={{
-                    background: "var(--color-surface-1)",
-                    border: "1px solid var(--color-line)",
-                  }}
+                  inView
+                  delay={mi * 0.08}
+                  y={22}
+                  scale={0.94}
+                  duration={0.6}
+                  ease={EASE.expo}
                 >
-                  <p
-                    className="font-heading font-bold"
+                  <div
+                    className="h-full rounded-2xl p-[clamp(18px,2.2vw,26px)]"
                     style={{
-                      fontSize: "clamp(1.3rem,2vw,1.7rem)",
-                      letterSpacing: "-0.02em",
-                      color: "var(--color-accent)",
+                      background: "var(--color-surface-1)",
+                      border: "1px solid var(--color-line)",
                     }}
                   >
-                    {m.value}
-                  </p>
-                  <p
-                    className="mt-1.5"
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "0.92rem",
-                      lineHeight: 1.45,
-                      color: "var(--color-ink-muted)",
-                    }}
-                  >
-                    {m.label}
-                  </p>
-                </div>
+                    <p
+                      className="font-heading font-bold"
+                      style={{
+                        fontSize: "clamp(1.3rem,2vw,1.7rem)",
+                        letterSpacing: "-0.02em",
+                        color: "var(--color-accent)",
+                      }}
+                    >
+                      {m.value}
+                    </p>
+                    <p
+                      className="mt-1.5"
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "0.92rem",
+                        lineHeight: 1.45,
+                        color: "var(--color-ink-muted)",
+                      }}
+                    >
+                      {m.label}
+                    </p>
+                  </div>
+                </FadeUp>
               ))}
             </div>
           </FadeUp>
@@ -743,6 +824,35 @@ export function ProjectDetail({
                   </div>
                 </div>
               </div>
+            </Link>
+          </FadeUp>
+
+          {/* Cicha furtka „do domu" — celowo SZARA i drobna: główną akcją jest
+              kolejna realizacja (mamy ich więcej do pokazania), a to dyskretne
+              wyjście dla kogoś, kto naprawdę chce wrócić na stronę główną po
+              przescrollowaniu całego case-study (logo chowa się przy zjeździe). */}
+          <FadeUp inView delay={0.1} y={10} duration={0.6} className="mt-9 flex justify-center">
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2 text-[13px] text-[var(--color-ink-faint)] transition-colors duration-300 hover:text-[var(--color-ink-muted)]"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:-translate-x-0.5"
+              >
+                <path
+                  d="M11 5l-7 7 7 7M4 12h15"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Wróć na stronę główną
             </Link>
           </FadeUp>
         </div>

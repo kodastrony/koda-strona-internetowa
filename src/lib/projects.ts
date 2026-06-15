@@ -104,7 +104,7 @@ export const PROJECTS: Project[] = [
     type: "Interaktywna strona 3D",
     year: "2026",
     client: "Gastronomia & rozrywka",
-    liveUrl: "https://kodastrony.github.io/rikoszet-bar/",
+    liveUrl: "https://rikoszet.kodastrony.pl",
     summary:
       "Bar i klub gier, który zwiedzasz w 3D — cały lokal w przeglądarce, z rezerwacją stołu na planie sali.",
     intro:
@@ -194,7 +194,7 @@ export const PROJECTS: Project[] = [
     type: "Strona firmowa",
     year: "2026",
     client: "Stolarstwo & rzemiosło",
-    liveUrl: "https://kodastrony.github.io/grabowski/",
+    liveUrl: "https://grabowski.kodastrony.pl",
     summary:
       "Strona pracowni stolarskiej w szwajcarskim stylu — spokojna, elegancka, z realizacjami w pełnoekranowych galeriach.",
     intro:
@@ -262,11 +262,12 @@ export const PROJECTS: Project[] = [
     gallery: [
       {
         src: "/realizacje/grabowski-g1.webp",
-        caption: "Spokojna narracja i duża typografia budują wrażenie klasy.",
+        caption:
+          "Realizacje w poziomej galerii — zdjęcia przesuwają się w bok, gdy zjeżdżasz stroną.",
       },
       {
         src: "/realizacje/grabowski-g2.webp",
-        caption: "Realizacje w przejrzystej siatce — każda z własną podstroną.",
+        caption: "Spokojna, edytorska strona oferty z galerią realizacji.",
       },
     ],
     mobileImage: "/realizacje/grabowski-mobile.webp",
@@ -284,7 +285,7 @@ export const PROJECTS: Project[] = [
     type: "Strona produktowa",
     year: "2026",
     client: "Soki & zdrowe odżywianie",
-    liveUrl: "https://kodastrony.github.io/Soki_Web/",
+    liveUrl: "https://wycisk.kodastrony.pl",
     summary:
       "Soki rozkładane na czynniki pierwsze — kliknij butelkę, a składniki rozlatują się na orbitę z witaminami i przepisem.",
     intro:
@@ -374,7 +375,7 @@ export const PROJECTS: Project[] = [
     type: "Landing page",
     year: "2026",
     client: "Gastronomia / pizzeria",
-    liveUrl: "https://kodastrony.github.io/Pizza_Web/",
+    liveUrl: "https://slice.kodastrony.pl",
     summary:
       "Odważny, kreskówkowy landing pizzerii — wielka typografia plakatowa, maskotki z „oczami google” i samolocik lecący ze scrollem.",
     intro:
@@ -442,11 +443,11 @@ export const PROJECTS: Project[] = [
     gallery: [
       {
         src: "/realizacje/slice-g1.webp",
-        caption: "Apetyczne zdjęcia i maskotki z charakterem.",
+        caption: "Papierowy samolot leci ze scrollem po trasie między miastami.",
       },
       {
         src: "/realizacje/slice-g2.webp",
-        caption: "Maskotki z „oczami google” i białymi rękawiczkami.",
+        caption: "Apetyczne zdjęcia dań i maskotki z „oczami google”.",
       },
     ],
     mobileImage: "/realizacje/slice-mobile.webp",

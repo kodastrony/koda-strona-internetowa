@@ -60,7 +60,11 @@ export function PageHero({
         />
       </Parallax>
 
-      <div className="container-koda relative z-10">
+      {/* data-logo-hide-anchor: czoło treści hero — gdy zjedziesz tak, że
+          nagłówek dochodzi do logo, „KODA" płynnie znika i ZOSTAJE schowane
+          (na mobile inaczej wordmark zasłaniałby całą treść). Powrót na górę =
+          logo wraca. Stabilny box (nie animowany) — patrz useLogoHidden. */}
+      <div data-logo-hide-anchor className="container-koda relative z-10">
         <FadeUp x={-24} y={0} duration={0.6} ease={EASE.out} delay={0.05}>
           <span className="label-koda">{label}</span>
         </FadeUp>
