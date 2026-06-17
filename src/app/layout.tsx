@@ -61,11 +61,19 @@ const ORG_JSON_LD = {
       ],
       serviceType: [
         "Projektowanie stron internetowych",
-        "Tworzenie sklepów internetowych",
         "Strony internetowe 2D i 3D",
         "SEO i optymalizacja",
         "Opieka i rozwój stron",
       ],
+      // Geo na poziomie MIASTA (centroid Bielska-Białej) — wzmacnia encję lokalną
+      // pod local pack / lokalne odpowiedzi AI, bez podawania precyzyjnego adresu
+      // (firma usługowa bez lokalu z obsługą klienta). openingHours / telephone /
+      // NIP / aggregateRating dodajemy DOPIERO, gdy będą realne (zależne od Natana).
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 49.8224,
+        longitude: 19.0444,
+      },
       address: {
         "@type": "PostalAddress",
         addressLocality: CONTACT.city,
@@ -139,7 +147,6 @@ export const metadata: Metadata = {
     "tworzenie stron internetowych",
     "projektowanie stron www",
     "strona internetowa dla firmy",
-    "sklep internetowy",
     "strony internetowe na miarę",
     "strony internetowe bez szablonów",
     "agencja interaktywna",
@@ -205,6 +212,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
         />
+        {/* Beacon Cloudflare Web Analytics wstrzykuje samo Cloudflare („Automatic
+            setup"). Nie dodajemy go tu (uniknięcie duplikatu). CSP w public/_headers
+            wpuszcza domeny beacona, żeby nie był blokowany. */}
         {/* Skip-to-content — pierwszy element fokusowalny; pozwala pominąć nagłówek
             (logo + menu + CTA) i skoczyć do treści. Ukryty do momentu focusu (Tab). */}
         <a

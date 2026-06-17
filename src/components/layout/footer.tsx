@@ -59,6 +59,14 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/cennik"
+                  className="text-sm text-ink-muted transition-colors duration-300 hover:text-white"
+                >
+                  Cennik
+                </Link>
+              </li>
             </ul>
           </nav>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { FadeUp } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
@@ -131,6 +132,17 @@ export function UslugiContent() {
                     ))}
                   </ul>
                 </FadeUp>
+                {s.id === "strony" && (
+                  <FadeUp inView delay={0.22}>
+                    <Link
+                      href="/uslugi/strony-3d"
+                      className="mt-7 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                      style={{ color: "var(--color-ink)" }}
+                    >
+                      Zobacz: strony 3D i animowane →
+                    </Link>
+                  </FadeUp>
+                )}
               </div>
             </article>
           ))}
@@ -196,6 +208,15 @@ export function UslugiContent() {
                 trudno je rozwijać. U nas dostajesz coś innego: kod pisany pod Twój konkretny
                 biznes, bezpośredni kontakt z osobami, które go tworzą, i zakres ustalony w umowie.
               </p>
+            </FadeUp>
+            <FadeUp inView delay={0.22}>
+              <Link
+                href="/cennik"
+                className="mt-6 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                style={{ color: "var(--color-ink)" }}
+              >
+                Zobacz pełny cennik i co wpływa na cenę →
+              </Link>
             </FadeUp>
           </div>
         </div>

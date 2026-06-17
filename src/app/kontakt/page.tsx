@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Contact } from "@/components/sections/contact";
+import { breadcrumbLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Kontakt",
@@ -8,7 +9,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "/kontakt/" },
 };
 
+const BREADCRUMB_JSON_LD = breadcrumbLd([
+  { name: "Strona główna", path: "/" },
+  { name: "Kontakt", path: "/kontakt/" },
+]);
+
 export default function KontaktPage() {
   // Brak <main> tutaj — layout.tsx już renderuje <main className="flex-1">.
-  return <Contact />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+      />
+      <Contact />
+    </>
+  );
 }

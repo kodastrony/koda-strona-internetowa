@@ -4,6 +4,7 @@ import { PROJECTS, getProject, getProjectNeighbours } from "@/lib/projects";
 import { ProjectDetail } from "@/components/sections/project-detail";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
+import { breadcrumbLd } from "@/lib/seo";
 
 // Static export: only the known project slugs are generated; anything else 404s.
 export const dynamicParams = false;
@@ -66,11 +67,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     ),
   };
 
+  // Home → Realizacje → {projekt} — czytelna hierarchia dla Google i AI.
+  const BREADCRUMB_JSON_LD = breadcrumbLd([
+    { name: "Strona główna", path: "/" },
+    { name: "Realizacje", path: "/realizacje/" },
+    { name: project.title, path: `/realizacje/${project.id}/` },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(CASE_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
       />
       <ProjectDetail project={project} prev={prev} next={next} />
       <CTABand

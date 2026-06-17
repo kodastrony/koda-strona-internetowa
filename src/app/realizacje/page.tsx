@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/page-hero";
 import { RealizacjeContent } from "@/components/sections/realizacje-content";
 import { CTABand } from "@/components/sections/cta-band";
+import { breadcrumbLd } from "@/lib/seo";
+
+const BREADCRUMB_JSON_LD = breadcrumbLd([
+  { name: "Strona główna", path: "/" },
+  { name: "Realizacje", path: "/realizacje/" },
+]);
 
 export const metadata: Metadata = {
   title: "Realizacje",
@@ -13,6 +19,10 @@ export const metadata: Metadata = {
 export default function RealizacjePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+      />
       <PageHero
         label="Wybrane projekty"
         title="Realizacje"
