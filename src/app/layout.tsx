@@ -212,13 +212,14 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
         />
-        {/* Cloudflare Web Analytics — beacon hard-coded (auto-injekcja Pages bywała
-            pomijana po deployu, więc nie polegamy na niej). Cookieless; CSP w
-            public/_headers wpuszcza jego domeny. Renderuje się gdy token ustawiony. */}
+        {/* Cloudflare Web Analytics — surowy <script> (serwerowo w statycznym HTML,
+            ładuje się od razu, dokładnie wg snippetu Cloudflare). Świadomie NIE
+            next/script (afterInteractive wstrzykiwał go dopiero po stronie klienta,
+            więc nie było go w HTML). Cookieless; CSP w public/_headers wpuszcza jego
+            domeny. Renderuje się gdy token ustawiony. */}
         {ANALYTICS.cfBeaconToken ? (
-          <Script
-            id="cf-web-analytics"
-            strategy="afterInteractive"
+          <script
+            defer
             src="https://static.cloudflareinsights.com/beacon.min.js"
             data-cf-beacon={JSON.stringify({ token: ANALYTICS.cfBeaconToken })}
           />
