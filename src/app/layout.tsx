@@ -10,7 +10,7 @@ import { MotionProvider } from "@/components/motion/motion-provider";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
-import { SITE_CONFIG, CONTACT } from "@/lib/constants";
+import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
 import "./globals.css";
 
 // Organization + WebSite structured data (JSON-LD) — helps search engines build
@@ -212,9 +212,17 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
         />
-        {/* Beacon Cloudflare Web Analytics wstrzykuje samo Cloudflare („Automatic
-            setup"). Nie dodajemy go tu (uniknięcie duplikatu). CSP w public/_headers
-            wpuszcza domeny beacona, żeby nie był blokowany. */}
+        {/* Cloudflare Web Analytics — beacon hard-coded (auto-injekcja Pages bywała
+            pomijana po deployu, więc nie polegamy na niej). Cookieless; CSP w
+            public/_headers wpuszcza jego domeny. Renderuje się gdy token ustawiony. */}
+        {ANALYTICS.cfBeaconToken ? (
+          <Script
+            id="cf-web-analytics"
+            strategy="afterInteractive"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: ANALYTICS.cfBeaconToken })}
+          />
+        ) : null}
         {/* Skip-to-content — pierwszy element fokusowalny; pozwala pominąć nagłówek
             (logo + menu + CTA) i skoczyć do treści. Ukryty do momentu focusu (Tab). */}
         <a

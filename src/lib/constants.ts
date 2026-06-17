@@ -23,11 +23,14 @@ export const CONTACT = {
   nip: "" as string, // np. "0000000000"
 } as const;
 
-// ── Analytics ────────────────────────────────────────────────────────────────
-// Cloudflare Web Analytics jest podpięte przez „Automatic setup" w panelu
-// Cloudflare — to ONO wstrzykuje beacon (z tokenem) na krawędzi proxy, więc NIE
-// dodajemy własnego beacona w kodzie (byłby duplikatem → podwójne liczenie).
-// Warunek działania: CSP w public/_headers MUSI wpuszczać static.cloudflareinsights.com
-// (script-src) i cloudflareinsights.com (connect-src) — bez tego beacon jest blokowany.
-// Cookieless, bez bannera RODO. Uwaga: Brave/uBlock blokują ten beacon → własne
-// wizyty mogą się nie liczyć (testuj w Chrome/Edge).
+// ── Cloudflare Web Analytics (cookieless, bez bannera RODO) ───────────────────
+// Beacon HARD-CODED (token jest publiczny). Dlaczego nie auto: „Automatic setup"
+// w panelu Cloudflare NIE wstrzykiwał beacona po deployu Pages — potwierdzone na
+// żywo 2026-06-17 (kruche). CSP w public/_headers wpuszcza static.cloudflareinsights.com
+// (script-src) i cloudflareinsights.com (connect-src).
+// ⚠️ Aby uniknąć podwójnego liczenia: w panelu Cloudflare → Web Analytics przełącz
+// „kodastrony.pl" z Automatic na MANUAL (skoro beacon jest już w kodzie).
+// Uwaga: Brave/uBlock blokują beacon → własne wizyty mogą się nie liczyć (testuj w Chrome/Edge).
+export const ANALYTICS = {
+  cfBeaconToken: "9f4fafef62ab476d945f2cd828c86322",
+} as const;
