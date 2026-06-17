@@ -53,6 +53,16 @@ export interface TierProfile {
   smoothScroll: boolean;
   /** Własny kursor (rAF). */
   cursor: boolean;
+  /** Limit klatek RENDERU (live). undefined = bez limitu (pełny rAF/wyświetlacz).
+      Na low = 30: równe tempo (33 ms) zamiast rozchwianego 25-45 fps; renderem
+      steruje <FrameCap> (render-priority), więc PerformanceMonitor wciąż widzi
+      pełny rAF (zero fałszywego downgrade'u). */
+  frameCap?: number;
+  /** PageCanvas: scroll-scrubbed (przemalowanie całego tła co klatkę) vs tani
+      statyczny gradient. false na słabym sprzęcie — repaint tła konkurował z hero. */
+  pageCanvasScrub: boolean;
+  /** Pełnoekranowa warstwa grain (blend co klatkę kompozytora). false = taniej. */
+  grain: boolean;
 }
 
 /* ── Profile tierów ────────────────────────────────────────────────────────
@@ -78,23 +88,32 @@ export const TIER_PROFILES: Record<Tier, TierProfile> = {
     horizon: false,
     smoothScroll: false,
     cursor: false,
+    pageCanvasScrub: false,
+    grain: false,
   },
   low: {
     webgl: true,
     octaves: 2,
     precision: "mediump",
-    // envRes 32 = TANI PMREM (one-time, nie per-klatkę) → litery dostają odbicia
-    // (premium) zamiast płaskiej matowości; ogromny skok jakości na low. dpr 1.25
-    // łagodzi schodki na krawędziach (watchdog zejdzie do 1 gdy realnie za słabo).
-    envRes: 32,
-    stars: 200,
-    motes: 90,
-    dprCap: 1.25,
+    // BEZ PMREM (envRes null) → ścieżka hemisphere-light: zero wielosekundowego
+    // zacięcia startu + brak próbkowania IBL na literach co klatkę (na słabym iGPU
+    // to JEDEN z najdroższych kosztów liter). Litery matowe, ale rim emissive (CSM)
+    // trzyma różowo-fioletowy charakter. Reszta płynności: DPR 1.0 + cap 30 fps +
+    // tani wariant shadera kosmosu (early-out + mniej szumu) + statyczne tło/grain.
+    envRes: null,
+    stars: 150,
+    motes: 60,
+    // DPR 1.0: fill-rate jest wąskim gardłem (1.25 = ~1.56× pikseli). Watchdog może
+    // zejść jeszcze do 0.85 pod realnym obciążeniem (scene-stage).
+    dprCap: 1,
     msaa: false,
     accents: false,
     horizon: false,
     smoothScroll: false,
     cursor: false,
+    frameCap: 30, // równe 33 ms zamiast rozchwianego 60-celu, którego iGPU nie dowozi
+    pageCanvasScrub: false, // statyczny gradient tła (koniec repaintu co klatkę)
+    grain: false, // bez pełnoekranowego blendu grain
   },
   medium: {
     webgl: true,
@@ -109,6 +128,8 @@ export const TIER_PROFILES: Record<Tier, TierProfile> = {
     horizon: true,
     smoothScroll: true,
     cursor: true,
+    pageCanvasScrub: true,
+    grain: true,
   },
   high: {
     webgl: true,
@@ -123,6 +144,8 @@ export const TIER_PROFILES: Record<Tier, TierProfile> = {
     horizon: true,
     smoothScroll: true,
     cursor: true,
+    pageCanvasScrub: true,
+    grain: true,
   },
 };
 

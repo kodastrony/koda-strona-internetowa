@@ -44,7 +44,11 @@ void main() {
      do kodu (literał) — pętla GLSL ES 1.0 musi mieć STAŁY bound (uniform by nie zadziałał).
    - precision: low=mediump (tańsze na mobilnych GPU; mgławica to tło o niskiej alfie,
      więc ewentualny banding jest niewidoczny), medium/high=highp. */
-export function cosmosFrag(octaves: number, precision: "highp" | "mediump"): string {
+export function cosmosFrag(
+  octaves: number,
+  precision: "highp" | "mediump",
+  cheap = false
+): string {
   return /* glsl */ `
 precision ${precision} float;
 varying vec2 vUv;
@@ -82,10 +86,24 @@ void main() {
   vec2 p = vUv * vec2(1.75, 1.0);
   float t = uTime * 0.04;
 
-  // Domain-warp jak w SA — mgławica „oddycha", nie płynie jak dym z maszyny.
+${
+    cheap
+      ? `  // CHEAP (low/iGPU): policz WIDOCZNOŚĆ najpierw + early-out na niewidocznych
+  // pikselach (puste góra/dół canvasu 155svh + kadry po zescrollowaniu) — pomijają
+  // cały szum/exp/światło. Mniej fbm: jeden domain-warp + f2=f → ~4 zamiast ~8
+  // próbek simplex-noise/piksel (główny koszt fill-rate). vis liczone ponownie na
+  // dole dla samej barwy — duplikat to 2 tanie smoothstepy wobec setek ALU szumu.
+  float visC = smoothstep(1.32, 0.16, length(av * vec2(0.76, 1.0)))
+             * uIntro * (1.0 - smoothstep(0.5, 1.35, uScroll) * 0.72);
+  if (visC < 0.004) { gl_FragColor = vec4(0.0); return; }
+  vec2 q = vec2(fbm(p, t), 0.3);
+  float f = fbm(p + 1.55 * q, t * 1.3);
+  float f2 = f;`
+      : `  // Domain-warp jak w SA — mgławica „oddycha", nie płynie jak dym z maszyny.
   vec2 q = vec2(fbm(p, t), fbm(p + vec2(5.2, 1.3), t + 11.0));
   float f = fbm(p + 1.55 * q, t * 1.3);
-  float f2 = fbm(p * 1.6 - 0.7 * q + vec2(0.0, 9.4), t * 0.7 + 4.0);
+  float f2 = fbm(p * 1.6 - 0.7 * q + vec2(0.0, 9.4), t * 0.7 + 4.0);`
+  }
 
   // Pas „drogi mlecznej": przekątna wstęga (↘ przez kolumnę KODA), detal fbm.
   float band = dot(av, normalize(vec2(0.42, 1.0)));
@@ -197,8 +215,10 @@ void main() {
 }
 `;
 
-export const STAR_FRAG = /* glsl */ `
-precision highp float;
+// precision per tier: low=mediump (iGPU często dławi highp w punktach), reszta=highp.
+export function starFrag(precision: "highp" | "mediump" = "highp"): string {
+  return /* glsl */ `
+precision ${precision} float;
 varying float vA;
 varying float vTint;
 uniform vec3 uWarm;
@@ -210,6 +230,7 @@ void main() {
   gl_FragColor = vec4(col, min(disc * vA, 1.0));
 }
 `;
+}
 
 /* ── Pył przy kamerze (rzadki, dryfuje ku górze — głębia bliska) ─────────── */
 export const MOTE_VERT = /* glsl */ `
@@ -228,8 +249,9 @@ void main() {
 }
 `;
 
-export const MOTE_FRAG = /* glsl */ `
-precision highp float;
+export function moteFrag(precision: "highp" | "mediump" = "highp"): string {
+  return /* glsl */ `
+precision ${precision} float;
 varying float vA;
 uniform vec3 uCol;
 void main() {
@@ -238,6 +260,7 @@ void main() {
   gl_FragColor = vec4(uCol, disc * vA * 0.4);
 }
 `;
+}
 
 export function makeStarGeometry(count: number, seed: number): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
@@ -343,9 +366,12 @@ export function makeCosmosMaterials(
   octaves: number = 4,
   precision: "highp" | "mediump" = "highp"
 ) {
+  // „cheap" = tier low (jedyny mediump): tańszy wariant mgławicy (early-out +
+  // mniej fbm) i mediump w punktach. medium/high (highp) dostają pełny shader.
+  const cheap = precision === "mediump";
   const nebula = new THREE.ShaderMaterial({
     vertexShader: COSMOS_VERT,
-    fragmentShader: cosmosFrag(octaves, precision),
+    fragmentShader: cosmosFrag(octaves, precision, cheap),
     uniforms: {
       uTime: { value: reduced ? 6.0 : 0 },
       uIntro: { value: reduced ? 1 : 0 },
@@ -374,7 +400,7 @@ export function makeCosmosMaterials(
 
   const stars = new THREE.ShaderMaterial({
     vertexShader: STAR_VERT,
-    fragmentShader: STAR_FRAG,
+    fragmentShader: starFrag(precision),
     uniforms: {
       uTime: { value: reduced ? 4 : 0 },
       uAlpha: { value: reduced ? 0.9 : 0 },
@@ -391,7 +417,7 @@ export function makeCosmosMaterials(
 
   const motes = new THREE.ShaderMaterial({
     vertexShader: MOTE_VERT,
-    fragmentShader: MOTE_FRAG,
+    fragmentShader: moteFrag(precision),
     uniforms: {
       uTime: { value: reduced ? 5 : 0 },
       uAlpha: { value: reduced ? 0.8 : 0 },

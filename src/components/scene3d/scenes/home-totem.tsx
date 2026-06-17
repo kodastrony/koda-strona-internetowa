@@ -485,14 +485,15 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
       cfg.cosmos.starMul *
       (1 - THREE.MathUtils.smoothstep(s2, 1.0, 1.5) * 0.6);
     cosmos.stars.uniforms.uScroll.value = s2;
-    cosmos.stars.uniforms.uPx.value = 2 * gl.getPixelRatio();
+    const pr = gl.getPixelRatio(); // raz/klatkę (było 2× — stars + motes)
+    cosmos.stars.uniforms.uPx.value = 2 * pr;
     (cosmos.stars.uniforms.uSpread.value as THREE.Vector2).set(
       Math.max(14, viewport.width * 0.85),
       Math.max(8, viewport.height * 0.62)
     );
     cosmos.motes.uniforms.uTime.value = t;
     cosmos.motes.uniforms.uAlpha.value = worldIn * 0.7 * pal.moteAlpha;
-    cosmos.motes.uniforms.uPx.value = 2 * gl.getPixelRatio();
+    cosmos.motes.uniforms.uPx.value = 2 * pr;
 
     /* ── Obrót: sprężyna z pędem (A/B) lub dostojny pochył (C) ───────────── */
     const introYawTarget =

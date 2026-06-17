@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "@/lib/motion";
@@ -31,7 +31,9 @@ function useWatchdog(setDpr: (v: React.SetStateAction<number>) => void, currentD
   return useMemo(
     () => ({
       onDecline: () => {
-        if (isDocVisible()) setDpr((d) => Math.max(1, +(d - 0.25).toFixed(2)));
+        // Podłoga 0.85 (było 1.0): słaby iGPU dostaje dodatkowe ~28% zapasu fill-rate,
+        // zanim watchdog w ogóle rozważy zejście tieru (treść/litery nadal czytelne).
+        if (isDocVisible()) setDpr((d) => Math.max(0.85, +(d - 0.2).toFixed(2)));
       },
       onChange: ({ fps }: { fps: number }) => {
         if (!isDocVisible() || dprRef.current > 1.05) {
@@ -114,6 +116,28 @@ function StaticKick() {
       clearTimeout(t3);
     };
   }, [invalidate]);
+  return null;
+}
+
+/* FrameCap — limit klatek RENDERU bez przełączania na frameloop="demand".
+   renderPriority>0 WYŁĄCZA auto-render R3F → to MY wołamy gl.render() co `1/fps` s
+   (równe ~33 ms na low). Kluczowe: pętla rAF i pozostałe useFrame wciąż tykają
+   pełnym tempem, więc:
+     • PerformanceMonitor mierzy realny rAF (~60 gdy zdrowo) i NIE myli capa ze
+       spadkiem fps → zero fałszywego downgrade'u do static,
+     • pauza poza ekranem działa nadal (frameloop="never" zatrzymuje też ten hook),
+   a GPU rysuje o połowę rzadziej (płynne, równe tempo zamiast rozchwianego 60-celu,
+   którego słaby iGPU nie dowozi). Montowany tylko gdy profil ma frameCap (low). */
+function FrameCap({ fps }: { fps: number }) {
+  const acc = useRef(0);
+  useFrame((state, dt) => {
+    acc.current += dt;
+    const step = 1 / fps;
+    if (acc.current >= step) {
+      acc.current %= step; // reszta → równe tempo, bez dryfu
+      state.gl.render(state.scene, state.camera);
+    }
+  }, 1);
   return null;
 }
 
@@ -340,6 +364,7 @@ export function SceneStage({
             <Scene reduced={reduced} quality={quality} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
+          {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}
           <DevFrameDriver />
           <DevFpsMeter />
         </Canvas>
@@ -485,6 +510,7 @@ export function SectionStage({
             <Scene reduced={reduced} quality={quality} getProgress={getProgress} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
+          {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}
           <DevFrameDriver />
           <DevFpsMeter />
         </Canvas>

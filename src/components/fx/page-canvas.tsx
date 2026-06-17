@@ -4,6 +4,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValue } from "motion/react";
 import { useThemeValue } from "@/lib/theme";
+import { useTierProfile } from "@/lib/device-tier";
 
 /* ══════════════════════════════════════════════════════════════════════════
    PageCanvas — ONE scroll-scrubbed background for the whole page.
@@ -75,6 +76,15 @@ const LIGHT_HOLDS: Record<string, string> = {
 
 const FALLBACK = "#0b0b0d";
 const FALLBACK_LIGHT = "#f7f4f8";
+
+/* Tani STATYCZNY gradient tła dla tierów bez scrubu (low/static): jeden malunek,
+   ZERO przemalowań całego viewportu na każdą klatkę scrolla (na słabym iGPU ten
+   repaint konkurował z hero = zacinanie). Sekcje są przezroczyste, więc kosmos
+   hero maluje się na tym, a reszta strony dostaje spokojne, ciemne „kosmiczne"
+   tło. Górny stop = FALLBACK, więc przeskok z 1-klatkowego scrubu (SSR=high) jest
+   niewidoczny. Stopy ~uśredniają łuk holdów (hero→usługi→świt→stopka). */
+const STATIC_BG_DARK = "linear-gradient(180deg, #0b0b0d 0%, #15111e 50%, #0c0710 100%)";
+const STATIC_BG_LIGHT = "linear-gradient(180deg, #f7f4f8 0%, #f1ecf6 50%, #efe9f1 100%)";
 
 /* ── OKLCH math (wystarczająco mała, żeby nie ciągnąć biblioteki) ────────── */
 
@@ -166,6 +176,8 @@ export function PageCanvas() {
   const pathname = usePathname();
   const theme = useThemeValue();
   const light = theme === "light";
+  // Tylko medium/high scrubują kolor tła per klatkę; low/static = statyczny gradient.
+  const scrub = useTierProfile().pageCanvasScrub;
   const stopsRef = useRef<Stops | null>(null);
   const bg = useMotionValue<string>(light ? FALLBACK_LIGHT : FALLBACK);
 
@@ -237,6 +249,9 @@ export function PageCanvas() {
   // useLayoutEffect: pierwszy pomiar PRZED malowaniem klatki (deep-linki typu
   // /#faq dostają od razu właściwy kolor zamiast błysku czerni).
   useLayoutEffect(() => {
+    // Tier bez scrubu (low/static): tło to statyczny gradient — pomijamy CAŁĄ
+    // maszynerię measure/scroll/rAF/ResizeObserver (zero przemalowań na klatkę).
+    if (!scrub) return;
     measure();
 
     // Własny listener scrolla (passive) zamiast useScroll: progi i odczyt są
@@ -280,7 +295,38 @@ export function PageCanvas() {
       window.removeEventListener("resize", remeasure);
       window.visualViewport?.removeEventListener("resize", remeasure);
     };
-  }, [measure, bg, pathname, light]);
+  }, [measure, bg, pathname, light, scrub]);
+
+  // Pastelowa poświata jasnego motywu (dawny LightWeather) — wspólne dziecko obu
+  // wariantów tła. Crossfade opacity przy przełączeniu ☀/☾.
+  const pastel = (
+    <div
+      aria-hidden="true"
+      className="absolute inset-0 transition-opacity duration-700 ease-out"
+      style={{
+        opacity: light ? 1 : 0,
+        background:
+          "radial-gradient(52% 38% at 16% 8%, rgba(207,67,184,0.07) 0%, rgba(207,67,184,0) 70%)," +
+          "radial-gradient(46% 34% at 88% 14%, rgba(122,76,214,0.06) 0%, rgba(122,76,214,0) 70%)",
+      }}
+    />
+  );
+
+  // Tier bez scrubu (low/static): ZWYKŁY div ze statycznym gradientem (longhand
+  // backgroundImage — zero kolizji shorthand/longhand z motion-owym backgroundColor;
+  // brak MotionValue). Osobny element od wariantu scrub → przy zmianie tieru tło
+  // po prostu się przemontowuje (jednorazowo, niezauważalnie).
+  if (!scrub) {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{ backgroundImage: light ? STATIC_BG_LIGHT : STATIC_BG_DARK }}
+      >
+        {pastel}
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -288,18 +334,7 @@ export function PageCanvas() {
       className="pointer-events-none fixed inset-0 -z-10"
       style={{ backgroundColor: bg }}
     >
-      {/* Jasny motyw: dwa miękkie pastelowe pola — papier ma światło, nie jest
-          płaski (dawny LightWeather). Crossfade opacity przy przełączeniu ☀/☾. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 transition-opacity duration-700 ease-out"
-        style={{
-          opacity: light ? 1 : 0,
-          background:
-            "radial-gradient(52% 38% at 16% 8%, rgba(207,67,184,0.07) 0%, rgba(207,67,184,0) 70%)," +
-            "radial-gradient(46% 34% at 88% 14%, rgba(122,76,214,0.06) 0%, rgba(122,76,214,0) 70%)",
-        }}
-      />
+      {pastel}
     </motion.div>
   );
 }
