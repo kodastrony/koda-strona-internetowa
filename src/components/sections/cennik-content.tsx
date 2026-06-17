@@ -489,6 +489,14 @@ export function CennikContent() {
                   style={{ color: "var(--color-ink)" }}
                 >
                   usług
+                </Link>{" "}
+                — w tym{" "}
+                <Link
+                  href="/uslugi/strony-3d"
+                  className="font-medium underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                  style={{ color: "var(--color-ink)" }}
+                >
+                  strony 3D i animowane
                 </Link>
                 .
               </p>

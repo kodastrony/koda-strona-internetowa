@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CONTACT } from "@/lib/constants";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Polityka prywatności",
   description: "Polityka prywatności i ochrony danych osobowych KODA Studio.",
-  robots: { index: true, follow: true },
-  alternates: { canonical: "/polityka-prywatnosci/" },
-};
+  path: "/polityka-prywatnosci/",
+});
 
 export default function PolitykaPrywatnosciPage() {
   return (

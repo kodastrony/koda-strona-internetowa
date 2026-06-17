@@ -3,20 +3,14 @@ import { PageHero } from "@/components/sections/page-hero";
 import { Strony3DContent, STRONY3D_FAQ } from "@/components/sections/strony-3d-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Strony internetowe 3D i animowane",
   description:
-    "Projektujemy i kodujemy strony internetowe 3D i z animacjami — interaktywne sceny WebGL/Three.js, płynny scroll i ruch, które wyróżniają markę. Zobacz nasze realizacje 3D. Szybkie, dostępne, działają na telefonie.",
-  alternates: { canonical: "/uslugi/strony-3d/" },
-  openGraph: {
-    title: "Strony internetowe 3D i animowane | KODA Studio",
-    description:
-      "Interaktywne strony 3D (WebGL/Three.js) i strony z animacjami, które wyróżniają markę — z 4 działającymi demami. Szybkie, dostępne i na każdym ekranie.",
-    url: "/uslugi/strony-3d/",
-  },
-};
+    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 4 działające dema. Szybkie i na każdym ekranie.",
+  path: "/uslugi/strony-3d/",
+});
 
 // Service — usługa spięta z encją Organization (jasność encji + kwalifikacja AI).
 const SERVICE_JSON_LD = {

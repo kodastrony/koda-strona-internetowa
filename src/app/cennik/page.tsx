@@ -3,20 +3,14 @@ import { PageHero } from "@/components/sections/page-hero";
 import { CennikContent, CENNIK_FAQ } from "@/components/sections/cennik-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Ile kosztuje strona internetowa? Cennik 2026",
   description:
-    "Ile kosztuje strona internetowa w Polsce w 2026? Orientacyjne widełki cen wg typu strony, co wpływa na cenę i czym różni się kreator, freelancer i agencja. Wycena w KODA — bezpłatnie.",
-  alternates: { canonical: "/cennik/" },
-  openGraph: {
-    title: "Ile kosztuje strona internetowa? Cennik 2026 | KODA Studio",
-    description:
-      "Orientacyjne widełki cen stron internetowych w Polsce (2026), co wpływa na cenę i porównanie: kreator, freelancer, agencja. Wycena w KODA — bezpłatnie i bez zobowiązań.",
-    url: "/cennik/",
-  },
-};
+    "Ile kosztuje strona internetowa w 2026? Widełki cen wg typu strony, co wpływa na cenę i porównanie: kreator, freelancer, agencja. Bezpłatna wycena w KODA.",
+  path: "/cennik/",
+});
 
 // Article — sygnał E-E-A-T + kwalifikacja do cytowań AI. Autor = KODA Studio
 // (organizacja, NIE osoba — zgodnie z decyzją „mówimy »my«, bez imion").
@@ -34,6 +28,7 @@ const ARTICLE_JSON_LD = {
   isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
   mainEntityOfPage: `${SITE_CONFIG.url}/cennik/`,
   about: { "@type": "Thing", name: "Koszt strony internetowej" },
+  image: [`${SITE_CONFIG.url}/opengraph-image`],
 };
 
 // FAQPage — to samo źródło co sekcja FAQ na stronie (CENNIK_FAQ). Rich result FAQ

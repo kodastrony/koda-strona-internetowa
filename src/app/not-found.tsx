@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { PillLink } from "@/components/ui/pill-link";
+
+// Własny tytuł + JAWNY noindex (override, nie append) — bez tego layout dokleja
+// drugą metę robots „index, follow" (konflikt; noindex i tak wygrywał, ale to bug).
+export const metadata: Metadata = {
+  title: "Strona nie znaleziona (404)",
+  robots: { index: false, follow: false },
+};
 
 // Custom 404 — renders inside the root layout (header/footer present).
 export default function NotFound() {

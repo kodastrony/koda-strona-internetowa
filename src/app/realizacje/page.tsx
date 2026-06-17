@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/page-hero";
 import { RealizacjeContent } from "@/components/sections/realizacje-content";
 import { CTABand } from "@/components/sections/cta-band";
-import { breadcrumbLd } from "@/lib/seo";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
 
 const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
   { name: "Realizacje", path: "/realizacje/" },
 ]);
 
-export const metadata: Metadata = {
-  title: "Realizacje",
+export const metadata: Metadata = pageMetadata({
+  title: "Realizacje stron internetowych",
   description:
     "Realizacje KODA — koncepcyjne strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Zobacz, jak pracujemy.",
-  alternates: { canonical: "/realizacje/" },
-};
+  path: "/realizacje/",
+});
 
 export default function RealizacjePage() {
   return (

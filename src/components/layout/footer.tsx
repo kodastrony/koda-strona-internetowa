@@ -61,6 +61,14 @@ export function Footer() {
               ))}
               <li>
                 <Link
+                  href="/uslugi/strony-3d"
+                  className="text-sm text-ink-muted transition-colors duration-300 hover:text-white"
+                >
+                  Strony 3D
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/cennik"
                   className="text-sm text-ink-muted transition-colors duration-300 hover:text-white"
                 >
