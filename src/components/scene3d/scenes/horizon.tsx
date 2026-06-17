@@ -155,6 +155,8 @@ function HorizonScene({ reduced, getProgress }: SectionSceneProps) {
 /* Tło-canvas finałowej sekcji: SectionStage (IO-pauza, DPR clamp, reduced→
    demand, context-lost→poster, drive-mode). absolute inset-0 robi SectionStage. */
 export function HorizonBackdrop() {
+  // Bramka tieru + leniwe ładowanie są w HorizonBackdropLazy (statement.tsx go
+  // używa). Tu sam canvas świtu.
   return (
     <SectionStage
       scene={HorizonScene}

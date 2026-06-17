@@ -13,9 +13,15 @@ import type { KodaBus } from "./scenes/cosmos";
 
 /* oncePerSession: strona główna gra intro 3D DOKŁADNIE RAZ na sesję (przy
    SPA/F5 scena startuje od razu w spoczynku). */
-export function useIntroOrchestra(introBase: number, opts?: { oncePerSession?: boolean }) {
+export function useIntroOrchestra(
+  introBase: number,
+  opts?: { oncePerSession?: boolean; instant?: boolean }
+) {
   const reduce = useReducedMotion();
   const oncePerSession = opts?.oncePerSession ?? false;
+  // instant: tier „static" (poster, brak sceny 3D) — treść hero (H1/CTA) ma się
+  // pokazać OD RAZU, bez czekania na bus sceny ani 5 s wall-clock safety.
+  const instant = opts?.instant ?? false;
   // ⚠ SSR-safe: NIE czytamy sessionStorage podczas renderu (rozjazd hydracji —
   // serwer „intro gra", klient „już grało"). Pierwszy render zawsze = „intro
   // gra" (zgodny z SSR), a decyzję o pominięciu podejmuje efekt PO montażu.
@@ -44,7 +50,7 @@ export function useIntroOrchestra(introBase: number, opts?: { oncePerSession?: b
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
-    if (oncePerSession && introHasPlayed()) {
+    if (instant || (oncePerSession && introHasPlayed())) {
       bus.skipped = true; // mutacja (nie state) — scena 3D (async) czyta od 1. klatki
       // Stany odkładamy do microtaska: poza synchronicznym ciałem efektu
       // (react-hooks/set-state-in-effect), batchowane w jeden render, wciąż

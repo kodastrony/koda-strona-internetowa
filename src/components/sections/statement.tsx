@@ -6,7 +6,7 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { EASE, type Bezier } from "@/lib/motion";
 import { Magnetic } from "@/components/motion/magnetic";
-import { HorizonBackdrop } from "@/components/scene3d/scenes/horizon";
+import { HorizonBackdropLazy } from "@/components/scene3d/scenes/horizon-lazy";
 import { CONTACT } from "@/lib/constants";
 
 /* ── Final CTA "moment" — the conversion climax before the footer ──────────
@@ -270,7 +270,7 @@ export function Statement() {
           im głębiej zjedziesz (uProg ze scrolla). To sekcja, którą user
           pamięta jako „świecącą się". Sekcja = ciemna wyspa w OBU motywach
           (LIGHT_HOLDS.statement też plum) — biały tekst czytelny, świt gra. ── */}
-      <HorizonBackdrop />
+      <HorizonBackdropLazy />
 
       {/* ── Wejście z FAQ: kontynuacja różowej łuny PRZEZ szew ────────────────
           FAQ ma łunę-zapowiedź H335 nad SWOJĄ dolną krawędzią (peak dokładnie na

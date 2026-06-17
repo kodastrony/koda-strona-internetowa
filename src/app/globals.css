@@ -251,6 +251,46 @@ html[data-koda-light] .cta-footer-wash {
   }
 }
 
+/* ── Poster hero (tier „static"): powolny „oddech" świetlnej bloomy ────
+   GPU-only (transform+opacity), tani nawet na słabym sprzęcie. Dwie warstwy
+   z różnym tempem/fazą → światło żyje organicznie, nie pulsuje mechanicznie. */
+@keyframes koda-poster-bloom {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translate3d(1.5%, -1.5%, 0) scale(1.07);
+    opacity: 1;
+  }
+}
+@keyframes koda-poster-bloom2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.04);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate3d(-2%, 1%, 0) scale(1);
+    opacity: 0.85;
+  }
+}
+.koda-poster-bloom {
+  animation: koda-poster-bloom 13s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.koda-poster-bloom2 {
+  animation: koda-poster-bloom2 17s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .koda-poster-bloom,
+  .koda-poster-bloom2 {
+    animation: none;
+  }
+}
+
 /* ── Film grain — the glue of the "one world" ────────────────────────
    Jedna globalna, NIERUCHOMA warstwa szumu (feTurbulence w data-URI;
    CSP `img-src data:` już to dopuszcza). ZWYKŁA alfa, NIE mix-blend-mode:

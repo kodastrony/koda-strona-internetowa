@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTierProfile } from "@/lib/device-tier";
 
 /** Live prefers-reduced-motion read via matchMedia (reliable, no hook-timing
  *  quirks). SSR-safe: false on first render (server matches), true after mount. */
@@ -34,6 +35,11 @@ export function VideoShowcase({
   label: string;
 }) {
   const reduce = usePrefersReduced();
+  // Hook MUSI być wołany bezwarunkowo (nie po `reduce ||`, bo `||` by go ucięło).
+  const profile = useTierProfile();
+  // low/static → traktuj jak reduced: bez autoodtwarzania, poster + kontrolki
+  // (opt-in). Oszczędza dekodowanie wideo (GPU/CPU) na słabym sprzęcie.
+  const noAutoplay = reduce || !profile.smoothScroll;
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [load, setLoad] = useState(false);
@@ -58,9 +64,9 @@ export function VideoShowcase({
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !load) return;
-    if (visible && !reduce) v.play().catch(() => {});
+    if (visible && !noAutoplay) v.play().catch(() => {});
     else v.pause();
-  }, [load, visible, reduce]);
+  }, [load, visible, noAutoplay]);
 
   return (
     <div
@@ -81,7 +87,7 @@ export function VideoShowcase({
         loop
         playsInline
         preload="none"
-        controls={!!reduce}
+        controls={noAutoplay}
         aria-label={label}
         className="block h-auto w-full"
       />

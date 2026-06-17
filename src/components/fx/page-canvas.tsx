@@ -242,8 +242,16 @@ export function PageCanvas() {
     // Własny listener scrolla (passive) zamiast useScroll: progi i odczyt są
     // w TEJ SAMEJ skali (px dokumentu) — żaden cudzy „total" się nie rozjedzie.
     const fallback = light ? FALLBACK_LIGHT : FALLBACK;
+    // Throttle do rAF: scroll potrafi sypać wiele zdarzeń na klatkę (zwł. z
+    // Lenis) — koalescencja do JEDNEJ aktualizacji koloru na klatkę zdejmuje
+    // zbędną pracę z głównego wątku (lżej na słabym CPU), bez zmiany efektu.
+    let scrollRaf = 0;
     const onScroll = () => {
-      bg.set(colorAt(stopsRef.current, window.scrollY, fallback));
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = 0;
+        bg.set(colorAt(stopsRef.current, window.scrollY, fallback));
+      });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -266,6 +274,7 @@ export function PageCanvas() {
 
     return () => {
       window.removeEventListener("scroll", onScroll);
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
       if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener("resize", remeasure);

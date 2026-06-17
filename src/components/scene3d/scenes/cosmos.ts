@@ -38,8 +38,15 @@ void main() {
 }
 `;
 
-export const COSMOS_FRAG = /* glsl */ `
-precision highp float;
+/* COSMOS_FRAG jako FUNKCJA: oktawy fbm i precyzja są wkompilowane per tier.
+   - octaves: GŁÓWNY koszt fill-rate (fbm woła snoise `octaves`× ×4 wywołań/piksel).
+     high=4, medium=3, low=2 → wprost połowa pracy GPU na low. Liczba jest WSTAWIANA
+     do kodu (literał) — pętla GLSL ES 1.0 musi mieć STAŁY bound (uniform by nie zadziałał).
+   - precision: low=mediump (tańsze na mobilnych GPU; mgławica to tło o niskiej alfie,
+     więc ewentualny banding jest niewidoczny), medium/high=highp. */
+export function cosmosFrag(octaves: number, precision: "highp" | "mediump"): string {
+  return /* glsl */ `
+precision ${precision} float;
 varying vec2 vUv;
 uniform float uTime;
 uniform float uIntro;   // narodziny świata (0→1)
@@ -61,7 +68,7 @@ ${GLSL_DITHER}
 float fbm(vec2 p, float t) {
   float v = 0.0;
   float a = 0.55;
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < ${octaves}; i++) {
     v += a * snoise(vec3(p, t));
     p = p * 2.04 + vec2(7.3, 3.1);
     a *= 0.5;
@@ -156,6 +163,7 @@ void main() {
   gl_FragColor = vec4(kodaDither(outRGB, gl_FragCoord.xy), a);
 }
 `;
+}
 
 /* ── Gwiazdy: jeden bufor, dwie głębokości (aSeed.w ∈ {0,1} = warstwa) ───── */
 export const STAR_VERT = /* glsl */ `
@@ -330,10 +338,14 @@ export function makeMoteGeometry(count: number, seed: number): THREE.BufferGeome
 }
 
 /** Fabryki materiałów kosmosu — sceny podają wartości startowe reduced. */
-export function makeCosmosMaterials(reduced: boolean) {
+export function makeCosmosMaterials(
+  reduced: boolean,
+  octaves: number = 4,
+  precision: "highp" | "mediump" = "highp"
+) {
   const nebula = new THREE.ShaderMaterial({
     vertexShader: COSMOS_VERT,
-    fragmentShader: COSMOS_FRAG,
+    fragmentShader: cosmosFrag(octaves, precision),
     uniforms: {
       uTime: { value: reduced ? 6.0 : 0 },
       uIntro: { value: reduced ? 1 : 0 },

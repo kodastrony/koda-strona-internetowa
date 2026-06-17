@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ReactLenis, useLenis } from "lenis/react";
 import { useReducedMotion } from "motion/react";
+import { useTierProfile } from "@/lib/device-tier";
 
 /* On route change Lenis OWNS the scroll position, so Next's built-in scroll
    reset desyncs (you land on the same offset = e.g. stuck on the "next project"
@@ -36,12 +37,16 @@ function ScrollReset() {
    renders, so there is no hydration mismatch — only the options flip post-mount. */
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
+  // Płynny scroll (Lenis = pętla rAF co klatkę) tylko medium/high. low/static →
+  // natywny scroll (lerp 1, bez smoothWheel) = zero rAF na słabym CPU. Opcje
+  // przełączają się po montażu (jak przy reduced-motion) — bez rozjazdu hydracji.
+  const smooth = useTierProfile().smoothScroll && !reduce;
   return (
     <ReactLenis
       root
       options={{
-        lerp: reduce ? 1 : 0.085,
-        smoothWheel: !reduce,
+        lerp: smooth ? 0.085 : 1,
+        smoothWheel: smooth,
         wheelMultiplier: 1,
         touchMultiplier: 1.5,
         syncTouch: false,

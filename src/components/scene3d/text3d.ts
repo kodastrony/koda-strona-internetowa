@@ -263,6 +263,63 @@ function pointInPolygon(p: Pt, poly: Pt[]): boolean {
   return inside;
 }
 
+/* ── Ekstruzja ODPORNA ─────────────────────────────────────────────────────
+   Degeneraty z rzadkiego tracingu (zwł. na low) potrafiły rzucać w
+   ExtrudeGeometry → cały build padał → znikały WSZYSTKIE litery. Próbujemy
+   kolejne, coraz prostsze warianty; gdy wszystko padnie → null (konsument da blok). */
+function buildExtrude(shapes: THREE.Shape[], depth: number, bevel: number): THREE.BufferGeometry | null {
+  if (!shapes.length) return null;
+  const variants = [
+    { depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel * 0.85, bevelSegments: 2, steps: 1 },
+    { depth, bevelEnabled: true, bevelThickness: bevel * 0.6, bevelSize: bevel * 0.4, bevelSegments: 1, steps: 1 },
+    { depth, bevelEnabled: false, steps: 1 },
+  ];
+  for (const v of variants) {
+    try {
+      const g = new THREE.ExtrudeGeometry(shapes, v);
+      const pos = g.getAttribute("position");
+      if (pos && pos.count > 2 && Number.isFinite((pos.array as ArrayLike<number>)[0])) return g;
+      g.dispose();
+    } catch {
+      /* spróbuj prostszy wariant */
+    }
+  }
+  return null;
+}
+
+/* ── Gwarancja, że font REALNIE rasteryzuje ───────────────────────────────
+   next/font ładuje Syne ASYNCHRONICZNIE; na słabym sprzęcie 2D-canvas potrafił
+   rysować PUSTO (font jeszcze nie gotowy) → puste pole alfy → brak konturów →
+   brak bryły → „znikające litery". Próbujemy aż „K" ma piksele (≤~0.8 s). */
+async function ensureGlyphInk(
+  ctx: CanvasRenderingContext2D,
+  family: string,
+  F: number,
+  padX: number,
+  baseY: number,
+  W: number,
+  H: number
+): Promise<void> {
+  const hasInk = (): boolean => {
+    ctx.font = `800 ${F}px ${family}`;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillText("K", padX, baseY);
+    const d = ctx.getImageData(0, 0, W, H).data;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) return true;
+    return false;
+  };
+  for (let attempt = 0; attempt < 12; attempt++) {
+    if (hasInk()) return;
+    try {
+      await document.fonts.load(`800 ${F}px ${family}`);
+      await document.fonts.ready;
+    } catch {
+      /* noop */
+    }
+    await new Promise((r) => setTimeout(r, 60));
+  }
+}
+
 /* ── Główny builder ───────────────────────────────────────────────────────
    depth/bevel w EM. quality "low" = rzadszy sampling (mniejszy canvas). */
 export async function buildKodaLetters3D(opts?: {
@@ -272,7 +329,8 @@ export async function buildKodaLetters3D(opts?: {
 }): Promise<KodaLetters3D> {
   const depth = opts?.depth ?? 0.16;
   const bevel = opts?.bevel ?? 0.012;
-  const F = opts?.quality === "low" ? 220 : 330; // px rozmiaru fontu w tracerze
+  // low 256 (było 220 — za rzadko: degeneraty/znikanie liter); high 330.
+  const F = opts?.quality === "low" ? 256 : 330;
 
   const family = await resolveLogoFontFamily();
 
@@ -285,10 +343,13 @@ export async function buildKodaLetters3D(opts?: {
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  ctx.font = `800 ${F}px ${family}`;
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#fff";
+
+  // ★ Czekaj aż Syne REALNIE rasteryzuje (anty-„znikające litery"); dopiero potem traceruj.
+  await ensureGlyphInk(ctx, family, F, PAD_X, BASE_Y, W, H);
+  ctx.font = `800 ${F}px ${family}`;
 
   const letters: LetterGeometry[] = [];
   let columnWidth = 0;
@@ -353,21 +414,21 @@ export async function buildKodaLetters3D(opts?: {
       shapes.push(shape);
     }
 
-    const raw = new THREE.ExtrudeGeometry(shapes, {
-      depth,
-      bevelEnabled: true,
-      bevelThickness: bevel,
-      bevelSize: bevel * 0.85,
-      bevelSegments: 2,
-      steps: 1,
-    });
-    // Extrude daje PŁASKIE normalne per segment ścianki → przy głębokich
-    // bryłach (strona 5) widać pionowe pasy. Próg crease MUSI być mniejszy
-    // niż kąt jednego kroku fazy (~22° przy bevelSegments 2), inaczej
-    // wygładzenie „przełazi" z czoła przez fazę na ścianę i bryła robi się
-    // poduszką. 0.3 rad: łuki ścian gładkie, czoło/faza ostre.
-    const geometry = toCreasedNormals(raw, 0.3);
-    raw.dispose();
+    // ★ Ekstruzja ODPORNA (kolejne prostsze warianty); skrajny fallback = blok em,
+    //   żeby litera NIGDY nie zniknęła całkowicie (lepsze niż pusty napis).
+    let geometry: THREE.BufferGeometry;
+    const raw = buildExtrude(shapes, depth, bevel);
+    if (raw) {
+      // toCreasedNormals 0.3 rad: łuki ścian gładkie, czoło/faza ostre (bez „poduszki").
+      try {
+        geometry = toCreasedNormals(raw, 0.3);
+        raw.dispose();
+      } catch {
+        geometry = raw;
+      }
+    } else {
+      geometry = new THREE.BoxGeometry(0.5, KODA_LINE_H * 0.78, depth);
+    }
     geometry.computeBoundingBox();
     const bb = geometry.boundingBox!;
     const cx = (bb.min.x + bb.max.x) / 2;

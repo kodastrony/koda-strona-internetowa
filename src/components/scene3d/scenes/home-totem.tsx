@@ -7,6 +7,7 @@ import { Environment, Lightformer } from "@react-three/drei";
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import type { SceneProps } from "../scene-stage";
 import { BRAND, GLSL_DITHER, usePointerRef } from "../lib";
+import { getTierProfile } from "@/lib/device-tier";
 import { buildKodaLetters3D, type KodaLetters3D } from "../text3d";
 import { P5_INTRO } from "../intro-timings";
 import { SCENE_DARK, SCENE_LIGHT, useThemeValue, type ScenePalette } from "../home/theme";
@@ -123,6 +124,11 @@ interface HomeTotemProps extends SceneProps {
 
 export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeTotemProps) {
   const cfg = variant;
+  // Profil tieru ZAMROŻONY na czas życia canvasu (oktawy mgławicy / Environment /
+  // liczba cząstek / precyzja = boot-params). Watchdog ich NIE rusza — zmiana
+  // wymagałaby rekompilacji shadera lub przebudowy geometrii (jank). Reaktywny
+  // downgrade (DPR / warstwy / bail na poster) obsługuje SceneStage.
+  const boot = useMemo(() => getTierProfile(), []);
   // Motyw przez subskrypcję store'a — NIE przez prop (prop remontowałby Canvas).
   const theme = useThemeValue();
   const ptr = usePointerRef(!reduced);
@@ -147,15 +153,26 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
   useEffect(() => {
     let alive = true;
     let data: KodaLetters3D | null = null;
-    buildKodaLetters3D({ quality, depth: cfg.depth, bevel: cfg.bevel }).then((d) => {
-      if (!alive) {
-        d.dispose();
-        return;
-      }
-      data = d;
-      setLetters(d);
-      bus.onReady?.();
-    });
+    const build = (attempt: number) => {
+      buildKodaLetters3D({ quality, depth: cfg.depth, bevel: cfg.bevel })
+        .then((d) => {
+          if (!alive) {
+            d.dispose();
+            return;
+          }
+          data = d;
+          setLetters(d);
+          bus.onReady?.();
+        })
+        .catch(() => {
+          // Build padł (rzadko, po hardeningu text3d) → ponów; po próbach NIE
+          // blokuj intro (mgławica + treść hero i tak wjadą — zero „crasha").
+          if (!alive) return;
+          if (attempt < 2) setTimeout(() => alive && build(attempt + 1), 220);
+          else bus.onReady?.();
+        });
+    };
+    build(0);
     return () => {
       alive = false;
       data?.dispose();
@@ -221,7 +238,10 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
   useEffect(() => () => discMaterial.dispose(), [discMaterial]);
 
   /* ── Kosmos ────────────────────────────────────────────────────────────── */
-  const cosmos = useMemo(() => makeCosmosMaterials(reduced), [reduced]);
+  const cosmos = useMemo(
+    () => makeCosmosMaterials(reduced, boot.octaves, boot.precision),
+    [reduced, boot.octaves, boot.precision]
+  );
   useEffect(
     () => () => {
       cosmos.nebula.dispose();
@@ -231,13 +251,10 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
     [cosmos]
   );
   const starGeometry = useMemo(
-    () => makeStarGeometry(quality === "high" ? 460 : 210, 0x7073 + cfg.id.charCodeAt(0)),
-    [quality, cfg.id]
+    () => makeStarGeometry(boot.stars, 0x7073 + cfg.id.charCodeAt(0)),
+    [boot.stars, cfg.id]
   );
-  const moteGeometry = useMemo(
-    () => makeMoteGeometry(quality === "high" ? 200 : 80, 0xbead),
-    [quality]
-  );
+  const moteGeometry = useMemo(() => makeMoteGeometry(boot.motes, 0xbead), [boot.motes]);
   useEffect(
     () => () => {
       starGeometry.dispose();
@@ -281,8 +298,12 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
       // CSM proxuje propy materiału bazowego w runtime, ale nie w typach.
       const std = m as unknown as THREE.MeshStandardMaterial;
       std.color.set(p.letter.color);
-      std.metalness = p.letter.metalness;
-      std.roughness = p.letter.roughness;
+      // Bez Environment (low): metale renderują się CZARNO (brak odbić, scena nie
+      // ma AmbientLight) → tnij metalness i podbij roughness, by hemisfera+key+fill
+      // dały czytelny, matowy wygląd. Rim emissive (CSM) trzyma różowy charakter.
+      // envMapIntensity bez env i tak nie działa. high/medium = bez zmian.
+      std.metalness = boot.envRes == null ? Math.min(p.letter.metalness, 0.12) : p.letter.metalness;
+      std.roughness = boot.envRes == null ? Math.max(p.letter.roughness, 0.5) : p.letter.roughness;
       std.envMapIntensity = p.letter.env;
     });
 
@@ -298,7 +319,7 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
       fillLightRef.current.color.set(p.fillColor);
       fillLightRef.current.intensity = p.fillIntensity;
     }
-  }, [theme, cosmos, materials, discMaterial]);
+  }, [theme, cosmos, materials, discMaterial, boot.envRes]);
 
   /* ── Zegary + sprężyna obrotu ─────────────────────────────────────────── */
   const riseAt = useRef<number | null>(null);
@@ -601,32 +622,39 @@ export default function HomeTotemScene({ reduced, quality, bus, variant }: HomeT
       />
       <primitive object={keyTarget} />
 
-      <Environment resolution={128} frames={1}>
-        <Lightformer
-          form="rect"
-          intensity={2.4}
-          color="#ffffff"
-          position={[1.5, 5, 3]}
-          scale={[8, 3, 1]}
-          target={[0, 0, 0]}
-        />
-        <Lightformer
-          form="rect"
-          intensity={2.2}
-          color={BRAND.pinkBright}
-          position={[-5.5, -1, 1.5]}
-          scale={[6, 5, 1]}
-          target={[0, 0, 0]}
-        />
-        <Lightformer
-          form="circle"
-          intensity={2.6}
-          color="#ffeaf7"
-          position={[3.4, 1.4, 4.6]}
-          scale={1.6}
-          target={[0, 0, 0]}
-        />
-      </Environment>
+      {boot.envRes != null ? (
+        <Environment resolution={boot.envRes} frames={1}>
+          <Lightformer
+            form="rect"
+            intensity={2.4}
+            color="#ffffff"
+            position={[1.5, 5, 3]}
+            scale={[8, 3, 1]}
+            target={[0, 0, 0]}
+          />
+          <Lightformer
+            form="rect"
+            intensity={2.2}
+            color={BRAND.pinkBright}
+            position={[-5.5, -1, 1.5]}
+            scale={[6, 5, 1]}
+            target={[0, 0, 0]}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2.6}
+            color="#ffeaf7"
+            position={[3.4, 1.4, 4.6]}
+            scale={1.6}
+            target={[0, 0, 0]}
+          />
+        </Environment>
+      ) : (
+        /* Tani zamiennik Environment (tier low): hemisfera daje AMBIENT, którego
+           scena inaczej nie ma (bez niej nieoświetlone ściany liter = czarne).
+           Zero PMREM = zero wielosekundowego zacięcia startu na słabym GPU. */
+        <hemisphereLight args={["#ffe9f6", "#0a0a12", 0.85]} />
+      )}
     </>
   );
 }

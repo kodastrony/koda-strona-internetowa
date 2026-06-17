@@ -64,22 +64,26 @@ export const SCENE_DARK: ScenePalette = {
   disc: { deep: "#270d20", violet: "#9a63ef", pink: "#cf43b8", shadowMul: 1, alphaMul: 1 },
 };
 
+// JASNY motyw — PODBITY (2026-06-17), by dorównał ciemnemu: bardziej nasycone
+// pastele mgławicy (więcej obecności chmur), wyraźniejsze gwiazdy/pył (kosmos nie
+// znika), mocniejszy rim liter (porcelana na porcelanie potrzebuje definicji
+// krawędzi) + odrobinę więcej metaliczności (rzeźbiące odbicia z env).
 export const SCENE_LIGHT: ScenePalette = {
   bg: "#f6f2f7",
-  pink: "#eec4e2",
-  pinkBright: "#f2aed9",
-  violet: "#d9c8ef",
-  indigo: "#c9cdf2",
-  starWarm: "#a05d92",
-  starCool: "#7a6a9e",
-  starAlpha: 0.34,
-  moteCol: "#c77bb1",
-  moteAlpha: 0.5,
-  letter: { color: "#efe9f2", metalness: 0.22, roughness: 0.46, env: 1.0 },
-  rimMul: 0.45,
+  pink: "#f1b8de",
+  pinkBright: "#f6a0d6",
+  violet: "#ccb4ec",
+  indigo: "#bcc1f5",
+  starWarm: "#9a527f",
+  starCool: "#6f5f94",
+  starAlpha: 0.46,
+  moteCol: "#c06bab",
+  moteAlpha: 0.64,
+  letter: { color: "#ece5f0", metalness: 0.3, roughness: 0.42, env: 1.05 },
+  rimMul: 0.62,
   keyColor: "#fff8fc",
-  keyIntensity: 2.1,
+  keyIntensity: 2.25,
   fillColor: "#b9c2ff",
-  fillIntensity: 0.4,
-  disc: { deep: "#cfc2d8", violet: "#ded2ec", pink: "#f2b9dd", shadowMul: 1.25, alphaMul: 0.9 },
+  fillIntensity: 0.42,
+  disc: { deep: "#cabfd6", violet: "#dccfeb", pink: "#f3b4db", shadowMul: 1.3, alphaMul: 0.95 },
 };

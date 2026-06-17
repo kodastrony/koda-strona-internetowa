@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSyncExternalStore } from "react";
+import { useTierProfile } from "@/lib/device-tier";
 
 /* ══════════════════════════════════════════════════════════════════════════
    OrbitsAccentLazy — leniwy, bramkowany media-query wrapper na OrbitsAccent.
@@ -44,9 +45,12 @@ const OrbitsAccentInner = dynamic(
 );
 
 export function OrbitsAccentLazy() {
-  // Hook wołany bezwarunkowo; dopiero potem wczesny return. Na mobile/serwerze
-  // = false → <OrbitsAccentInner/> nigdy się nie montuje → import() nie startuje.
+  // Bramka media-query (≥1024) ORAZ tier: orbity (3. kontekst WebGL) tylko na
+  // tierze „high". Na low/medium/static komponent zwraca null → import() nie
+  // startuje → chunk akcentu NIE jest pobierany. Reaktywnie: gdy watchdog zejdzie
+  // high→medium, orbity znikają (zwolniony kontekst WebGL). Hooki bezwarunkowo.
   const desktop = useDesktop();
-  if (!desktop) return null;
+  const accents = useTierProfile().accents;
+  if (!desktop || !accents) return null;
   return <OrbitsAccentInner />;
 }

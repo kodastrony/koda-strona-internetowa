@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { SceneStage, type SceneProps } from "@/components/scene3d/scene-stage";
 import { P5_INTRO } from "@/components/scene3d/intro-timings";
-import { TOTEM_VARIANTS } from "@/components/scene3d/home/variants";
 import { useIntroOrchestra, SkipCatcher } from "@/components/scene3d/intro-orchestra";
-import { ScenePoster } from "@/components/scene3d/scene-poster";
+import { HeroPoster } from "@/components/scene3d/scene-poster";
+import { getTier, TIER_PROFILES } from "@/lib/device-tier";
 import { useThemeValue } from "@/lib/theme";
 import { EASE } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
@@ -27,10 +26,9 @@ import { PillLink } from "@/components/ui/pill-link";
    stałe; w jasnym motywie provider mapuje je na „light" (zero mutacji DOM).
    ══════════════════════════════════════════════════════════════════════════ */
 
-const HomeTotemScene = dynamic(() => import("@/components/scene3d/scenes/home-totem"), {
-  ssr: false,
-});
-const CFG = TOTEM_VARIANTS.c;
+// Cała three-zależna część hero (SceneStage + scena) ZA dynamic(ssr:false) —
+// tier „static" jej nie montuje, więc chunk three/fiber/drei NIE jest pobierany.
+const Hero3DCanvas = dynamic(() => import("./hero-3d-canvas"), { ssr: false });
 
 /* ── Treść hero (1:1 z dawnym sections/hero.tsx — tekst bez zmian) ────────── */
 function HeroCopy({ base }: { base: number }) {
@@ -164,9 +162,45 @@ function ThemedScrollHint({ base }: { base: number }) {
 }
 
 export function Hero3D() {
+  // Tier „static" (brak/sw WebGL, save-data, bardzo słaby sprzęt) → intro INSTANT
+  // (treść od razu, bez czekania na scenę). Zamrożone na czas życia komponentu.
+  const [instant] = useState(
+    () => typeof window !== "undefined" && !TIER_PROFILES[getTier()].webgl
+  );
+
+  // POSTER-FIRST + progresywny upgrade: start = dopracowany HeroPoster (H1 widoczne
+  // natychmiast, zero blokowania 3D na pierwszej klatce). Sprzęt zdolny montuje
+  // scenę 3D dopiero na IDLE (nie konkuruje z hydracją/LCP). „static" zostaje na
+  // posterze NA ZAWSZE → chunk three.js NIGDY się nie pobiera (koniec ~20 s na
+  // słabym sprzęcie/wolnym łączu).
+  const [mount3d, setMount3d] = useState(false);
+  useEffect(() => {
+    if (!TIER_PROFILES[getTier()].webgl) return; // static → poster, bez 3D
+    let cancelled = false;
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const start = () => {
+      if (!cancelled) setMount3d(true);
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      idleId = w.requestIdleCallback(start, { timeout: 1200 });
+    } else {
+      timeoutId = window.setTimeout(start, 200);
+    }
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined && typeof w.cancelIdleCallback === "function") w.cancelIdleCallback(idleId);
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, []);
+
   // Treść hero (H1=LCP) wjeżdża wg copyBase (~0,5 s), NIE base (~1,8 s = osiadanie
   // światła sceny). Intro 3D gra dalej pełny czas — scena czyta P5_INTRO osobno.
-  const o = useIntroOrchestra(P5_INTRO.copyBase, { oncePerSession: true });
+  const o = useIntroOrchestra(P5_INTRO.copyBase, { oncePerSession: true, instant });
   const theme = useThemeValue();
   const light = theme === "light";
   const reduce = useReducedMotion();
@@ -174,26 +208,13 @@ export function Hero3D() {
   const copyOpacity = useTransform(scrollY, [0, 260, 660], [1, 1, 0]);
   const copyY = useTransform(scrollY, [0, 660], [0, -84]);
 
-  const Wrapped = useMemo(() => {
-    return function HomeTotemC(p: SceneProps) {
-      return <HomeTotemScene {...p} bus={o.bus} variant={CFG} />;
-    };
-  }, [o.bus]);
-
   return (
     <section
       data-header-theme="dark"
       data-canvas="hero"
       className="relative flex min-h-svh flex-col"
     >
-      <SceneStage
-        scene={Wrapped}
-        camera={{ position: [0, 0, 8], fov: 38 }}
-        maskStops="black 74%, transparent 96%"
-        coverSvh={155}
-        poster={<ScenePoster hue={335} />}
-        fadeIn={false}
-      />
+      {mount3d ? <Hero3DCanvas bus={o.bus} /> : <HeroPoster />}
 
       {/* Winieta: subtelne ściemnienie POD treścią (lewa-góra), gładko gasnące do
           zera w stronę galaktyki (prawo/dół). BEZ maski — poprzednia maska

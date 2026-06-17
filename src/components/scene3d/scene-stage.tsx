@@ -6,6 +6,53 @@ import { PerformanceMonitor } from "@react-three/drei";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "@/lib/motion";
 import { useDeviceQuality, type Quality } from "./lib";
+import { useTier, downgradeTier, TIER_PROFILES } from "@/lib/device-tier";
+
+/* Watchdog reaguje TYLKO gdy karta jest WIDOCZNA. W tle przeglądarka dławi rAF
+   (klatki rzadkie) → PerformanceMonitor widziałby fałszywe „1 FPS" i zbiłby tier
+   (mocny komputer spadłby z high po samym przełączeniu karty — a downgrade jest
+   jednokierunkowy). Ten strażnik blokuje DPR↓/downgrade, gdy dokument ukryty. */
+const isDocVisible = () => typeof document === "undefined" || !document.hidden;
+
+/* ── Watchdog FPS ──────────────────────────────────────────────────────────
+   onDecline → łagodne DPR↓ (drei stabilizuje płynność). Tier-downgrade (drastyczny:
+   zdejmuje canvasy, finalnie bail na poster) NIE leci już z onFallback/flipflops —
+   to liczyło WAHANIA fps wokół 60 (intro, generacja PMREM, GC) jako spadki i po
+   ~10 s fałszywie zbijało low→static (litery „znikały" → poster). Teraz downgrade
+   tylko gdy fps jest REALNIE niski (<30) i UTRZYMUJE się >5 s, i to dopiero gdy
+   DPR jest już przy podłodze (najpierw tańsza adaptacja). isTierForced() + ukryta
+   karta dodatkowo blokują (override testowy ma być stabilny). */
+function useWatchdog(setDpr: (v: React.SetStateAction<number>) => void, currentDpr: number) {
+  const lowSince = useRef<number | null>(null);
+  const dprRef = useRef(currentDpr);
+  useEffect(() => {
+    dprRef.current = currentDpr;
+  }, [currentDpr]);
+  return useMemo(
+    () => ({
+      onDecline: () => {
+        if (isDocVisible()) setDpr((d) => Math.max(1, +(d - 0.25).toFixed(2)));
+      },
+      onChange: ({ fps }: { fps: number }) => {
+        if (!isDocVisible() || dprRef.current > 1.05) {
+          lowSince.current = null;
+          return;
+        }
+        if (fps > 0 && fps < 30) {
+          const now = performance.now();
+          if (lowSince.current === null) lowSince.current = now;
+          else if (now - lowSince.current > 5000) {
+            lowSince.current = null;
+            downgradeTier();
+          }
+        } else {
+          lowSince.current = null;
+        }
+      },
+    }),
+    [setDpr]
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    SceneStage — wspólna „scena" canvasu 3D hero strony głównej.
@@ -33,9 +80,7 @@ interface SceneStageProps {
   camera?: { position: [number, number, number]; fov: number };
   /** Maska wygaszająca dół canvasu — spójna z dekoracjami hero (szew!). */
   maskStops?: string;
-  /** MSAA tylko tam, gdzie nie ma postprocessingu i geometria tego chce. */
-  antialias?: boolean;
-  /** Statyczny zamiennik (brak WebGL / context lost). */
+  /** Statyczny zamiennik (brak WebGL / context lost / bail watchdoga). */
   poster: React.ReactNode;
   /**
    * Ile svh pokrywa canvas licząc od GÓRY hero (default 100 = sam hero).
@@ -186,7 +231,6 @@ export function SceneStage({
   scene: Scene,
   camera = { position: [0, 0, 8], fov: 42 },
   maskStops = "black 62%, transparent 97%",
-  antialias = true,
   poster,
   coverSvh = 100,
   z = 0,
@@ -195,6 +239,10 @@ export function SceneStage({
 }: SceneStageProps) {
   const reduced = !!useReducedMotion();
   const quality = useDeviceQuality();
+  // Reaktywny tier — watchdog może go obniżyć w trakcie sesji (DPR ↓, a gdy
+  // zejdzie do „static” → bail na poster). Boot-params sceny są zamrożone osobno.
+  const liveTier = useTier();
+  const profile = TIER_PROFILES[liveTier];
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // Pauza poza ekranem: oficjalny wzorzec R3F (frameloop 'always' ↔ 'never').
@@ -209,13 +257,23 @@ export function SceneStage({
     return () => io.disconnect();
   }, []);
 
-  // DPR: start = min(devicePixelRatio, 1.75); spadki fps → schodzimy do 1.
+  // DPR: start = min(devicePixelRatio, limit tieru); spadki fps → schodzimy krokowo.
   // Leniwy initializer (SSR-safe) zamiast setState w efekcie.
   const [dpr, setDpr] = useState<number>(() =>
-    typeof window === "undefined" ? 1.5 : Math.min(window.devicePixelRatio || 1, 1.75)
+    typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, profile.dprCap)
   );
+  // DPR efektywny = min(stan watchdoga, limit tieru) — liczony przy renderze
+  // (bez setState-in-effect): gdy watchdog obniży tier, limit spada i DPR
+  // automatycznie się zaciska na kolejnym renderze.
+  const effectiveDpr = Math.min(dpr, profile.dprCap);
+  const watchdog = useWatchdog(setDpr, effectiveDpr);
 
   const [lost, setLost] = useState(false);
+  // Klucz remontu Canvasu — przy ODZYSKANIU kontekstu WebGL (np. po wyczerpaniu
+  // limitu kontekstów przez wiele otwartych kart) montujemy ŚWIEŻY Canvas zamiast
+  // zostać na posterze na zawsze.
+  const [glKey, setGlKey] = useState(0);
+  const recover = useRef(0);
 
   const manualDrive = useManualDrive();
   const frameloop = manualDrive ? "never" : reduced ? "demand" : onScreen ? "always" : "never";
@@ -243,19 +301,20 @@ export function SceneStage({
         reduced || !fadeIn ? { duration: 0 } : { duration: 1.3, ease: EASE.primary, delay: 0.05 }
       }
     >
-      {lost ? (
+      {lost || !profile.webgl ? (
         poster
       ) : (
         <Canvas
+          key={glKey}
           // alpha: PageCanvas (fixed -z-10) zostaje JEDYNYM tłem strony —
           // scena maluje się NA „pogodzie" kanwy, nie obok niej.
           gl={{
-            antialias,
+            antialias: profile.msaa,
             alpha: true,
             powerPreference: "high-performance",
             stencil: false,
           }}
-          dpr={dpr}
+          dpr={effectiveDpr}
           frameloop={frameloop}
           camera={camera}
           fallback={poster}
@@ -263,22 +322,21 @@ export function SceneStage({
           style={{ position: "absolute", inset: 0 }}
           onCreated={({ gl }) => {
             if (localClipping) gl.localClippingEnabled = true;
-            gl.domElement.addEventListener(
-              "webglcontextlost",
-              (e) => {
-                e.preventDefault();
-                setLost(true);
-              },
-              { once: true }
-            );
+            gl.domElement.addEventListener("webglcontextlost", (e) => {
+              e.preventDefault();
+              setLost(true);
+              // Odzyskanie: po krótkim posterze przemontuj canvas (świeży kontekst).
+              if (recover.current < 5) {
+                recover.current += 1;
+                window.setTimeout(() => {
+                  setLost(false);
+                  setGlKey((k) => k + 1);
+                }, 2200);
+              }
+            });
           }}
         >
-          {/* flipflops=3: po trzecim wahnięciu fps zostajemy na DPR 1 na stałe */}
-          <PerformanceMonitor
-            onDecline={() => setDpr(1)}
-            flipflops={3}
-            onFallback={() => setDpr(1)}
-          >
+          <PerformanceMonitor onDecline={watchdog.onDecline} onChange={watchdog.onChange}>
             <Scene reduced={reduced} quality={quality} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
@@ -312,7 +370,6 @@ interface SectionStageProps {
   camera?: { position: [number, number, number]; fov: number };
   /** Maska pionowa canvasu (default: miękkie wygaszenie góry i dołu). */
   maskStops?: string;
-  antialias?: boolean;
   poster: React.ReactNode;
 }
 
@@ -320,11 +377,12 @@ export function SectionStage({
   scene: Scene,
   camera = { position: [0, 0, 8], fov: 42 },
   maskStops = "transparent 0%, black 14%, black 84%, transparent 100%",
-  antialias = true,
   poster,
 }: SectionStageProps) {
   const reduced = !!useReducedMotion();
   const quality = useDeviceQuality();
+  const liveTier = useTier();
+  const profile = TIER_PROFILES[liveTier];
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const [onScreen, setOnScreen] = useState(false);
@@ -371,9 +429,13 @@ export function SectionStage({
   );
 
   const [dpr, setDpr] = useState<number>(() =>
-    typeof window === "undefined" ? 1.5 : Math.min(window.devicePixelRatio || 1, 1.75)
+    typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, profile.dprCap)
   );
+  const effectiveDpr = Math.min(dpr, profile.dprCap);
+  const watchdog = useWatchdog(setDpr, effectiveDpr);
   const [lost, setLost] = useState(false);
+  const [glKey, setGlKey] = useState(0);
+  const recover = useRef(0);
 
   const manualDrive = useManualDrive();
   const frameloop = manualDrive ? "never" : reduced ? "demand" : onScreen ? "always" : "never";
@@ -393,33 +455,33 @@ export function SectionStage({
       className="pointer-events-none absolute inset-0 z-0"
       style={maskStyle}
     >
-      {lost ? (
+      {lost || !profile.webgl ? (
         poster
       ) : (
         <Canvas
-          gl={{ antialias, alpha: true, powerPreference: "high-performance", stencil: false }}
-          dpr={dpr}
+          key={glKey}
+          gl={{ antialias: profile.msaa, alpha: true, powerPreference: "high-performance", stencil: false }}
+          dpr={effectiveDpr}
           frameloop={frameloop}
           camera={camera}
           fallback={poster}
           resize={{ polyfill: KickedResizeObserver as unknown as typeof ResizeObserver }}
           style={{ position: "absolute", inset: 0 }}
           onCreated={({ gl }) => {
-            gl.domElement.addEventListener(
-              "webglcontextlost",
-              (e) => {
-                e.preventDefault();
-                setLost(true);
-              },
-              { once: true }
-            );
+            gl.domElement.addEventListener("webglcontextlost", (e) => {
+              e.preventDefault();
+              setLost(true);
+              if (recover.current < 5) {
+                recover.current += 1;
+                window.setTimeout(() => {
+                  setLost(false);
+                  setGlKey((k) => k + 1);
+                }, 2200);
+              }
+            });
           }}
         >
-          <PerformanceMonitor
-            onDecline={() => setDpr(1)}
-            flipflops={3}
-            onFallback={() => setDpr(1)}
-          >
+          <PerformanceMonitor onDecline={watchdog.onDecline} onChange={watchdog.onChange}>
             <Scene reduced={reduced} quality={quality} getProgress={getProgress} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}

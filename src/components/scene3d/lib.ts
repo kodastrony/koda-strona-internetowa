@@ -13,6 +13,7 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 import { useEffect, useMemo, useRef } from "react";
+import { getTier } from "@/lib/device-tier";
 
 /* ── Paleta marki (lustro tokenów globals.css w hexach three) ─────────────
    Dodatkowe stopnie ciemne (plum/deepRose) trzymają hue ~335 przy niskiej
@@ -129,20 +130,15 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-/* ── Jakość urządzenia (raz, przy montażu) ────────────────────────────────
-   "low" = telefon/tablet/coarse pointer/mało RAM → mniejsze liczniki,
-   niższe rozdzielczości buforów. Świadomie prosta heurystyka. */
+/* ── Jakość GEOMETRII liter (raz, przy montażu) ───────────────────────────
+   Steruje TYLKO szczegółem geometrii liter (buildKodaLetters3D) — reszta
+   parametrów (oktawy/Environment/cząstki/DPR) idzie z TIER_PROFILE w
+   device-tier.ts. "high" = pełna geometria tylko na tierze high; medium/low =
+   tańsza (mniej trójkątów, tańszy build). Jedno źródło prawdy = device-tier. */
 export type Quality = "low" | "high";
 
 export function useDeviceQuality(): Quality {
-  return useMemo<Quality>(() => {
-    if (typeof window === "undefined") return "high";
-    // Wąski ekran = mobile; coarse pointer liczy się tylko razem z małym oknem
-    // (laptopy dotykowe / przeglądarki tnące deviceMemory dawały fałszywe "low").
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const small = window.innerWidth < 768;
-    return small || (coarse && window.innerWidth < 1024) ? "low" : "high";
-  }, []);
+  return useMemo<Quality>(() => (getTier() === "high" ? "high" : "low"), []);
 }
 
 /* ── Wskaźnik (mysz) — znormalizowany do [-1, 1], czytany w useFrame ────── */
