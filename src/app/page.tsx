@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Hero3D } from "@/components/sections/hero-3d";
+import { Hero } from "@/components/hero/hero";
 import { Services } from "@/components/sections/services";
 import { Work } from "@/components/sections/work";
 import { Process } from "@/components/sections/process";
 import { Faq } from "@/components/sections/faq";
 import { Statement } from "@/components/sections/statement";
-import { OrbitsAccentLazy } from "@/components/scene3d/home/orbits-accent-lazy";
 import { FAQS } from "@/lib/faq";
+import { jsonLd } from "@/lib/seo";
+import { SITE_CONFIG } from "@/lib/constants";
 
 // Strona główna — jawne metadane (nie tylko dziedziczenie z layoutu): tytuł
 // „absolute" pomija szablon „%s | KODA" (home = korzeń) + kanoniczny URL.
@@ -24,6 +25,11 @@ export const metadata: Metadata = {
 const FAQ_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  // Spięcie z grafem encji z layoutu (Organization/ProfessionalService/WebSite)
+  // przez @id → jeden spójny graf = mocniejszy sygnał dla Google i AI search.
+  "@id": `${SITE_CONFIG.url}/#faq`,
+  isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
+  about: { "@id": `${SITE_CONFIG.url}/#business` },
   mainEntity: FAQS.map((f) => ({
     "@type": "Question",
     name: f.q,
@@ -39,18 +45,13 @@ export default function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(FAQ_JSON_LD) }}
       />
-      <Hero3D />
+      <Hero />
 
-      {/* Usługi — PLANETA z orbitami (świetlny węzeł prowadzony scrollem) gra
-          POD treścią; sekcja zostaje przezroczysta (data-canvas). */}
-      <div className="relative">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <OrbitsAccentLazy />
-        </div>
-        <Services />
-      </div>
+      {/* Usługi — sekcja przezroczysta (data-canvas) leży na płynnym PageCanvas.
+          Bez akcentu „planeta/orbity" (hero 2D zastąpił wariant 3D). */}
+      <Services />
 
       <Work />
 

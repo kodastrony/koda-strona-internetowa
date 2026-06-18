@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/page-hero";
 import { ONasContent } from "@/components/sections/o-nas-content";
 import { CTABand } from "@/components/sections/cta-band";
-import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
 
 const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
@@ -21,7 +21,7 @@ export default function ONasPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <PageHero
         label="Kim jesteśmy"

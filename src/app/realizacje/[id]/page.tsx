@@ -4,7 +4,7 @@ import { PROJECTS, getProject, getProjectNeighbours } from "@/lib/projects";
 import { ProjectDetail } from "@/components/sections/project-detail";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd } from "@/lib/seo";
+import { breadcrumbLd, jsonLd } from "@/lib/seo";
 
 // Static export: only the known project slugs are generated; anything else 404s.
 export const dynamicParams = false;
@@ -78,11 +78,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(CASE_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(CASE_JSON_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <ProjectDetail project={project} prev={prev} next={next} />
       <CTABand

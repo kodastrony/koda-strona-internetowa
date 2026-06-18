@@ -3,7 +3,7 @@ import { PageHero } from "@/components/sections/page-hero";
 import { Strony3DContent, STRONY3D_FAQ } from "@/components/sections/strony-3d-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Strony internetowe 3D i animowane",
@@ -49,15 +49,15 @@ export default function Strony3DPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICE_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(SERVICE_JSON_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(FAQ_JSON_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <PageHero
         label="Usługi · 3D i animacje"

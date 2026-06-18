@@ -24,6 +24,13 @@ interface FadeUpProps {
    * which is intro-synced via `delay`.
    */
   inView?: boolean;
+  /**
+   * Sterowanie wejściem ZDARZENIEM (zamiast na mount): gdy podane, element jest
+   * ukryty dopóki `play` nie stanie się `true` — wtedy wjeżdża (z `delay`).
+   * Hero używa tego, by treść wjechała DOPIERO po zakończeniu intro (zero zgadywania
+   * czasu, zero nakładania z napisem). `undefined` → zachowanie jak dotąd.
+   */
+  play?: boolean;
 }
 
 /**
@@ -42,6 +49,7 @@ export function FadeUp({
   y = 28,
   scale = 1,
   inView = false,
+  play,
 }: FadeUpProps) {
   // Reduced motion: snap straight to the resting state (no slide/scale/fade time).
   // motion/react JS animations aren't covered by the global CSS reduced-motion
@@ -51,15 +59,18 @@ export function FadeUp({
     hidden: { opacity: 0, x, y, scale },
     visible: { opacity: 1, x: 0, y: 0, scale: 1 },
   };
+  // play === undefined → dotychczasowe zachowanie (mount / inView).
+  // play zdefiniowane → sterowanie zdarzeniem: ukryty aż play=true.
+  const gated = play !== undefined;
   return (
     <motion.div
       data-reveal
       className={className}
       variants={variants}
       initial="hidden"
-      animate={inView ? undefined : "visible"}
-      whileInView={inView ? "visible" : undefined}
-      viewport={inView ? { once: true, margin: "0px 0px -80px 0px" } : undefined}
+      animate={gated ? (play ? "visible" : "hidden") : inView ? undefined : "visible"}
+      whileInView={!gated && inView ? "visible" : undefined}
+      viewport={!gated && inView ? { once: true, margin: "0px 0px -80px 0px" } : undefined}
       transition={reduce ? { duration: 0 } : { duration, ease, delay }}
     >
       {children}

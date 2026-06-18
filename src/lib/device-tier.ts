@@ -158,7 +158,8 @@ const SOFTWARE_RX = /swiftshader|llvmpipe|software|microsoft basic|paravirtual|v
 /** Apple GPU (Safari/iOS = generyczne; macOS Chrome = „ANGLE (Apple…") → mocne. */
 const APPLE_GPU_RX = /apple gpu|apple m\d|angle \(apple/i;
 /** Mocne dGPU → high: RTX, Radeon RX, GTX, Arc + AMD 680M/780M (RDNA2/3, klasa dGPU). */
-const STRONG_GPU_RX = /(rtx|radeon rx|geforce gtx|arc a[3-9]\d\d|quadro|titan|\brx [4-9]\d{2,3}\b|\brx \d{4}\b|radeon \d{3}m)/i;
+const STRONG_GPU_RX =
+  /(rtx|radeon rx|geforce gtx|arc a[3-9]\d\d|quadro|titan|\brx [4-9]\d{2,3}\b|\brx \d{4}\b|radeon \d{3}m)/i;
 /** Dolna półka dyskretnych (GTX 9/10/16xx, RX 4xx/5xx): high ≤1080p, ale na 1440p+
     (w*dpr≥2400) fill-rate pada → medium (detect-gpu: GTX1650@4K≈59fps, nasz shader cięższy). */
 const ENTRY_DISCRETE_RX = /gtx (9|10|16)\d\d|\brx [45]\d\d\b/i;
@@ -444,7 +445,10 @@ if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
   // detectTier (sonda high-performance, coarse, flagi platformy, dopasowania GPU).
   w.__kodaTierDebug = () => {
     const p = probeWebGL();
-    const n = navigator as Navigator & { brave?: { isBrave?: () => unknown }; deviceMemory?: number };
+    const n = navigator as Navigator & {
+      brave?: { isBrave?: () => unknown };
+      deviceMemory?: number;
+    };
     const readable = p.renderer.trim().length > 3 && !APPLE_GPU_RX.test(p.renderer);
     return {
       tier: getTier(),

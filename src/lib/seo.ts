@@ -57,6 +57,16 @@ export function pageMetadata({ title, description, path, ogTitle }: PageMetaInpu
   };
 }
 
+/**
+ * Serializuj JSON-LD do bezpiecznego wstrzyknięcia w `<script>`. Escapuje „<"
+ * → `<`, więc treść NIGDY nie zamknie przedwcześnie tagu `</script>`
+ * (hardening XSS + zalecany przez Next.js wzorzec dla structured data). Używać
+ * we WSZYSTKICH blokach `<script type="application/ld+json">`.
+ */
+export function jsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
 /** One step in a breadcrumb trail. `path` is absolute, with trailing slash. */
 export interface Crumb {
   name: string;

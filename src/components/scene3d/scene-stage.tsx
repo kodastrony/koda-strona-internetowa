@@ -485,7 +485,12 @@ export function SectionStage({
       ) : (
         <Canvas
           key={glKey}
-          gl={{ antialias: profile.msaa, alpha: true, powerPreference: "high-performance", stencil: false }}
+          gl={{
+            antialias: profile.msaa,
+            alpha: true,
+            powerPreference: "high-performance",
+            stencil: false,
+          }}
           dpr={effectiveDpr}
           frameloop={frameloop}
           camera={camera}

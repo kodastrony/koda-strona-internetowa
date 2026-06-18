@@ -11,6 +11,7 @@ import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
 import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
+import { jsonLd } from "@/lib/seo";
 import "./globals.css";
 
 // Organization + WebSite structured data (JSON-LD) — helps search engines build
@@ -210,7 +211,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(ORG_JSON_LD) }}
         />
         {/* Cloudflare Web Analytics — surowy <script> (serwerowo w statycznym HTML,
             ładuje się od razu, dokładnie wg snippetu Cloudflare). Świadomie NIE

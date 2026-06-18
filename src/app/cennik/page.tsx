@@ -3,7 +3,7 @@ import { PageHero } from "@/components/sections/page-hero";
 import { CennikContent, CENNIK_FAQ } from "@/components/sections/cennik-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Ile kosztuje strona internetowa? Cennik 2026",
@@ -53,15 +53,15 @@ export default function CennikPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ARTICLE_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(ARTICLE_JSON_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(FAQ_JSON_LD) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <PageHero
         label="Cennik"

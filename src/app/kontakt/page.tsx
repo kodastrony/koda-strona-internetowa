@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Contact } from "@/components/sections/contact";
-import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Kontakt",
@@ -20,7 +20,7 @@ export default function KontaktPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <Contact />
     </>
