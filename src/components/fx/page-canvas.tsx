@@ -305,9 +305,14 @@ export function PageCanvas() {
       className="absolute inset-0 transition-opacity duration-700 ease-out"
       style={{
         opacity: light ? 1 : 0,
+        // Pastelowa „pogoda" papieru — różowo-fioletowo-indygowe światło w rogach
+        // (echo ciemnej aurory marki). Trochę mocniejsze niż wcześniej + trzeci,
+        // indygowy akcent u dołu = porcelana ŻYJE kolorem, nie jest płaska. Alfy
+        // niskie (0.06–0.10) → wciąż lekka i przewiewna, bez „brudu".
         background:
-          "radial-gradient(52% 38% at 16% 8%, rgba(207,67,184,0.07) 0%, rgba(207,67,184,0) 70%)," +
-          "radial-gradient(46% 34% at 88% 14%, rgba(122,76,214,0.06) 0%, rgba(122,76,214,0) 70%)",
+          "radial-gradient(56% 42% at 13% 5%, rgba(207,67,184,0.10) 0%, rgba(207,67,184,0) 68%)," +
+          "radial-gradient(50% 38% at 90% 11%, rgba(124,76,222,0.09) 0%, rgba(124,76,222,0) 70%)," +
+          "radial-gradient(64% 44% at 82% 94%, rgba(77,98,224,0.06) 0%, rgba(77,98,224,0) 72%)",
       }}
     />
   );

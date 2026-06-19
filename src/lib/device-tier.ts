@@ -29,103 +29,61 @@ export type Tier = "static" | "low" | "medium" | "high";
 export const TIER_ORDER: Tier[] = ["static", "low", "medium", "high"];
 
 export interface TierProfile {
-  /** Czy w ogóle montować WebGL (false → dopracowany statyczny poster). */
+  /** Czy montować WebGL w SceneStage (false → statyczny poster). */
   webgl: boolean;
-  /** Oktawy fbm mgławicy — GŁÓWNY koszt fill-rate (boot, wkompilowane w shader). */
-  octaves: number;
-  /** Precyzja fragmentów mgławicy (boot). */
-  precision: "highp" | "mediump";
-  /** Rozdzielczość PMREM <Environment>; null = brak (boot) → tanie światło zastępcze. */
-  envRes: number | null;
-  /** Liczba gwiazd (boot). */
-  stars: number;
-  /** Liczba pyłków (boot). */
-  motes: number;
-  /** Górny limit DPR (live — watchdog może zejść w dół). */
-  dprCap: number;
-  /** MSAA na canvasie (boot). */
-  msaa: boolean;
-  /** Kosmiczny akcent „orbity” pod Usługami (osobny kontekst WebGL). */
-  accents: boolean;
-  /** Canvas „świtu” w Statement (osobny kontekst WebGL). */
+  /** Czy w ogóle ładować/montować canvas „świtu" w Statement (jedyny WebGL na
+      stronie; leniwy + IO-pauza). false → sam gradient CSS sekcji. */
   horizon: boolean;
-  /** Płynny scroll Lenis (CPU co klatkę). */
-  smoothScroll: boolean;
-  /** Własny kursor (rAF). */
-  cursor: boolean;
-  /** Limit klatek RENDERU (live). undefined = bez limitu (pełny rAF/wyświetlacz).
-      Na low = 30: równe tempo (33 ms) zamiast rozchwianego 25-45 fps; renderem
-      steruje <FrameCap> (render-priority), więc PerformanceMonitor wciąż widzi
-      pełny rAF (zero fałszywego downgrade'u). */
+  /** Górny limit DPR canvasu świtu (live — watchdog może zejść w dół). */
+  dprCap: number;
+  /** MSAA na canvasie świtu (boot). */
+  msaa: boolean;
+  /** Limit klatek RENDERU świtu (live). undefined = pełny rAF. Na słabym sprzęcie
+      30 = równe 33 ms (FrameCap render-priority; PerformanceMonitor wciąż widzi
+      pełny rAF → zero fałszywego downgrade'u). */
   frameCap?: number;
-  /** PageCanvas: scroll-scrubbed (przemalowanie całego tła co klatkę) vs tani
-      statyczny gradient. false na słabym sprzęcie — repaint tła konkurował z hero. */
+  /** Płynny scroll Lenis (rAF co klatkę; Lenis i tak nie wygładza dotyku). */
+  smoothScroll: boolean;
+  /** Własny kursor (rAF) — i tak montowany TYLKO przy fine-pointerze. */
+  cursor: boolean;
+  /** PageCanvas: scroll-scrubbed (przemalowanie tła co klatkę scrolla) vs tani
+      statyczny gradient. false na słabym sprzęcie — repaint konkurował o GPU. */
   pageCanvasScrub: boolean;
-  /** Pełnoekranowa warstwa grain (blend co klatkę kompozytora). false = taniej. */
+  /** Pełnoekranowa, NIERUCHOMA warstwa grain (statyczna alfa). false = taniej. */
   grain: boolean;
 }
 
-/* ── Profile tierów ────────────────────────────────────────────────────────
-   high = DOKŁADNIE obecny produkcyjny stan (mocny sprzęt nic nie traci).
-   medium = solidny laptop/tablet bez słabych sygnałów: hero + świt, bez orbit,
-            DPR≤1.25, Environment 64, bez MSAA.
-   low    = słaby laptop (Intel HD) / starszy telefon: SAM hero, 2 oktawy,
-            mediump, BEZ Environment (tanie światło), DPR 1, bez orbit/świtu,
-            bez płynnego scrolla i kursora.
-   static = brak/sw WebGL, save-data, bardzo słaby sprzęt: ZERO WebGL — czysty,
-            dopracowany poster + cała treść (H1/CTA/sekcje) jak zawsze. */
+/* ── Profile tierów (po odchudzeniu strony: 2D hero + JEDEN leniwy canvas świtu) ──
+   Strona NIE jest już ciężka (zniknął 3D-hero z literami/mgławicą/Environment),
+   więc tiery sterują dziś tylko: świtem (mały shader-quad nad stopką, IO-pauza),
+   DPR/MSAA tego canvasu, płynnym scrollem, kursorem, scrubem tła i grainem.
+   Dlatego pełne doznanie jest TANIE → wpuszczamy do niego więcej urządzeń.
+
+   high   = mocny desktop/laptop + nowoczesny telefon/tablet: wszystko, DPR≤2, MSAA.
+   medium = solidne urządzenie: wszystko jak high, DPR≤1.5, bez MSAA.
+   low    = słaby GPU / stary telefon: BEZ świtu (poster) + natywny scroll + bez
+            kursora/scruba/grainu, DPR 1 → gwarantowana płynność na lekkiej stronie.
+   static = brak/sw WebGL, save-data, skrajnie słaby sprzęt: identycznie „lite" jak low
+            (czysty poster + cała treść). */
+const LITE: TierProfile = {
+  webgl: false,
+  horizon: false,
+  dprCap: 1,
+  msaa: false,
+  frameCap: 30,
+  smoothScroll: false,
+  cursor: false,
+  pageCanvasScrub: false,
+  grain: false,
+};
 export const TIER_PROFILES: Record<Tier, TierProfile> = {
-  static: {
-    webgl: false,
-    octaves: 0,
-    precision: "mediump",
-    envRes: null,
-    stars: 0,
-    motes: 0,
-    dprCap: 1,
-    msaa: false,
-    accents: false,
-    horizon: false,
-    smoothScroll: false,
-    cursor: false,
-    pageCanvasScrub: false,
-    grain: false,
-  },
-  low: {
-    webgl: true,
-    octaves: 2,
-    precision: "mediump",
-    // BEZ PMREM (envRes null) → ścieżka hemisphere-light: zero wielosekundowego
-    // zacięcia startu + brak próbkowania IBL na literach co klatkę (na słabym iGPU
-    // to JEDEN z najdroższych kosztów liter). Litery matowe, ale rim emissive (CSM)
-    // trzyma różowo-fioletowy charakter. Reszta płynności: DPR 1.0 + cap 30 fps +
-    // tani wariant shadera kosmosu (early-out + mniej szumu) + statyczne tło/grain.
-    envRes: null,
-    stars: 150,
-    motes: 60,
-    // DPR 1.0: fill-rate jest wąskim gardłem (1.25 = ~1.56× pikseli). Watchdog może
-    // zejść jeszcze do 0.85 pod realnym obciążeniem (scene-stage).
-    dprCap: 1,
-    msaa: false,
-    accents: false,
-    horizon: false,
-    smoothScroll: false,
-    cursor: false,
-    frameCap: 30, // równe 33 ms zamiast rozchwianego 60-celu, którego iGPU nie dowozi
-    pageCanvasScrub: false, // statyczny gradient tła (koniec repaintu co klatkę)
-    grain: false, // bez pełnoekranowego blendu grain
-  },
+  static: LITE,
+  low: LITE,
   medium: {
     webgl: true,
-    octaves: 3,
-    precision: "highp",
-    envRes: 64,
-    stars: 280,
-    motes: 120,
-    dprCap: 1.5, // 1.25→1.5: ostrzejszy/płynniejszy obraz przy scrollu, bliżej high
-    msaa: false,
-    accents: false,
     horizon: true,
+    dprCap: 1.5,
+    msaa: false,
     smoothScroll: true,
     cursor: true,
     pageCanvasScrub: true,
@@ -133,15 +91,9 @@ export const TIER_PROFILES: Record<Tier, TierProfile> = {
   },
   high: {
     webgl: true,
-    octaves: 4,
-    precision: "highp",
-    envRes: 128,
-    stars: 460,
-    motes: 200,
-    dprCap: 1.75,
-    msaa: true,
-    accents: true,
     horizon: true,
+    dprCap: 2,
+    msaa: true,
     smoothScroll: true,
     cursor: true,
     pageCanvasScrub: true,
@@ -301,8 +253,12 @@ function detectTier(): Tier {
   if (coresTrusted && cores <= 2 && memKnown && (mem as number) <= 2) return "static";
 
   // ── 2. iOS/iPadOS — cores=2 (clamp WebKit) bezużyteczne → decyzja po klasie ──
-  if (isIPhone) return "low"; // iPhone: sam hero; watchdog → static gdy stary rzęzi
-  if (isIPad) return "medium"; // każdy iPad (z Pro): hero+świt, bez orbit, 1 dod. kontekst
+  // Telefon → LITE (low): na mobile świadomie NIE montujemy świtu-WebGL ani scruba
+  // tła — poster + natywny scroll są szybsze, gładsze i NIE grzeją/zjadają baterii
+  // (a świt to właśnie „świecąca kulka", którą user wskazał jako podejrzaną o lagi).
+  // Tablet → medium (więcej powierzchni, chłodniej, zwykle mocniejszy SoC).
+  if (isIPhone) return "low";
+  if (isIPad) return "medium";
 
   // ── 3. Apple desktop (Mac). Apple Silicon (cores=8 clamp) → high. Stary Intel
   //       MacBook Air (Iris Plus + Retina, dual-core → cores≤4, też „Apple GPU"
@@ -346,7 +302,9 @@ function detectTier(): Tier {
   }
   if (eff === "3g") cap(1);
   if (coarse) {
-    // Telefon → low, tablet (≥768) → medium (mobilny fill-rate; bohater = hero).
+    // Telefon (<768) → LITE (low): poster zamiast świtu-WebGL + natywny scroll =
+    // szybko, gładko, bez grzania/baterii (mobile = większość ruchu, priorytet płynność).
+    // Tablet (≥768) → medium (chłodniej, więcej mocy; świt na większym ekranie się broni).
     if (w < 768) cap(1);
     else cap(2);
   }

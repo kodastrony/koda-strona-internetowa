@@ -1,23 +1,20 @@
-"use client";
-
 /* ══════════════════════════════════════════════════════════════════════════
-   scene3d/lib — wspólny fundament silnika 3D hero strony głównej.
+   scene3d/lib — wspólne kawałki silnika WebGL.
 
-   Wspólne kawałki GLSL (simplex, dithering), paleta marki w przestrzeni three
-   i drobne hooki (wskaźnik myszy, jakość urządzenia).
+   Po odchudzeniu strony został JEDEN canvas: „świt nad planetą" w Statement
+   (horizon.tsx). Ten plik dostarcza mu paletę marki (hexy three) + wspólny GLSL
+   (simplex 3D, dithering). Stary 3D-hero (litery, mgławica, geometria, jakość
+   urządzenia, wskaźnik myszy) został usunięty — wraz z nim mulberry32 /
+   usePointerRef / useDeviceQuality / resolveLogoFontFamily (nie miały już
+   konsumentów). Detekcja możliwości urządzenia żyje w @/lib/device-tier.
 
-   Zasady wydajności (research 2026-06-10, patrz pamięć projektu):
-   - szum liczony WYŁĄCZNIE na GPU (zero per-frame pracy na CPU),
-   - dithering na ciemnych gradientach (banding na #0b0b0d),
-   - mysz/scroll czytane w useFrame z refów — nigdy przez setState.
+   Zasady wydajności: szum liczony WYŁĄCZNIE na GPU; dithering na ciemnych
+   gradientach (banding na #0b0b0d).
    ══════════════════════════════════════════════════════════════════════════ */
-
-import { useEffect, useMemo, useRef } from "react";
-import { getTier } from "@/lib/device-tier";
 
 /* ── Paleta marki (lustro tokenów globals.css w hexach three) ─────────────
    Dodatkowe stopnie ciemne (plum/deepRose) trzymają hue ~335 przy niskiej
-   luminancji — sceny gasną W markę, nie w szarość. */
+   luminancji — scena gaśnie W markę, nie w szarość. */
 export const BRAND = {
   bg: "#0b0b0d",
   bgDeep: "#070709",
@@ -36,7 +33,7 @@ export const BRAND = {
 } as const;
 
 /* ── GLSL: simplex noise 3D (Ashima Arts / Stefan Gustavson, MIT) ─────────
-   Kanoniczna implementacja używana wszędzie (drei/lamina/maxime heckel). */
+   Kanoniczna implementacja używana przez świt (relief planety + szum mgły). */
 export const GLSL_SIMPLEX_3D = /* glsl */ `
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -114,74 +111,3 @@ vec3 kodaDither(vec3 color, vec2 fragCoord) {
   return color + (ign(fragCoord) - 0.5) * (1.5 / 255.0);
 }
 `;
-
-/* ── Deterministyczny PRNG (mulberry32) ──────────────────────────────────
-   Geometrie proceduralne budujemy z USTALONEGO ziarna: render jest czystą
-   funkcją wejść (zgodność z react-hooks/purity), a scena wygląda IDENTYCZNIE
-   przy każdym wejściu — łatwiej porównywać warianty i robić screenshoty. */
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/* ── Jakość GEOMETRII liter (raz, przy montażu) ───────────────────────────
-   Steruje TYLKO szczegółem geometrii liter (buildKodaLetters3D) — reszta
-   parametrów (oktawy/Environment/cząstki/DPR) idzie z TIER_PROFILE w
-   device-tier.ts. "high" = pełna geometria tylko na tierze high; medium/low =
-   tańsza (mniej trójkątów, tańszy build). Jedno źródło prawdy = device-tier. */
-export type Quality = "low" | "high";
-
-export function useDeviceQuality(): Quality {
-  return useMemo<Quality>(() => (getTier() === "high" ? "high" : "low"), []);
-}
-
-/* ── Wskaźnik (mysz) — znormalizowany do [-1, 1], czytany w useFrame ────── */
-export interface PointerRef {
-  x: number;
-  y: number;
-}
-
-export function usePointerRef(enabled: boolean) {
-  const ref = useRef<PointerRef>({ x: 0, y: 0 });
-  useEffect(() => {
-    if (!enabled) return;
-    const onMove = (e: PointerEvent) => {
-      ref.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      ref.current.y = -((e.clientY / window.innerHeight) * 2 - 1);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [enabled]);
-  return ref;
-}
-
-/* Uwaga: scrollY sceny czytają BEZPOŚREDNIO w useFrame (window.scrollY) —
-   listener 'scroll' nie jest dostarczany w ukrytych kartach (drive-mode),
-   a bezpośredni odczyt jest zawsze aktualny i darmowy. */
-
-/* ── Font logo (Syne) dla rysowania na canvas 2D ──────────────────────────
-   next/font hashuje family name — czytamy WYLICZONĄ rodzinę z proby DOM
-   zamiast zgadywać. Zwraca string gotowy do ctx.font. */
-export async function resolveLogoFontFamily(): Promise<string> {
-  const probe = document.createElement("span");
-  probe.style.fontFamily = "var(--font-logo, Syne, sans-serif)";
-  probe.style.position = "absolute";
-  probe.style.visibility = "hidden";
-  probe.textContent = "K";
-  document.body.appendChild(probe);
-  const family = getComputedStyle(probe).fontFamily || "Syne, sans-serif";
-  probe.remove();
-  try {
-    await document.fonts.load(`800 200px ${family}`);
-    await document.fonts.ready;
-  } catch {
-    /* noop — fallback glify i tak się narysują */
-  }
-  return family;
-}

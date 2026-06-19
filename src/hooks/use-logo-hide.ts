@@ -67,8 +67,16 @@ export function useLogoHidden<T extends HTMLElement>(logoRef: RefObject<T | null
         if (r.width === 0 && r.height === 0) continue;
         if (r.top < minTop) minTop = r.top;
       }
+
       if (minTop === Infinity) {
-        commit(false); // no anchor on this page → never auto-hide
+        // ── UNIVERSAL FALLBACK (pages without a hide-anchor: 404, privacy, etc.) ──
+        // Behaviour stays identical to the anchor pages — "hide once you've scrolled
+        // onto content, show again at the very top" — but keyed off scrollY instead
+        // of an anchor. The logo is fixed, so once scrollY passes the logo's own
+        // bottom edge the page content has risen under it. Same hysteresis as below.
+        const y = window.scrollY;
+        const next = hiddenRef.current ? y > hideLine - HYST : y > hideLine;
+        commit(next);
         return;
       }
 

@@ -12,7 +12,7 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 export const metadata: Metadata = pageMetadata({
   title: "Realizacje stron internetowych",
   description:
-    "Realizacje KODA — koncepcyjne strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Zobacz, jak pracujemy.",
+    "Realizacje KODA — strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Realne marki i autorskie koncepty.",
   path: "/realizacje/",
 });
 

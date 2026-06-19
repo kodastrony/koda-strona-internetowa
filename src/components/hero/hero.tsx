@@ -6,7 +6,9 @@ import { EASE } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { PillLink } from "@/components/ui/pill-link";
-import { KODA_FILL } from "./hero-config";
+import { introHasPlayed, markIntroPlayed } from "@/lib/intro-state";
+import { useThemeValue } from "@/lib/theme";
+import { KODA_FILL, KODA_FILL_LIGHT } from "./hero-config";
 import { HeroBackground } from "./hero-background";
 import { HeroIntro } from "./hero-intro";
 import { KodaColumnLetters, KODA_LEFT } from "./koda-letters";
@@ -22,11 +24,18 @@ import { KodaColumnLetters, KODA_LEFT } from "./koda-letters";
    na <lg wyśrodkowany napis KODA znika ZANIM pojawi się treść (zero nakładania,
    niezależnie od czasu ładowania fontów), a handoff na ≥lg jest piksel-w-piksel.
 
-   INTRO RAZ NA SESJĘ (sessionStorage) — powrót na stronę = treść od razu, bez
-   powtórki. reduced-motion → bez intro, treść natychmiast. Hero jest ZAWSZE ciemny.
-   ══════════════════════════════════════════════════════════════════════════ */
+   ★ ZERO BŁYSKU WEJŚCIA: overlay intro renderuje się już w SSR/pierwszej klatce
+   (introActive startuje true, gdy intro jeszcze nie grało w tym załadowaniu),
+   więc PIERWSZY namalowany kadr to ciemna kurtyna intro — nie ma migawki „gotowego
+   hero", która potem przeskakuje na animację. Treść (i trwała kolumna KODA na ≥lg)
+   wjeżdża dopiero gdy `revealed` = true (po onDone intro).
 
-const INTRO_SEEN_KEY = "koda-intro-seen";
+   INTRO PRZY KAŻDYM ODŚWIEŻENIU (flaga modułowa intro-state, NIE sessionStorage) —
+   nowe wejście/F5 = znów wita; powrót w obrębie sesji SPA = treść od razu, bez
+   powtórki. reduced-motion → bez intro (kurtyna ukryta CSS-em), treść natychmiast.
+   Hero ADAPTUJE się do motywu (☾ ciemna aurora / ☀ świetlista porcelana) — tło,
+   litery KODA, intro i tokeny mają warianty jasne (useThemeValue).
+   ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Treść hero (H1/opis/CTA — tekst bez zmian). Wjeżdża, gdy `play` = true. ── */
 function HeroCopy({ play }: { play: boolean }) {
@@ -125,9 +134,15 @@ function HeroCopy({ play }: { play: boolean }) {
   );
 }
 
-/* ── Wskaźnik SCROLL (czytelny na ciemnym tle), tylko ≥lg. Pojawia się z treścią. ── */
-function ScrollHint({ play }: { play: boolean }) {
+/* ── Wskaźnik SCROLL, tylko ≥lg. Pojawia się z treścią. Kolory adaptują się do
+      motywu (atrament na porcelanie / biel na ciemnej aurorze). ── */
+function ScrollHint({ play, light }: { play: boolean; light: boolean }) {
   const reduce = useReducedMotion();
+  const track = light ? "rgba(22,16,31,0.12)" : "rgba(255,255,255,0.08)";
+  const beam = light
+    ? "linear-gradient(to bottom, transparent, rgba(22,16,31,0.34), transparent)"
+    : "linear-gradient(to bottom, transparent, rgba(255,255,255,0.32), transparent)";
+  const labelColor = light ? "rgba(22,16,31,0.32)" : "rgba(255,255,255,0.2)";
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -138,14 +153,11 @@ function ScrollHint({ play }: { play: boolean }) {
       style={{ zIndex: 10 }}
     >
       <div className="relative h-14 w-px overflow-hidden">
-        <div className="absolute inset-0" style={{ backgroundColor: "rgba(255,255,255,0.08)" }} />
+        <div className="absolute inset-0" style={{ backgroundColor: track }} />
         {!reduce && (
           <motion.div
             className="absolute inset-x-0 top-0 h-6"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.32), transparent)",
-            }}
+            style={{ background: beam }}
             animate={{ y: ["-100%", "200%"] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "linear", repeatDelay: 0.6 }}
           />
@@ -158,7 +170,7 @@ function ScrollHint({ play }: { play: boolean }) {
           fontWeight: 700,
           letterSpacing: "0.35em",
           textTransform: "uppercase" as const,
-          color: "rgba(255,255,255,0.2)",
+          color: labelColor,
           writingMode: "vertical-rl" as const,
         }}
       >
@@ -170,42 +182,33 @@ function ScrollHint({ play }: { play: boolean }) {
 
 export function Hero() {
   const reduce = useReducedMotion();
-  // introActive/revealed startują false (SSR + 1. klatka klienta = brak overlayu,
-  // treść w stanie wejściowym) → ZERO niezgodności hydracji. Decyzja w efekcie.
-  const [introActive, setIntroActive] = useState(false);
-  const [revealed, setRevealed] = useState(false);
+  const light = useThemeValue() === "light";
+  // ★ Stan startuje na podstawie flagi modułowej (introHasPlayed), IDENTYCZNEJ na
+  // serwerze i w pierwszej klatce klienta (na świeżym ładowaniu = false) → zero
+  // niezgodności hydracji. Na świeżym wejściu: introActive=true (kurtyna w SSR =
+  // brak błysku), revealed=false. Na powrocie SPA (flaga już true): introActive=
+  // false, revealed=true (treść od razu, bez kurtyny). reduced-motion korygowany
+  // w efekcie (overlay i tak ukryty CSS-em — patrz globals.css).
+  const [introActive, setIntroActive] = useState(() => !introHasPlayed());
+  const [revealed, setRevealed] = useState(() => introHasPlayed());
 
-  // Jednorazowa, KLIENT-ONLY decyzja po mount (czyta sessionStorage, którego NIE ma
-  // na serwerze). setState w efekcie jest tu ZAMIERZONE: stany startują false (zgodnie
-  // z SSR → zero niezgodności hydracji), a efekt je koryguje po pierwszym malowaniu.
+  // reduced-motion / brak intro → treść natychmiast (klient-only; SSR renderuje
+  // stan świeżego wejścia, efekt go koryguje po pierwszym malowaniu).
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (reduce) {
-      setRevealed(true); // bez ruchu → treść od razu, bez intro
-      return;
+      markIntroPlayed();
+      setIntroActive(false);
+      setRevealed(true);
     }
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
-    } catch {
-      /* prywatny tryb / brak dostępu → potraktuj jak pierwszą wizytę */
-    }
-    if (seen) {
-      setRevealed(true); // powrót w tej samej sesji → bez powtórki intro
-      return;
-    }
-    try {
-      sessionStorage.setItem(INTRO_SEEN_KEY, "1");
-    } catch {
-      /* noop */
-    }
-    setIntroActive(true);
   }, [reduce]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Koniec/pominięcie intro: zdejmij overlay i ODSŁOŃ treść + trwałą kolumnę (≥lg)
-  // w TYM SAMYM commicie → handoff piksel-w-piksel, brak nakładania na <lg.
+  // Koniec/pominięcie intro: oznacz odegrane (Header czyta tę flagę), zdejmij
+  // overlay i ODSŁOŃ treść + trwałą kolumnę (≥lg) w TYM SAMYM commicie → handoff
+  // piksel-w-piksel, brak nakładania na <lg.
   const onIntroDone = () => {
+    markIntroPlayed();
     setIntroActive(false);
     setRevealed(true);
   };
@@ -218,20 +221,29 @@ export function Hero() {
 
   return (
     <section
-      // Hero jest ZAWSZE ciemny (ciemna aurora). Wymusza własne ciemne tokeny
-      // ink/accent (poniżej) → treść czytelna i header „dark" (białe logo + różowy
-      // pill KONTAKT) niezależnie od globalnego motywu jasny/ciemny strony.
-      data-header-theme="dark"
+      // Hero ADAPTUJE się do motywu: ciemna aurora (☾) albo świetlista porcelana
+      // (☀). Wymusza komplet tokenów ink/accent pod swoje tło, więc treść jest
+      // czytelna, a header dostaje właściwy motyw (białe logo na ciemnym / atrament
+      // na jasnym; mapowanie dark→light robi i tak useHeaderTheme).
+      data-header-theme={light ? "light" : "dark"}
       data-canvas="hero"
       className="relative flex min-h-svh flex-col overflow-hidden"
       style={
-        {
-          "--color-ink": "#f5f5f7",
-          "--color-ink-muted": "#b2b2ba",
-          "--color-ink-faint": "#94949d",
-          "--color-accent": "#cf43b8",
-          "--color-pink": "#cf43b8",
-        } as React.CSSProperties
+        (light
+          ? {
+              "--color-ink": "#16101f",
+              "--color-ink-muted": "#4e4459",
+              "--color-ink-faint": "#6f6379",
+              "--color-accent": "#b32a9d",
+              "--color-pink": "#b32a9d",
+            }
+          : {
+              "--color-ink": "#f5f5f7",
+              "--color-ink-muted": "#b2b2ba",
+              "--color-ink-faint": "#94949d",
+              "--color-accent": "#cf43b8",
+              "--color-pink": "#cf43b8",
+            }) as React.CSSProperties
       }
     >
       {/* ── TŁO hero (aurora) z miękką MASKĄ u dołu. Maska wygasza TYLKO TŁO do
@@ -251,7 +263,7 @@ export function Hero() {
           WebkitMaskRepeat: "no-repeat",
         }}
       >
-        <HeroBackground />
+        <HeroBackground light={light} />
       </div>
 
       {/* ── ≥lg: WIELKA, off-center pionowa kolumna KODA — TRWAŁA (backdrop).
@@ -272,10 +284,10 @@ export function Hero() {
           willChange: "transform",
         }}
       >
-        <KodaColumnLetters fill={KODA_FILL} />
+        <KodaColumnLetters fill={light ? KODA_FILL_LIGHT : KODA_FILL} />
       </motion.div>
 
-      <ScrollHint play={revealed} />
+      <ScrollHint play={revealed} light={light} />
 
       {/* ── Treść (z-hero-content). W trakcie intro NIEKLIKALNA (klik = „pomiń").
             Wjeżdża przez `play={revealed}` — czyli PO intro. ── */}
@@ -285,8 +297,14 @@ export function Hero() {
         }`}
         style={reduce ? undefined : { opacity: copyOpacity, y: copyY }}
       >
+        {/* Rozmieszczenie treści w pionie:
+            • telefon (<md): justify-start — treść od razu pod headerem (czytelna
+              natychmiast, bez spychania pod zagięcie),
+            • tablet/„między" (≥md, <lg) i desktop (≥lg): justify-center — bez
+              kolumny KODA (ukryta <lg) treść WYŚRODKOWANA w pionie, więc nie wisi
+              w lewym-górnym rogu nad pustą aurorą (to wyglądało niezbalansowanie). */}
         <div
-          className="flex flex-1 flex-col justify-start lg:justify-center"
+          className="flex flex-1 flex-col justify-start md:justify-center"
           style={{ paddingBottom: "clamp(50px, 7vh, 90px)" }}
         >
           <HeroCopy play={revealed} />
@@ -294,7 +312,7 @@ export function Hero() {
       </motion.div>
 
       {/* ── Overlay intro (z-intro) — montowany tylko gdy intro faktycznie gra. ── */}
-      {introActive && <HeroIntro onDone={onIntroDone} />}
+      {introActive && <HeroIntro onDone={onIntroDone} light={light} />}
     </section>
   );
 }

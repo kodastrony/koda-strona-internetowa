@@ -88,7 +88,7 @@ function Node({
         initial={{ opacity: 0 }}
         animate={lit}
         transition={litTransition}
-        style={{ fontSize: numberSize, color: "#0b0b0d", letterSpacing: "-0.02em" }}
+        style={{ fontSize: numberSize, color: "var(--color-on-accent)", letterSpacing: "-0.02em" }}
       >
         {n}
       </motion.span>

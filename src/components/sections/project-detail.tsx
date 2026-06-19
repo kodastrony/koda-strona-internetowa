@@ -95,8 +95,7 @@ export function ProjectDetail({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-0"
           style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(circle, var(--dot-grid) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
@@ -234,8 +233,8 @@ export function ProjectDetail({
             <div
               className="relative overflow-hidden rounded-[24px]"
               style={{
-                border: "1px solid rgba(255,255,255,0.09)",
-                boxShadow: `0 50px 110px -40px rgba(0,0,0,0.7), 0 0 120px -40px rgba(${project.rgb},0.35)`,
+                border: "1px solid var(--color-line)",
+                boxShadow: `0 50px 110px -42px rgba(0,0,0,0.5), 0 0 120px -40px rgba(${project.rgb},0.32)`,
               }}
             >
               <div className="relative" style={{ paddingBottom: "62.5%" }}>
@@ -366,8 +365,8 @@ export function ProjectDetail({
                 <div
                   className="relative overflow-hidden rounded-[20px]"
                   style={{
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    boxShadow: "0 40px 90px -44px rgba(0,0,0,0.6)",
+                    border: "1px solid var(--color-line)",
+                    boxShadow: "0 40px 90px -46px rgba(0,0,0,0.45)",
                   }}
                 >
                   <div className="relative" style={{ paddingBottom: "62.5%" }}>
@@ -766,8 +765,8 @@ export function ProjectDetail({
               <div
                 className="relative overflow-hidden rounded-[24px]"
                 style={{
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  boxShadow: "0 40px 90px -44px rgba(0,0,0,0.6)",
+                  border: "1px solid var(--color-line)",
+                  boxShadow: "0 40px 90px -46px rgba(0,0,0,0.45)",
                 }}
               >
                 <div className="relative" style={{ paddingBottom: "42%" }}>

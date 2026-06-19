@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useRef, useState, type RefObject } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -26,11 +27,25 @@ export function Header() {
   const [origin, setOrigin] = useState<Origin | null>(null);
   const theme = useHeaderTheme();
 
-  // Wejście headera jest zsync z intro tylko gdy intro gra (1. twarde wejście,
-  // bez reduced-motion). Inaczej (SPA / reduced-motion) header jest od razu —
-  // bez ~2.4 s pustego paska. Spójne z Hero.
+  // Wejście headera jest zsync z intro TYLKO gdy intro faktycznie gra: strona
+  // główna („/"), pierwsze twarde wejście, bez reduced-motion. Na podstronach
+  // (brak intro), powrocie SPA (flaga introHasPlayed) i reduced-motion header
+  // wjeżdża od razu — bez ~1.9 s pustego paska. Spójne z Hero (ta sama flaga).
   const reduce = useReducedMotion();
-  const base = reduce || introHasPlayed() ? 0 : INTRO_DURATION;
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const base = reduce || !isHome || introHasPlayed() ? 0 : INTRO_DURATION;
+
+  // ── Zamknij menu przy KAŻDEJ zmianie trasy (defensywnie) ──────────────────
+  // Pozycje menu mają już onClick={onClose}, ale to gwarantuje, że overlay NIGDY
+  // nie zostaje otwarty po nawigacji — także przez back/forward, klik w pozycję
+  // będącą bieżącą trasą, czy nawigację programową. (Hash typu „/#faq" nie zmienia
+  // pathname → tam zamyka onClick={onClose}; oba mechanizmy razem pokrywają wszystko.)
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Na białym menu (open) elementy headera są ciemne — niezależnie od sekcji.
   const light = open || theme === "light";

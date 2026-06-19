@@ -43,7 +43,7 @@ export function SuccessCheck() {
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <motion.path
             d="M5 12.5L10 17.5L19 7"
-            stroke="#0b0b0d"
+            stroke="var(--color-on-accent)"
             strokeWidth="2.4"
             strokeLinecap="round"
             strokeLinejoin="round"

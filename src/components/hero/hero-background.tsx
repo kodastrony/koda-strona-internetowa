@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { GlowField } from "@/components/fx/glow-field";
-import { HERO_BASE } from "./hero-config";
+import { HERO_BASE, HERO_BASE_LIGHT } from "./hero-config";
 
 /* ══════════════════════════════════════════════════════════════════════════
    HeroBackground — ciemna AURORA marki pod hero (wypełnia absolute inset-0).
@@ -52,10 +52,75 @@ function useMouseParallax(amount: number) {
   return { px, py };
 }
 
-export function HeroBackground() {
-  const { px, py } = useMouseParallax(48);
+export function HeroBackground({ light = false }: { light?: boolean }) {
+  const { px, py } = useMouseParallax(light ? 36 : 48);
   const vx = useTransform(px, (v) => v * -0.6);
   const vy = useTransform(py, (v) => v * -0.6);
+
+  // ── Wariant JASNY (porcelana) ────────────────────────────────────────────
+  // Świetlista aurora na papierze: trzy miękkie pastelowe poświaty (róż lewa-
+  // góra, fiolet prawa-góra, indygo dół-prawa) + ukośna „wstęga" światła. Dwie
+  // poświaty dryfują z myszą (głębia). Baza półprzezroczysta → globalny
+  // PageCanvas (porcelana + pastel) prześwituje, a dolna maska (w hero.tsx)
+  // rozpływa hero w resztę strony. Kolory marki, ale jasne i przewiewne.
+  if (light) {
+    return (
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 overflow-hidden"
+        style={{ backgroundColor: HERO_BASE_LIGHT }}
+      >
+        {/* Delikatny pionowy gradient: u góry minimalnie jaśniej (światło z góry) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(180deg, #fbf9fc 0%, #f7f4f8 52%, #f3eef7 100%)",
+          }}
+        />
+        {/* Ukośna wstęga światła — echo ciemnej wstęgi aurory, ale jasne */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(118deg, transparent 26%, rgba(207,67,184,0.07) 48%, rgba(124,76,222,0.06) 62%, transparent 80%)",
+            maskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
+          }}
+        />
+        {/* Pastelowe poświaty (róż / fiolet) — dryf z myszą */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            x: px,
+            y: py,
+            willChange: "transform",
+            background:
+              "radial-gradient(46% 40% at 16% 12%, rgba(207,67,184,0.20) 0%, rgba(207,67,184,0) 64%)",
+          }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            x: vx,
+            y: vy,
+            willChange: "transform",
+            background:
+              "radial-gradient(44% 38% at 88% 14%, rgba(124,76,222,0.17) 0%, rgba(124,76,222,0) 66%)",
+          }}
+        />
+        {/* Indygowy akcent u dołu — kotwiczy kompozycję, nie dryfuje */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(64% 46% at 80% 96%, rgba(77,98,224,0.12) 0%, rgba(77,98,224,0) 72%)",
+            maskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

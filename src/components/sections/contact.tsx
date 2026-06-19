@@ -181,7 +181,7 @@ function FloatingField({
         </motion.p>
       )}
       {!invalid && hint && (
-        <p id={`${id}-hint`} className="pl-1 font-body text-[12px] leading-snug text-black/45">
+        <p id={`${id}-hint`} className="pl-1 font-body text-[12px] leading-snug text-black/60">
           {hint}
         </p>
       )}
@@ -271,7 +271,7 @@ function FileAttach({
                 onClick={() => onRemove(i)}
                 disabled={disabled}
                 aria-label={`Usuń plik ${f.name}`}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-black/45 transition-colors duration-200 hover:bg-black/5 hover:text-black/80"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-black/60 transition-colors duration-200 hover:bg-black/5 hover:text-black/80"
               >
                 <svg width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true">
                   <path
@@ -339,7 +339,7 @@ function FileAttach({
           </span>
         </button>
       ) : (
-        <p className="pl-1 font-body text-[12px] leading-snug text-black/45">
+        <p className="pl-1 font-body text-[12px] leading-snug text-black/60">
           Dodano maksymalną liczbę plików ({MAX_FILES}).
         </p>
       )}
@@ -739,13 +739,16 @@ export function Contact() {
                   disabled={isLoading}
                   className={cn(
                     "group inline-flex items-center justify-center gap-3 rounded-full px-8 py-4",
-                    "font-heading text-[14px] font-bold tracking-[0.1em] text-[#0f0f0f] uppercase",
+                    "font-heading text-[14px] font-bold tracking-[0.1em] uppercase",
                     "bg-pink transition-[transform,box-shadow] duration-300",
                     isLoading
                       ? "cursor-not-allowed opacity-70"
                       : "cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_rgba(207,67,184,0.6)] active:translate-y-0 active:scale-[0.98]"
                   )}
-                  style={{ transitionTimingFunction: EXPO }}
+                  // Etykieta na różowym wypełnieniu: --color-on-accent = biel w jasnym
+                  // motywie (na ciemniejszym #b32a9d daje ≥5:1; ciemny atrament spadał <AA),
+                  // a w ciemnym = near-black na jaśniejszym #cf43b8. Oba ≥AA.
+                  style={{ transitionTimingFunction: EXPO, color: "var(--color-on-accent)" }}
                 >
                   {isLoading ? (
                     <>
@@ -770,7 +773,7 @@ export function Contact() {
                 </p>
               </div>
               {/* RODO — krótko, dokładnie w momencie decyzji */}
-              <p className="mt-4 max-w-[460px] font-body text-[12px] leading-snug text-black/45">
+              <p className="mt-4 max-w-[460px] font-body text-[12px] leading-snug text-black/60">
                 Twoje dane wykorzystamy tylko do przygotowania wyceny. Bez spamu. Więcej w{" "}
                 <a
                   href="/polityka-prywatnosci/"

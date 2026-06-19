@@ -68,7 +68,7 @@ export const DURATION = {
  *
  * Real phase sum (po skróceniu, audyt): Phase 0 (~0.16s) + Phase 1 letters
  * (0.7 + 0.3 stagger) + 0.06 hold + Phase 3 lines (0.7) ≈ 1.9s.
- * See intro-animation.tsx. (Intro gra raz na sesję — patrz intro-state.ts.)
+ * See hero-intro.tsx. (Intro gra przy KAŻDYM odświeżeniu — patrz intro-state.ts.)
  */
 export const INTRO_DURATION = 1.9;
 

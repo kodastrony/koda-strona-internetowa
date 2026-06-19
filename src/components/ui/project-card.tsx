@@ -7,6 +7,7 @@ import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "motion/react";
 import { EASE, cssBezier } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
+import { cn } from "@/lib/utils";
 import type { Project } from "@/lib/projects";
 
 /* ── MockWebsite — decorative fallback ─────────────────────────────────────
@@ -86,11 +87,27 @@ export function ProjectCard({
   project,
   delay = 0,
   priority = false,
+  aspectPct = 75,
+  aspectClassName,
+  imageSrc,
+  imageSrcSet,
+  sizes = "(min-width: 768px) 45vw, 92vw",
 }: {
   project: Project;
   delay?: number;
   /** Eager-load the image (first row on /realizacje). Default lazy. */
   priority?: boolean;
+  /** Frame aspect as a padding-bottom percentage. Default 75 = 4:3. */
+  aspectPct?: number;
+  /** Responsive frame aspect via Tailwind pb-[%] classes (overrides aspectPct).
+   *  e.g. "pb-[62%] sm:pb-[52%] lg:pb-[46%]" for a bento lead. */
+  aspectClassName?: string;
+  /** Override the card image (e.g. a wide `showcase` for a bento lead card). */
+  imageSrc?: string;
+  /** Explicit srcset when using `imageSrc` (which has no auto -640 sibling). */
+  imageSrcSet?: string;
+  /** Responsive sizes hint for the card image. */
+  sizes?: string;
 }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -168,7 +185,12 @@ export function ProjectCard({
     };
   }, [hovered, measure]);
 
+  // Only the 4:3 card crop ships a -640 variant; a wide `imageSrc` override
+  // (e.g. showcase) has none, so skip the srcset to avoid 404s.
+  const img = imageSrc ?? project.image;
+  const has640 = !imageSrc;
   const src640 = project.image.replace(/\.webp$/, "-640.webp");
+  const srcSet = has640 ? `${src640} 640w, ${project.image} 1200w` : imageSrcSet;
 
   return (
     <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>
@@ -191,22 +213,26 @@ export function ProjectCard({
             <div
               className="relative overflow-hidden rounded-[22px]"
               style={{
-                border: "1px solid rgba(255,255,255,0.09)",
+                border: "1px solid var(--color-line)",
                 transition: `box-shadow 600ms ${cssBezier(EASE.expo)}`,
                 boxShadow: hovered
                   ? `0 44px 90px -34px rgba(0,0,0,0.78), 0 0 80px -22px rgba(${project.rgb},0.42)`
                   : "0 26px 60px -36px rgba(0,0,0,0.6)",
               }}
             >
-              {/* 4:3 frame — the #1 cohesion lever across all cards. */}
-              <div className="relative" style={{ paddingBottom: "75%" }}>
+              {/* Locked frame ratio — the #1 cohesion lever across cards
+                  (4:3 default; aspectClassName drives a responsive bento lead). */}
+              <div
+                className={cn("relative", aspectClassName)}
+                style={aspectClassName ? undefined : { paddingBottom: `${aspectPct}%` }}
+              >
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
-                {project.image ? (
+                {img ? (
                   <img
-                    src={project.image}
-                    srcSet={`${src640} 640w, ${project.image} 1200w`}
-                    sizes="(min-width: 768px) 45vw, 92vw"
+                    src={img}
+                    srcSet={srcSet}
+                    sizes={sizes}
                     alt={`${project.title} — ${project.type}`}
                     width={1200}
                     height={900}
@@ -230,7 +256,7 @@ export function ProjectCard({
                   <video
                     ref={videoRef}
                     src={project.video}
-                    poster={project.image}
+                    poster={img}
                     muted
                     loop
                     playsInline

@@ -6,15 +6,16 @@
  * the full case study and the per-page JSON-LD.
  *
  * HONESTY NOTE (critical — never break): every project below is a fully built,
- * LIVE website (see `liveUrl`) that KODA designed and coded from scratch — but
- * each is for a FICTIONAL brand, built as a showcase of how we work. So:
- *   • never present a project as a real paying client,
- *   • never imply KODA was hired or paid for it,
- *   • NEVER fabricate a business metric (no "+70% konwersji").
- * `concept: true` renders the honest "Koncept" framing. The verifiable craft
- * proof in `metrics` is the credible substitute for fake KPIs — a viewer can
- * confirm every number by opening the live demo. When a REAL client project
- * lands, add it with concept omitted/false and real copy.
+ * LIVE website (see `liveUrl`) that KODA designed and coded from scratch.
+ *   • `concept: true` → a FICTIONAL brand built purely as a showcase of how we
+ *     work; renders the honest "Koncept" framing. Never present it as a real
+ *     paying client and never imply KODA was hired or paid for it.
+ *   • concept omitted/false → a REAL brand with a real product (e.g. DrBlocks,
+ *     JR Modular Systems) whose site KODA built; copy describes only what was
+ *     built, never a hire/payment we can't prove.
+ *   • In BOTH cases: NEVER fabricate a business metric (no "+70% konwersji").
+ * The verifiable craft proof in `metrics` is the credible substitute for fake
+ * KPIs — a viewer can confirm every claim by opening the live site.
  */
 
 /** A deliberate design decision, framed constraint → choice → benefit. */
@@ -186,6 +187,186 @@ export const PROJECTS: Project[] = [
     bg: "linear-gradient(150deg,#0e1a14 0%,#13241c 55%,#1b3327 100%)",
     glow: "#efb24a",
     rgb: "239,178,74",
+  },
+  {
+    id: "jr-modular",
+    title: "JR Modular Systems",
+    tagline: "Budynki modułowe, które układasz w 3D",
+    type: "Strona firmowa z konfiguratorem 3D",
+    year: "2026",
+    client: "Budownictwo modułowe",
+    liveUrl: "https://jr-modular-systems.kodastrony.pl",
+    summary:
+      "Producent budynków modułowych z filmowym hero i konfiguratorem 3D — układasz obiekt z kontenerów 20'/40', dokładasz okna, drzwi, panele PV i taras.",
+    intro:
+      "JR Modular Systems stawia budynki z modułów — biura, przedszkola, gastronomię, hotele. Stronie daliśmy filmowy, przemysłowy charakter i autorski konfigurator 3D: klient układa swój obiekt z kontenerów 20' i 40', piętruje moduły, dokłada okna, drzwi, panele PV i taras — a gotowy projekt wysyła do wyceny.",
+    challengeTitle: "Modułowy producent musi pokazać skalę i elastyczność naraz.",
+    challenge:
+      "Budynki z kontenerów żyją elastycznością — można je łączyć, piętrować i dowolnie konfigurować. Trudno to oddać galerią cudzych realizacji; klient chce zobaczyć WŁASNY obiekt, zanim zapyta o cenę.",
+    decisions: [
+      {
+        constraint: "Modułowości nie odda zdjęcie gotowej realizacji.",
+        choice: "Zbudowaliśmy konfigurator 3D — klient układa obiekt z modułów 20'/40' na placu.",
+        benefit: "Każdy projektuje swój budynek, nie ogląda cudzego.",
+      },
+      {
+        constraint: "Pierwsze sekundy decydują, czy ktoś zostaje.",
+        choice: "Hero to filmowe, surowe ujęcia montażu modułów dźwigiem na żywo.",
+        benefit: "Marka od razu mówi „robimy to naprawdę, w skali”.",
+      },
+      {
+        constraint: "Konfigurator 3D bywa ciężki i nieczytelny.",
+        choice:
+          "Izometryczny plac z siatką, podpowiedzi krok po kroku i licznik modułów/m²/kondygnacji.",
+        benefit: "Składanie obiektu jest proste jak układanie klocków.",
+      },
+    ],
+    scope: [
+      "Projekt i kierunek wizualny",
+      "Konfigurator 3D obiektów modułowych (Three.js)",
+      "Filmowy hero i montaż treści",
+      "Architektura oferty (8 typów obiektów)",
+      "Realizacje, proces i FAQ",
+      "SEO, wydajność i dostępność",
+    ],
+    deliverables: [
+      "Konfigurator 3D: moduły 20'/40', piętrowanie, okna, drzwi, panele PV i taras",
+      "Licznik modułów, metrażu i kondygnacji liczony na żywo",
+      "Filmowy hero budujący zaufanie od pierwszego ekranu",
+      "Komplet pod SEO: dane strukturalne firmy, sitemap, Open Graph",
+    ],
+    features: [
+      {
+        title: "Konfigurator 3D „Kreator”",
+        desc: "Układasz obiekt z kontenerów 20' i 40' na placu, stawiasz piętra i od razu widzisz metraż, liczbę modułów i kondygnacji.",
+      },
+      {
+        title: "Okna, drzwi, taras, PV",
+        desc: "Detale dokładasz na właściwych ścianach i dachach — konfigurator pilnuje, co gdzie pasuje (np. ostrzega „brak podpory”).",
+      },
+      {
+        title: "Filmowy hero",
+        desc: "Surowe, czarno-białe ujęcia montażu modułów dźwigiem — strona od pierwszej sekundy mówi „prawdziwa produkcja”.",
+      },
+      {
+        title: "Pełna oferta i realizacje",
+        desc: "Osiem typów obiektów, proces w pięciu krokach i galeria realizacji — jeden spójny, przemysłowy świat.",
+      },
+    ],
+    metrics: [
+      { value: "Konfigurator 3D", label: "Twój obiekt z modułów 20'/40' w przeglądarce" },
+      { value: "20' / 40'", label: "Moduły ISO, piętrowanie, okna, drzwi, taras, PV" },
+      { value: "320–2560 px", label: "Telefon → 4K" },
+    ],
+    tech: ["Three.js", "WebGL", "JavaScript", "SPA (hash-router)"],
+    image: "/realizacje/jr-card.webp",
+    showcase: "/realizacje/jr-showcase.webp",
+    gallery: [
+      {
+        src: "/realizacje/jr-g1.webp",
+        caption: "Realizacje obiektów modułowych — biura, gastronomia, pawilony i strefy eventowe.",
+      },
+      {
+        src: "/realizacje/jr-g2.webp",
+        caption: "Oferta podzielona na osiem typów obiektów — każdy z własnym kontekstem.",
+      },
+    ],
+    mobileImage: "/realizacje/jr-mobile.webp",
+    video: "/realizacje/jr.mp4",
+    poster: "/realizacje/jr-poster.webp",
+    bg: "linear-gradient(150deg,#14130e 0%,#201d12 55%,#2b2614 100%)",
+    glow: "#f4c020",
+    rgb: "244,192,32",
+  },
+  {
+    id: "drblocks",
+    title: "DrBlocks",
+    tagline: "Regulowane bloczki fundamentowe, których dotkniesz w 3D",
+    type: "Strona produktowa z modelem 3D",
+    year: "2026",
+    client: "Fundamenty & budownictwo",
+    liveUrl: "https://drblocks.kodastrony.pl",
+    summary:
+      "Strona regulowanych bloczków fundamentowych z interaktywnym modelem 3D i kalkulatorem, który dobiera rozstaw, rozkłada podpory i sprawdza nośność.",
+    intro:
+      "DrBlocks to system regulowanych bloczków fundamentowych — fundament w jeden dzień, bez wylewki i tygodni schnięcia. Zamiast katalogu zbudowaliśmy stronę, która pokazuje produkt tak, jak działa: pełny bloczek w 3D z regulacją wysokości na żywo i kalkulator, który dobiera rozstaw, liczy podpory i sprawdza nośność.",
+    challengeTitle: "Inżynierski produkt, którego nie sprzeda zdjęcie w katalogu.",
+    challenge:
+      "Regulowany bloczek fundamentowy to konkret: beton B30, stalowa stopa, śruby M16, regulacja co do milimetra. Z płaskiego zdjęcia klient nie zobaczy, jak to działa — ani ile bloczków potrzebuje pod swój taras czy dom modułowy.",
+    decisions: [
+      {
+        constraint: "Bloczka trudno docenić ze zdjęcia.",
+        choice: "Zbudowaliśmy interaktywny model 3D — obrót, zoom i regulacja 120–200 mm na żywo.",
+        benefit: "Klient rozumie konstrukcję, zanim cokolwiek zamówi.",
+      },
+      {
+        constraint: "Klienci nie wiedzą, ile bloczków kupić.",
+        choice: "Kalkulator doboru liczy rozstaw, podpory i nośność na bazie researchu.",
+        benefit: "Realna wstępna ocena zamiast zgadywanki — i gotowy lead.",
+      },
+      {
+        constraint: "Ciężki render 3D potrafi ściąć telefon.",
+        choice:
+          "Pętla renderu pauzuje poza ekranem i w trakcie scrolla, jakość dobiera się do sprzętu.",
+        benefit: "Płynnie i na mocnym PC, i na słabszym telefonie.",
+      },
+    ],
+    scope: [
+      "Projekt i kierunek wizualny",
+      "Interaktywny model bloczka 3D (React Three Fiber)",
+      "Kalkulator doboru bloczków",
+      "Treść techniczna (specyfikacja, FAQ, blog)",
+      "Optymalizacja wydajności 3D",
+      "SEO, dane strukturalne i dostępność",
+    ],
+    deliverables: [
+      "Pełny model bloczka generowany w przeglądarce — zero plików do pobrania",
+      "Kalkulator liczący rozstaw, podpory i nośność z realnego researchu",
+      "Pętla renderu 3D pauzowana poza ekranem — płynny scroll na słabszym sprzęcie",
+      "Komplet pod SEO: dane strukturalne produktu, sitemap, Open Graph",
+    ],
+    features: [
+      {
+        title: "Bloczek w 3D",
+        desc: "Cały bloczek w przeglądarce: obrót, zoom, wariant Standard/Plus i suwak regulacji 120–200 mm, który na żywo unosi stalową stopę.",
+      },
+      {
+        title: "Kalkulator doboru",
+        desc: "Wybierasz zastosowanie i wymiary, a kalkulator rozkłada podpory (narożniki, obwód, siatka), liczy bloczki i sprawdza nośność.",
+      },
+      {
+        title: "Etykiety części",
+        desc: "Włączasz opisy, a model sam pokazuje korpus B30, stopę, śruby M16 i chwytak magnetyczny — jak instrukcja, tylko interaktywna.",
+      },
+      {
+        title: "Spokojny, techniczny wygląd",
+        desc: "Dużo światła, czytelna typografia i jeden akcent — strona mówi „precyzja”, a nie „katalog”.",
+      },
+    ],
+    metrics: [
+      { value: "Model 3D", label: "Bloczek w przeglądarce — obrót, zoom, regulacja na żywo" },
+      { value: "Kalkulator", label: "Liczy rozstaw, podpory i nośność z researchu" },
+      { value: "320–2560 px", label: "Telefon → 4K" },
+    ],
+    tech: ["Next.js", "React Three Fiber", "Three.js", "Tailwind CSS"],
+    image: "/realizacje/drblocks-card.webp",
+    showcase: "/realizacje/drblocks-showcase.webp",
+    gallery: [
+      {
+        src: "/realizacje/drblocks-g1.webp",
+        caption: "Model z etykietami — korpus B30, stalowa stopa, śruby M16 i chwytak magnetyczny.",
+      },
+      {
+        src: "/realizacje/drblocks-g2.webp",
+        caption: "Kalkulator doboru — rozstaw, rozkład podpór i sprawdzenie nośności na żywo.",
+      },
+    ],
+    mobileImage: "/realizacje/drblocks-mobile.webp",
+    video: "/realizacje/drblocks.mp4",
+    poster: "/realizacje/drblocks-poster.webp",
+    bg: "linear-gradient(150deg,#0c1f24 0%,#11313a 55%,#16454c 100%)",
+    glow: "#2dbdb0",
+    rgb: "45,189,176",
   },
   {
     id: "grabowski",

@@ -36,12 +36,15 @@ function FaqItem({
 
   return (
     <div
-      className="overflow-hidden rounded-2xl transition-[background-color,border-color] duration-300"
+      className="overflow-hidden rounded-2xl transition-[background-color,border-color,box-shadow] duration-300"
       style={{
         // Karty w ciepłej strefie strony — surface-warm (H335) zamiast
         // neutralnego surface-1, żeby siedziały w kolorze canvasu pod sobą.
         backgroundColor: open ? "rgba(207,67,184,0.07)" : "var(--color-surface-warm)",
         border: `1px solid ${open ? "rgba(207,67,184,0.24)" : "var(--color-line)"}`,
+        // Elewacja (light: miękki śliwkowy cień, karta unosi się nad papierem;
+        // dark: none → bez zmian). Otwarta karta unosi się wyżej.
+        boxShadow: open ? "var(--shadow-card-hover)" : "var(--shadow-card)",
       }}
     >
       <h3 className="m-0">

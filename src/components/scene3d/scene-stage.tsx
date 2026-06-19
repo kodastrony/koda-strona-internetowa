@@ -5,7 +5,6 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "@/lib/motion";
-import { useDeviceQuality, type Quality } from "./lib";
 import { useTier, downgradeTier, TIER_PROFILES } from "@/lib/device-tier";
 
 /* Watchdog reaguje TYLKO gdy karta jest WIDOCZNA. W tle przeglądarka dławi rAF
@@ -73,7 +72,6 @@ function useWatchdog(setDpr: (v: React.SetStateAction<number>) => void, currentD
 
 export interface SceneProps {
   reduced: boolean;
-  quality: Quality;
 }
 
 interface SceneStageProps {
@@ -262,7 +260,6 @@ export function SceneStage({
   localClipping = false,
 }: SceneStageProps) {
   const reduced = !!useReducedMotion();
-  const quality = useDeviceQuality();
   // Reaktywny tier — watchdog może go obniżyć w trakcie sesji (DPR ↓, a gdy
   // zejdzie do „static” → bail na poster). Boot-params sceny są zamrożone osobno.
   const liveTier = useTier();
@@ -361,7 +358,7 @@ export function SceneStage({
           }}
         >
           <PerformanceMonitor onDecline={watchdog.onDecline} onChange={watchdog.onChange}>
-            <Scene reduced={reduced} quality={quality} />
+            <Scene reduced={reduced} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
           {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}
@@ -405,7 +402,6 @@ export function SectionStage({
   poster,
 }: SectionStageProps) {
   const reduced = !!useReducedMotion();
-  const quality = useDeviceQuality();
   const liveTier = useTier();
   const profile = TIER_PROFILES[liveTier];
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -512,7 +508,7 @@ export function SectionStage({
           }}
         >
           <PerformanceMonitor onDecline={watchdog.onDecline} onChange={watchdog.onChange}>
-            <Scene reduced={reduced} quality={quality} getProgress={getProgress} />
+            <Scene reduced={reduced} getProgress={getProgress} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
           {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}

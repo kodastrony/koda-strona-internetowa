@@ -30,3 +30,24 @@ export const INTRO_KODA = "#c45cf0";
 
 /** Baza ciemnego tła aurory (kolor pod gradientami/poświatami). */
 export const HERO_BASE = "#0c0712";
+
+/* ── Wariant JASNY (porcelana) — hero żyje też w trybie ☀ ─────────────────
+   Cały „head" jest budowany pod motyw, nie doklejany: na papierze litery KODA
+   to delikatny, kolorowy znak wodny (szkło różowo-fioletowo-indygowe), kurtyna
+   intro jest porcelanowa z muśnięciem koloru, a litery intro świecą żywą
+   magentą marki (czytelne na jasnej kurtynie). Aurorę jasną maluje samo
+   <HeroBackground light />. */
+export const KODA_FILL_LIGHT: KodaFill = {
+  kind: "gradient",
+  value:
+    "linear-gradient(180deg, rgba(179,42,157,0.16) 0%, rgba(124,76,222,0.15) 52%, rgba(77,98,224,0.15) 100%)",
+};
+
+/** „Kurtyna" intro w trybie jasnym — porcelana z muśnięciem fioletu. */
+export const INTRO_COVER_LIGHT = "#efe7f5";
+
+/** Kolor liter KODA podczas intro (tryb jasny) — żywa magenta marki. */
+export const INTRO_KODA_LIGHT = "#cf43b8";
+
+/** Baza jasnego tła aurory (porcelana). */
+export const HERO_BASE_LIGHT = "#f7f4f8";

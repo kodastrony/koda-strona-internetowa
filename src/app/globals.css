@@ -127,6 +127,20 @@
   --color-accent-3: #9a63ef;
   --color-accent-4: #6478f0;
   --color-pink-bright: #ff5ec8;
+
+  /* ── Cross-theme helpers (adapt in html[data-koda-light]) ──────────────
+     --color-on-accent: ink stamped ON a brand-pink fill (process node number,
+       any „dark text on pink" chip). Dark theme = near-black on the BRIGHT
+       #cf43b8 (≈5.5:1). Light theme flips to white on the DARKER #b32a9d
+       (a dark stamp on it drops <AA). --dot-grid: hero/sub-page dot texture —
+       white on dark, ink-alpha on porcelain (so it doesn't vanish in light).
+     --shadow-card: elevation for raised surfaces. Dark world reads depth from
+       glows/borders, so none; the light world is flat porcelain → a soft,
+       plum-tinted lift makes cards/frames sit ABOVE the page (premium depth). */
+  --color-on-accent: #0b0b0d;
+  --dot-grid: rgba(255, 255, 255, 0.025);
+  --shadow-card: none;
+  --shadow-card-hover: none;
 }
 
 /* ── LIGHT MODE — porcelana z nutą śliwki (trust dla SMB) ─────────────
@@ -160,6 +174,15 @@ html[data-koda-light] {
   --color-accent-2: #a93bb4;
   --color-accent-3: #7a4cd6;
   --color-accent-4: #4d62e0;
+  /* ── Light-theme cross-theme helpers (patrz @theme) ──────────────────
+     on-accent = biały (na ciemniejszym #b32a9d daje ≥5:1, ciemny stempel <AA).
+     dot-grid = atrament z alfą (widoczny na porcelanie). shadow-card = miękki,
+     śliwkowy cień: karty/ramki UNOSZĄ się nad papierem (głębia bez „flat"). */
+  --color-on-accent: #ffffff;
+  --dot-grid: rgba(26, 16, 34, 0.05);
+  --shadow-card: 0 16px 40px -24px rgba(42, 14, 46, 0.22), 0 3px 10px -6px rgba(42, 14, 46, 0.1);
+  --shadow-card-hover:
+    0 26px 60px -28px rgba(42, 14, 46, 0.28), 0 6px 16px -8px rgba(42, 14, 46, 0.12);
   /* Legacy aliasy używane przez bg-dark/text-off-white itd. */
   --color-dark: #f7f4f8;
   --color-dark-2: #eee9f1;
@@ -349,6 +372,13 @@ html[data-koda-light] .cta-footer-wash {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+    }
+    /* Intro „dwóch linii" renderuje się już w SSR (kurtyna w pierwszej klatce =
+       zero błysku gotowego hero). Dla reduced-motion chowamy ją CSS-em PRZED
+       malowaniem — overlay nigdy nie miga, a Hero w efekcie ustawia revealed=true
+       (treść od razu, bez animacji). */
+    [data-intro] {
+      display: none !important;
     }
   }
 

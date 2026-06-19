@@ -3,7 +3,14 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { cssBezier, EASE } from "@/lib/motion";
-import { INTRO_COVER, INTRO_KODA, KODA_FILL } from "./hero-config";
+import {
+  INTRO_COVER,
+  INTRO_COVER_LIGHT,
+  INTRO_KODA,
+  INTRO_KODA_LIGHT,
+  KODA_FILL,
+  KODA_FILL_LIGHT,
+} from "./hero-config";
 import { KodaColumnLetters, KODA_LEFT, KODA_FONT_CENTER } from "./koda-letters";
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -49,10 +56,14 @@ function coverScaleKeyframes(m: number): Keyframe[] {
 interface HeroIntroProps {
   /** Wołane po zakończeniu (lub pominięciu) — rodzic zdejmuje overlay. */
   onDone: () => void;
+  /** Tryb jasny — porcelanowa kurtyna + jasne wypełnienie KODA. */
+  light?: boolean;
 }
 
-export function HeroIntro({ onDone }: HeroIntroProps) {
+export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
   const reduce = useReducedMotion();
+  const coverColor = light ? INTRO_COVER_LIGHT : INTRO_COVER;
+  const finalFill = light ? KODA_FILL_LIGHT : KODA_FILL;
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -241,7 +252,7 @@ export function HeroIntro({ onDone }: HeroIntroProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const introFill = { kind: "color", value: INTRO_KODA } as const;
+  const introFill = { kind: "color", value: light ? INTRO_KODA_LIGHT : INTRO_KODA } as const;
   const startHidden = () => ({ opacity: 0, transform: "translateY(50%)" }) as const;
 
   return (
@@ -259,7 +270,7 @@ export function HeroIntro({ onDone }: HeroIntroProps) {
         aria-hidden="true"
         className="absolute inset-0"
         style={{
-          backgroundColor: INTRO_COVER,
+          backgroundColor: coverColor,
           transformOrigin: "right center",
           willChange: "transform",
         }}
@@ -272,7 +283,7 @@ export function HeroIntro({ onDone }: HeroIntroProps) {
         style={{ left: KODA_LEFT, width: "max-content", y: kodaY }}
       >
         <div ref={finalRefA} className="absolute top-0 left-0" style={{ opacity: 0 }}>
-          <KodaColumnLetters fill={KODA_FILL} />
+          <KodaColumnLetters fill={finalFill} />
         </div>
         <div ref={pinkRefA} className="absolute top-0 left-0" style={{ willChange: "clip-path" }}>
           <KodaColumnLetters
@@ -295,7 +306,7 @@ export function HeroIntro({ onDone }: HeroIntroProps) {
             className="absolute inset-0 flex flex-col items-center"
             style={{ opacity: 0 }}
           >
-            <KodaColumnLetters fill={KODA_FILL} fontSize={KODA_FONT_CENTER} />
+            <KodaColumnLetters fill={finalFill} fontSize={KODA_FONT_CENTER} />
           </div>
           <div
             ref={pinkRefB}
@@ -318,8 +329,12 @@ export function HeroIntro({ onDone }: HeroIntroProps) {
         type="button"
         onClick={skip}
         aria-label="Pomiń animację wejścia"
-        className="absolute right-4 bottom-4 z-[5] flex h-11 items-center rounded-full px-4 font-heading text-[11px] font-bold tracking-[0.2em] uppercase"
-        style={{ color: "#ffffff", backgroundColor: "rgba(0,0,0,0.4)" }}
+        className="absolute right-4 bottom-4 z-[5] flex h-11 items-center rounded-full px-4 font-heading text-[11px] font-bold tracking-[0.2em] uppercase backdrop-blur-sm"
+        style={
+          light
+            ? { color: "#16101f", backgroundColor: "rgba(255,255,255,0.6)" }
+            : { color: "#ffffff", backgroundColor: "rgba(0,0,0,0.4)" }
+        }
       >
         Pomiń →
       </button>
