@@ -227,7 +227,11 @@ export function Hero() {
       // na jasnym; mapowanie dark→light robi i tak useHeaderTheme).
       data-header-theme={light ? "light" : "dark"}
       data-canvas="hero"
-      className="relative flex min-h-svh flex-col overflow-hidden"
+      // Wysokość hero: ≥md pełny ekran (min-h-svh). Na TELEFONIE treść jest
+      // justify-start (pod headerem), więc pełny min-h-svh zostawiał duży pas
+      // pustki pod CTA przed kolejną sekcją → na <md tniemy do ~70svh (treść +
+      // oddech z paddingBottom niżej), kolejna sekcja podchodzi wyżej.
+      className="relative flex min-h-[70svh] flex-col overflow-hidden md:min-h-svh"
       style={
         (light
           ? {

@@ -12,6 +12,8 @@ import { CustomCursor } from "@/components/ui/custom-cursor";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
 import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
 import { jsonLd } from "@/lib/seo";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-init";
+import { ThemeAutoSync } from "@/components/layout/theme-auto-sync";
 import "./globals.css";
 
 // Organization + WebSite structured data (JSON-LD) — helps search engines build
@@ -197,18 +199,20 @@ export default function RootLayout({
       className={`${display.variable} ${inter.variable} ${syne.variable}`}
     >
       <body className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased">
-        {/* Motyw PRZED malowaniem (zero FOUC): czyta localStorage i ustawia
-            html[data-koda-light] + color-scheme zanim załaduje się bundle.
-            beforeInteractive → Next wstrzykuje skrypt do <head> statycznego HTML.
-            Klucz 'koda-theme' MUSI się zgadzać z lib/theme.ts. */}
+        {/* Motyw PRZED malowaniem (zero FOUC): ustala motyw AUTOMATYCZNIE wg pory
+            dnia (jasny 07:00–20:00, poza tym ciemny) — a jeśli jest WAŻNE ręczne
+            nadpisanie (do najbliższego progu), bierze je. Ustawia html[data-koda-light]
+            + color-scheme, zanim załaduje się bundle. beforeInteractive → Next
+            wstrzykuje skrypt do <head> statycznego HTML. Logika i godziny progu
+            żyją w lib/theme-init.ts (jedno źródło, wspólne z theme.ts). */}
         <Script
           id="koda-theme-init"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{var t=localStorage.getItem('koda-theme');var d=document.documentElement;if(t==='light'){d.setAttribute('data-koda-light','');d.style.colorScheme='light';}else{d.style.colorScheme='dark';}}catch(e){}})();",
-          }}
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
         />
+        {/* Automat na żywo: przełącza motyw na progu 07:00/20:00 i po powrocie do
+            karty (gdy zakładka była w tle/uśpiona). Nic nie renderuje. */}
+        <ThemeAutoSync />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(ORG_JSON_LD) }}
