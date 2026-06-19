@@ -76,7 +76,14 @@ export function CustomCursor() {
           let t = (sec.dataset.headerTheme as Theme) ?? "dark";
           // Globalny motyw jasny: „dark" sekcje są na papierze → ring/kropka
           // muszą być atramentowe (jak w useHeaderTheme). „pink" zostaje.
-          if (t === "dark" && getTheme() === "light") t = "light";
+          // WYJĄTEK: ciemne wyspy (data-header-dark-island) są ciemne w obu
+          // motywach → kursor zostaje jasny (atramentowy byłby niewidoczny).
+          if (
+            t === "dark" &&
+            getTheme() === "light" &&
+            !sec.hasAttribute("data-header-dark-island")
+          )
+            t = "light";
           applyTheme(t);
         }
         // nad fixed-headerem (brak sekcji) → zostaw ostatni motyw

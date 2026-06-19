@@ -3,9 +3,13 @@
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import { EASE, DURATION, type Bezier } from "@/lib/motion";
 
+// Ujemne top/bottom (−40% wysokości pudełka) sprawiają, że clip NIE ucina
+// descenderów (y, j, ę, ą) ani znaków diakrytycznych nad literami przy ciasnym
+// line-height nagłówków. Poziomy wipe (right 100%→0%) działa bez zmian; %
+// odnosi się do wysokości pudełka, więc skaluje się dla KAŻDEGO rozmiaru fontu.
 const variants: Variants = {
-  hidden: { clipPath: "inset(0 100% 0 0)" },
-  visible: { clipPath: "inset(0 0% 0 0)" },
+  hidden: { clipPath: "inset(-40% 100% -40% 0)" },
+  visible: { clipPath: "inset(-40% 0% -40% 0)" },
 };
 
 interface RevealProps {

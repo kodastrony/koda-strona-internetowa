@@ -270,7 +270,12 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         aria-hidden="true"
         className="absolute inset-0"
         style={{
-          backgroundColor: coverColor,
+          // ★ Kolor kurtyny z CSS-zmiennej (ustawianej atrybutem html[data-koda-light]
+          // PRZEZ inline-skrypt PRZED malowaniem) — NIE z propa `light` (ten przy
+          // hydracji jest chwilowo "dark" → kurtyna błyskała czarnym i dopiero po
+          // sekundzie bielała). Teraz PIERWSZA klatka ma poprawny motyw. `coverColor`
+          // zostaje jako fallback (gdyby zmiennej nie było).
+          backgroundColor: `var(--intro-cover, ${coverColor})`,
           transformOrigin: "right center",
           willChange: "transform",
         }}
@@ -323,21 +328,9 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         </div>
       </div>
 
-      {/* Afordancja „pomiń" — REALNY przycisk (fokus, Enter/Space); klik gdziekolwiek
-          i Escape też pomijają. Touch target ≥44px (h-11 + px). */}
-      <button
-        type="button"
-        onClick={skip}
-        aria-label="Pomiń animację wejścia"
-        className="absolute right-4 bottom-4 z-[5] flex h-11 items-center rounded-full px-4 font-heading text-[11px] font-bold tracking-[0.2em] uppercase backdrop-blur-sm"
-        style={
-          light
-            ? { color: "#16101f", backgroundColor: "rgba(255,255,255,0.6)" }
-            : { color: "#ffffff", backgroundColor: "rgba(0,0,0,0.4)" }
-        }
-      >
-        Pomiń →
-      </button>
+      {/* Bez widocznego przycisku „Pomiń" (usunięty na życzenie). Pominięcie nadal
+          działa niewidocznie: klik gdziekolwiek w overlay (onClick={skip}) oraz
+          Escape — afordancje a11y bez elementu UI. */}
     </div>
   );
 }

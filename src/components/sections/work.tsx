@@ -9,16 +9,17 @@ import { ProjectCard } from "@/components/ui/project-card";
 import { getProject } from "@/lib/projects";
 
 // ══════════════════════════════════════════════════════════════════════
-// Homepage "Nasze realizacje" — a curated teaser (4 of the portfolio). Bento:
-// RIKOSZET leads full-width (the most spectacular 3D piece), then a 3-up row —
-// JR Modular (kontenery) left, DrBlocks centre (directly under the lead) and
-// Grabowski right. Slice + Wycisk live on /realizacje. Cards are the shared
-// <ProjectCard> (same component as /realizacje); the trio drifts gently on
-// scroll (transform-only Parallax) for a living, layered grid.
-const LEAD = getProject("rikoszet")!;
-const TRIO = ["jr-modular", "drblocks", "grabowski"].map((id) => getProject(id)!);
-// Centre card (DrBlocks) drifts the opposite way to the flanks → quiet depth.
-const TRIO_DRIFT = [26, -18, 26];
+// Homepage "Nasze realizacje" — a curated teaser shown as a 2×2 grid of four
+// equal square-ish cards (życzenie usera „4 kwadraty, jak wcześniej"):
+//   ┌────────────┬────────────┐
+//   │  RIKOSZET  │  GRABOWSKI │   (lewy-górny / prawy-górny)
+//   ├────────────┼────────────┤
+//   │ JR MODULAR │  DRBLOCKS  │   (lewy-dolny / prawy-dolny)
+//   └────────────┴────────────┘
+// Kolejność w DOM = kolejność czytania siatki, więc grid-cols-2 układa je
+// dokładnie w te rogi. Karty to wspólny <ProjectCard> (ten sam komponent co na
+// /realizacje). Slice + Wycisk żyją na /realizacje.
+const GRID = ["rikoszet", "grabowski", "jr-modular", "drblocks"].map((id) => getProject(id)!);
 
 export function Work() {
   const reduce = useReducedMotion();
@@ -54,8 +55,8 @@ export function Work() {
                 key={line}
                 data-reveal
                 className="block"
-                initial={{ clipPath: "inset(0 100% 0 0)" }}
-                whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+                initial={{ clipPath: "inset(-40% 100% -40% 0)" }}
+                whileInView={{ clipPath: "inset(-40% 0% -40% 0)" }}
                 viewport={{ once: true, margin: "0px 0px -80px 0px" }}
                 transition={
                   reduce
@@ -69,37 +70,20 @@ export function Work() {
           </h2>
         </div>
 
-        {/* ── Bento ── */}
-        <div className="flex flex-col" style={{ gap: "clamp(20px,2.8vw,36px)" }}>
-          {/* Lead — RIKOSZET, full-width. Responsive aspect: near-native 16:10 on
-              phones (overlay breathes, no over-crop) → cinematic wide on lg. */}
-          <ProjectCard
-            project={LEAD}
-            delay={0}
-            priority
-            aspectClassName="pb-[62%] sm:pb-[52%] lg:pb-[46%]"
-            imageSrc={LEAD.showcase}
-            imageSrcSet="/realizacje/rikoszet-showcase-640.webp 640w, /realizacje/rikoszet-showcase.webp 1680w"
-            sizes="92vw"
-          />
-
-          {/* Trio — JR (left) · DrBlocks (centre, under the lead) · Grabowski (right).
-              3-up only at lg (matches the site's 2-col-max rhythm; avoids cramped
-              ~209px cards at md). md/tablet = full-width stacked. */}
-          <div
-            className="grid grid-cols-1 lg:grid-cols-3"
-            style={{ gap: "clamp(20px,2.8vw,36px)" }}
-          >
-            {TRIO.map((p, i) => (
-              <Parallax key={p.id} speed={TRIO_DRIFT[i]} style={{ willChange: "transform" }}>
-                <ProjectCard
-                  project={p}
-                  delay={0.05 + i * 0.07}
-                  sizes="(min-width: 768px) 31vw, 92vw"
-                />
-              </Parallax>
-            ))}
-          </div>
+        {/* ── 2×2 grid (4 kwadraty) ──
+            Dwie kolumny NA KAŻDYM urządzeniu (siatka 2×2 = „cztery kwadraty”),
+            stała proporcja 4:3 wspólna z resztą portfolio. Kolejność rikoszet →
+            grabowski → jr-modular → drblocks daje rogi: TL, TR, BL, BR. */}
+        <div className="grid grid-cols-2" style={{ gap: "clamp(12px,2.4vw,32px)" }}>
+          {GRID.map((p, i) => (
+            <ProjectCard
+              key={p.id}
+              project={p}
+              delay={i * 0.06}
+              priority={i < 2}
+              sizes="(min-width: 768px) 46vw, 47vw"
+            />
+          ))}
         </div>
 
         {/* ── View-all CTA ── */}

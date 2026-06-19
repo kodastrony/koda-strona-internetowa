@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
-import { useHeaderTheme } from "@/hooks/use-header-theme";
+import { useHeaderTheme, useHeaderDarkIsland } from "@/hooks/use-header-theme";
 import { useLogoHidden } from "@/hooks/use-logo-hide";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -26,6 +26,10 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState<Origin | null>(null);
   const theme = useHeaderTheme();
+  // Nad ciemną wyspą (Statement „świt" / stopka) chrom ma być WIDOCZNY i biały —
+  // logo i przełącznik wychodzą z trybu „schowane przy zjeździe", więc user widzi
+  // je białe na finałowym CTA (życzenie: „zmienia się na biały w dobrym momencie").
+  const onDarkIsland = useHeaderDarkIsland();
 
   // Wejście headera jest zsync z intro TYLKO gdy intro faktycznie gra: strona
   // główna („/"), pierwsze twarde wejście, bez reduced-motion. Na podstronach
@@ -70,7 +74,14 @@ export function Header() {
   // Gdy menu jest otwarte, KODA MUSI być widoczne (białe menu, ciemny napis) —
   // żeby było co kliknąć (powrót na stronę główną) i żeby nie znikało, gdy ktoś
   // otworzy menu po zjechaniu w dół (gdzie logo jest normalnie schowane).
-  const hideLogo = logoHidden && !logoFocused && !open;
+  const hideLogo = logoHidden && !logoFocused && !open && !onDarkIsland;
+
+  // ── Przełącznik motywu chowa się TAK SAMO jak logo ────────────────────────
+  // (życzenie usera: ikonka ☀/☾ znika przy zjeździe i wraca na górze, dokładnie
+  // jak wordmark KODA). Burger i pill „Kontakt" ZOSTAJĄ (menu zawsze dostępne).
+  // Osobny stan focusu, by Tab na przełącznik wymuszał jego widoczność (a11y).
+  const [toggleFocused, setToggleFocused] = useState(false);
+  const hideToggle = logoHidden && !toggleFocused && !open && !onDarkIsland;
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -126,7 +137,15 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-[var(--z-header)]">
+      {/* ⚠ pointer-events-none na całym pasku: przezroczyste „puste" pole headera
+          (między logo a prawą grupą) rozciąga się na PEŁNĄ szerokość i z domyślnym
+          pointer-events:auto PRZECHWYTYWAŁO kliknięcia w górnym pasie ekranu (84px
+          mobile / 130px desktop). Każdy element pod tym pasem (np. przyciski FAQ
+          przescrollowane pod header) stawał się NIEKLIKALNY — „da się kliknąć tylko
+          gdy element jest niżej, na środku ekranu". Teraz pasek przepuszcza klik, a
+          realne kontrolki (logo, przełącznik, pill, burger) włączają pointer-events
+          z powrotem. */}
+      <header className="pointer-events-none fixed top-0 right-0 left-0 z-[var(--z-header)]">
         <div className="w-full px-[clamp(24px,4vw,58px)]">
           <nav
             className="flex h-[84px] items-center justify-between md:h-[130px] md:pt-5"
@@ -137,7 +156,7 @@ export function Header() {
                  ANCHOR (plain div) = STABILNY box do detekcji kolizji — NIGDY nie
                  transformowany, więc ani wejście, ani ukrywanie nie wracają do
                  testu nakładania (zero oscylacji, zero skew przy starcie). */}
-            <div ref={logoSlotRef} className="z-10 shrink-0">
+            <div ref={logoSlotRef} className="pointer-events-auto z-10 shrink-0">
               {/* WEJŚCIE — slide z góry, jednorazowe, zsync z intro */}
               <motion.div
                 data-reveal
@@ -191,13 +210,24 @@ export function Header() {
                  wjeżdża gdy linia dochodzi do prawej krawędzi) */}
             <motion.div
               data-reveal
-              className="flex items-center gap-3 sm:gap-5"
+              className="pointer-events-auto flex items-center gap-3 sm:gap-5"
               initial={{ opacity: 0, y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.02 }}
             >
-              {/* ── Przełącznik motywu (jasny/ciemny) — dostępny też na mobile ── */}
-              <ThemeToggle />
+              {/* ── Przełącznik motywu (jasny/ciemny) — dostępny też na mobile.
+                  CHOWA SIĘ jak logo (fade + lekki lift) przy zjeździe, wraca na
+                  górze. pointer-events:none gdy schowany = nieklikalny myszą, a
+                  focus (Tab) wymusza powrót do widoku. */}
+              <motion.div
+                onFocus={() => setToggleFocused(true)}
+                onBlur={() => setToggleFocused(false)}
+                animate={{ opacity: hideToggle ? 0 : 1, y: hideToggle ? -10 : 0 }}
+                transition={{ duration: 0.6, ease: EASE.smooth }}
+                style={{ pointerEvents: hideToggle ? "none" : "auto" }}
+              >
+                <ThemeToggle />
+              </motion.div>
 
               {/* ── KONTAKT pill (główne CTA do kontaktu) ── */}
               <Link

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { SITE_CONFIG, NAV_LINKS, CONTACT } from "@/lib/constants";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, cssBezier } from "@/lib/motion";
@@ -6,10 +9,20 @@ import { EASE, cssBezier } from "@/lib/motion";
 export function Footer() {
   const year = new Date().getFullYear();
 
+  // Hold kanwy pod stopką zależy od trasy (patrz HOLDS/LIGHT_HOLDS w page-canvas):
+  // • HOME ("/") → "footer-home": CIEMNY w obu motywach, bo stopka domyka ciemny
+  //   Statement („świt"). Inaczej scrub statement→stopka rozjaśniałby kanwę i
+  //   prześwitywała przez półprzezroczysty horyzont = „rozjaśnianie poniżej sekcji".
+  // • PODSTRONY → "footer": JASNY hold w jasnym motywie, by jasny CTA (CTABand)
+  //   został jasny aż do krawędzi stopki (życzenie usera). Sama stopka-element jest
+  //   ciemną wyspą w obu wariantach (globals.css), niezależnie od holdu.
+  const pathname = usePathname();
+  const canvas = pathname === "/" ? "footer-home" : "footer";
+
   return (
-    // Tło = PageCanvas (hold „footer" #0a0609 — ciepła czerń H335: róż
-    // Statementu „umiera" W stopkę zamiast zderzać się z zimnym #070709).
-    <footer data-canvas="footer" className="relative mt-auto">
+    // Tło = PageCanvas (hold ciemny #0a0609 — ciepła czerń H335: róż Statementu
+    // „umiera" W stopkę zamiast zderzać się z zimnym #070709).
+    <footer data-canvas={canvas} className="relative mt-auto">
       {/* Poświata — róż ledwo dogasa u górnej krawędzi (ostatni takt color story) */}
       <div
         aria-hidden="true"

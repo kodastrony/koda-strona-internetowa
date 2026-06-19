@@ -103,6 +103,10 @@ void main() {
 }
 `;
 
+/** Postęp scrolla, przy którym świt osiąga PEŁNY „idealny” kadr i ZATRZYMUJE się
+ *  (dalszy scroll ku stopce już go nie rozjaśnia). 0.5 ≈ sekcja ładnie w kadrze. */
+const PROG_PEAK = 0.5;
+
 function HorizonScene({ reduced, getProgress }: SectionSceneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const viewport = useThree((s) => s.viewport);
@@ -116,7 +120,12 @@ function HorizonScene({ reduced, getProgress }: SectionSceneProps) {
         uniforms: {
           uTime: { value: reduced ? 6 : 0 },
           uProg: { value: reduced ? 0.62 : 0 },
-          uAlpha: { value: reduced ? 1 : 0 },
+          // uAlpha = 1 OD RAZU (bez „born" rampy fade-in). SectionStage zamraża
+          // renderowanie poza ekranem (frameloop="never"), więc czasowy fade i tak
+          // ruszał dopiero PO wejściu sekcji w kadr → świt „pojawiał się po chwili".
+          // Teraz świt jest pełny od pierwszej klatki, a jego JASNOŚĆ i tak rośnie
+          // ze scrollem (uProg → rise), więc wjazd jest miękki, bez doczytywania.
+          uAlpha: { value: 1 },
           uAspect: { value: 1.6 },
           uPink: { value: new THREE.Color(BRAND.pink) },
           uPinkBright: { value: new THREE.Color(BRAND.pinkBright) },
@@ -130,19 +139,19 @@ function HorizonScene({ reduced, getProgress }: SectionSceneProps) {
   );
   useEffect(() => () => material.dispose(), [material]);
 
-  const born = useRef(0);
-
-  useFrame((state, rawDt) => {
+  useFrame((state) => {
     const m = meshRef.current;
     if (!m) return;
     m.scale.set(viewport.width, viewport.height, 1);
     material.uniforms.uAspect.value = size.width / Math.max(size.height, 1);
     if (reduced) return;
-    const dt = Math.min(rawDt, 1 / 30);
-    born.current = Math.min(1, born.current + dt / 1.6);
-    material.uniforms.uAlpha.value = born.current;
+    // uAlpha stałe = 1 (patrz uniforms): świt gotowy od razu, jasność steruje uProg.
     material.uniforms.uTime.value = state.clock.elapsedTime;
-    material.uniforms.uProg.value = getProgress();
+    // ★ Świt rozjaśnia się ze scrollem TYLKO do „idealnego” kadru (PROG_PEAK),
+    // potem TRZYMA. Wcześniej uProg jechał do 1 → przy zjeździe ku stopce świt
+    // robił się coraz jaśniejszy/większy (brzydko). Teraz efekt zatrzymuje się
+    // w dobrym momencie (sekcja ładnie w kadrze), a dalszy scroll go nie rusza.
+    material.uniforms.uProg.value = Math.min(getProgress(), PROG_PEAK);
   });
 
   return (

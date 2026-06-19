@@ -134,52 +134,6 @@ function HeroCopy({ play }: { play: boolean }) {
   );
 }
 
-/* ── Wskaźnik SCROLL, tylko ≥lg. Pojawia się z treścią. Kolory adaptują się do
-      motywu (atrament na porcelanie / biel na ciemnej aurorze). ── */
-function ScrollHint({ play, light }: { play: boolean; light: boolean }) {
-  const reduce = useReducedMotion();
-  const track = light ? "rgba(22,16,31,0.12)" : "rgba(255,255,255,0.08)";
-  const beam = light
-    ? "linear-gradient(to bottom, transparent, rgba(22,16,31,0.34), transparent)"
-    : "linear-gradient(to bottom, transparent, rgba(255,255,255,0.32), transparent)";
-  const labelColor = light ? "rgba(22,16,31,0.32)" : "rgba(255,255,255,0.2)";
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: play ? 1 : 0 }}
-      transition={{ duration: 0.7, delay: play ? 0.6 : 0 }}
-      aria-hidden="true"
-      className="absolute right-[clamp(20px,3vw,44px)] bottom-10 hidden flex-col items-center gap-3 lg:flex"
-      style={{ zIndex: 10 }}
-    >
-      <div className="relative h-14 w-px overflow-hidden">
-        <div className="absolute inset-0" style={{ backgroundColor: track }} />
-        {!reduce && (
-          <motion.div
-            className="absolute inset-x-0 top-0 h-6"
-            style={{ background: beam }}
-            animate={{ y: ["-100%", "200%"] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "linear", repeatDelay: 0.6 }}
-          />
-        )}
-      </div>
-      <span
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "8px",
-          fontWeight: 700,
-          letterSpacing: "0.35em",
-          textTransform: "uppercase" as const,
-          color: labelColor,
-          writingMode: "vertical-rl" as const,
-        }}
-      >
-        SCROLL
-      </span>
-    </motion.div>
-  );
-}
-
 export function Hero() {
   const reduce = useReducedMotion();
   const light = useThemeValue() === "light";
@@ -221,17 +175,20 @@ export function Hero() {
 
   return (
     <section
-      // Hero ADAPTUJE się do motywu: ciemna aurora (☾) albo świetlista porcelana
-      // (☀). Wymusza komplet tokenów ink/accent pod swoje tło, więc treść jest
-      // czytelna, a header dostaje właściwy motyw (białe logo na ciemnym / atrament
-      // na jasnym; mapowanie dark→light robi i tak useHeaderTheme).
-      data-header-theme={light ? "light" : "dark"}
+      // ★ data-header-theme STAŁE „dark" (NIE reaktywne od `light`): hero jest
+      // INTRYNSECZNIE ciemny (ciemna aurora), a globalny tryb jasny obsługuje
+      // useHeaderTheme mapując „dark”→„light”. Reaktywny atrybut powodował, że
+      // przy przełączeniu motywu provider czytał STARĄ (zcache'owaną) wartość
+      // atrybutu (React jeszcze nie zdążył jej zmienić) i logo zostawało czarne
+      // na ciemnym (niewidoczne). Jedno źródło prawdy = mapowanie w useHeaderTheme.
+      data-header-theme="dark"
       data-canvas="hero"
-      // Wysokość hero: ≥md pełny ekran (min-h-svh). Na TELEFONIE treść jest
-      // justify-start (pod headerem), więc pełny min-h-svh zostawiał duży pas
-      // pustki pod CTA przed kolejną sekcją → na <md tniemy do ~70svh (treść +
-      // oddech z paddingBottom niżej), kolejna sekcja podchodzi wyżej.
-      className="relative flex min-h-[70svh] flex-col overflow-hidden md:min-h-svh"
+      // Wysokość hero: PEŁNY EKRAN na każdym urządzeniu (min-h-svh). Dzięki temu
+      // intro „dwóch linii” (overlay h-svh) odgrywa się na CAŁYM ekranie telefonu
+      // — wcześniej hero <md miał min-h-[70svh] + overflow-hidden, więc kurtyna
+      // intro była przycinana do ~3/4 ekranu. Treść dostaje większy odstęp od
+      // chromu (logo/przełącznik/burger) przez paddingi niżej.
+      className="relative flex min-h-svh flex-col overflow-hidden"
       style={
         (light
           ? {
@@ -291,12 +248,13 @@ export function Hero() {
         <KodaColumnLetters fill={light ? KODA_FILL_LIGHT : KODA_FILL} />
       </motion.div>
 
-      <ScrollHint play={revealed} light={light} />
-
       {/* ── Treść (z-hero-content). W trakcie intro NIEKLIKALNA (klik = „pomiń").
-            Wjeżdża przez `play={revealed}` — czyli PO intro. ── */}
+            Wjeżdża przez `play={revealed}` — czyli PO intro.
+            pt-[128px] na telefonie (było 88px): większy odstęp od chromu headera
+            (logo/przełącznik/burger) do startu treści — życzenie usera; hero ma
+            teraz pełną wysokość, więc jest na to miejsce. ── */}
       <motion.div
-        className={`container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[88px] md:pt-[130px] [@media(max-height:600px)]:pt-[60px] ${
+        className={`container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[128px] md:pt-[130px] [@media(max-height:600px)]:pt-[60px] ${
           introActive ? "pointer-events-none" : ""
         }`}
         style={reduce ? undefined : { opacity: copyOpacity, y: copyY }}

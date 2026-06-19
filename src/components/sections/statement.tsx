@@ -262,9 +262,29 @@ export function Statement() {
     <section
       ref={sectionRef}
       data-header-theme="dark"
+      // CIEMNA WYSPA w obu motywach (świt) → chrom headera (logo/przełącznik/
+      // burger) zostaje BIAŁY także w trybie jasnym (inaczej czarne logo i ☀ są
+      // niewidoczne na ciemnym tle). useHeaderTheme/custom-cursor czytają tę flagę.
+      data-header-dark-island=""
       data-canvas="statement"
       className="relative isolate flex min-h-[90svh] flex-col items-center justify-center"
     >
+      {/* ── CIEMNA BAZA (HOME-only fix „białego pasa") — GRADIENT: przezroczysta
+          U GÓRY, ciemna U DOŁU. Góra przezroczysta → przejście FAQ→Statement
+          zostaje GŁADKIM scrubem kanwy (jak było — NIE twarda krawędź; to ją
+          wcześniej psułem pełną bazą). Dół ciemny (kolor holdu Statementu,
+          var(--statement-base)) → zasłania prześwit jasnej kanwy przez
+          półprzezroczyste, masko­wane DNO świtu przy zjeździe do stopki
+          („biały pas"). Świt maluje NA niej → wygląd bez zmian. ── */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, transparent 66%, var(--statement-base) 84%, var(--statement-base) 100%)",
+        }}
+      />
+
       {/* ── ŚWIT NAD PLANETĄ — finałowy klimaks: ciemny kosmos na plumowym
           holdzie kanwy (#521648), a różowo-biały świt WSCHODZI i ROZJAŚNIA SIĘ
           im głębiej zjedziesz (uProg ze scrolla). To sekcja, którą user
@@ -387,8 +407,8 @@ export function Statement() {
                 key={i}
                 data-reveal
                 className="block"
-                initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
-                animate={inView ? { clipPath: "inset(0 0% 0 0)", opacity: 1 } : undefined}
+                initial={{ clipPath: "inset(-40% 100% -40% 0)", opacity: 0 }}
+                animate={inView ? { clipPath: "inset(-40% 0% -40% 0)", opacity: 1 } : undefined}
                 transition={
                   reduce
                     ? { duration: 0 }

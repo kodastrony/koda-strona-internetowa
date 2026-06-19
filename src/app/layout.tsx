@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Syne, Inter, Geologica } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -131,7 +130,21 @@ const syne = Syne({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0b0b0d", // = --color-bg (kanwa) → chrome mobile pasuje do strony
+  // theme-color = kolor, którym Chromium maluje TŁO dokumentu podczas nawigacji
+  // (między starą a nową stroną — widoczne TYLKO przy pierwszym wejściu, nie refresh).
+  // Historia tego pola:
+  //  • stałe ciemne #0b0b0d → przy wejściu z ciemnej karty na naszą JASNĄ stronę
+  //    1 klatka CZARNA;
+  //  • wariant prefers-color-scheme (light/dark) → Chromium NIE używa media-query
+  //    theme-color do backdropu, więc spadał na DOMYŚLNY ciemny kolor schematu OS
+  //    = SZARY #3b3a3f (user na ciemnym OS + jasny motyw strony widział szary błysk).
+  // ROZWIĄZANIE: JEDEN, STAŁY kolor = porcelana #f7f4f8 (główny/jasny look marki).
+  // Strona jest light-first (auto-jasny 07–20, marka = porcelana), więc backdrop
+  // wejścia zawsze jasny → płynnie wtapia się w jasny top strony, bez błysku — i to
+  // NIEZALEŻNIE od motywu OS usera. (Kompromis: wejście NOCĄ przy auto-ciemnym da
+  // krótki jasny backdrop zamiast ciemnego — akceptowalne, bo i tak najpierw widać
+  // markową porcelanę; gdyby przeszkadzało, do rozważenia dynamiczny update metatagu.)
+  themeColor: "#f7f4f8",
 };
 
 export const metadata: Metadata = {
@@ -190,11 +203,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // suppressHydrationWarning: inline-skrypt motywu ustawia color-scheme /
-    // data-koda-light na <html> PRZED hydracją — różnica atrybutów <html> jest
-    // zamierzona (wzorzec next-themes), więc wyciszamy ostrzeżenie hydracji.
+    // ★ LIGHT-FIRST SSR: renderujemy <html data-koda-light style=color-scheme:light>
+    // JUŻ w statycznym HTML. Dzięki temu PIERWSZA KLATKA (przed jakimkolwiek skryptem,
+    // przed/po CSS, także na zimnym cache) jest JASNA = porcelana — bez czarnego/szarego
+    // błysku domyślnego ciemnego stanu. Inline-skrypt motywu (niżej) USUWA atrybut +
+    // ustawia color-scheme:dark TYLKO dla ciemnego motywu (auto-noc / ręczny). Light-first
+    // pasuje do marki (porcelana, auto-jasny 07–20) i życzenia „otwiera się od razu biała".
+    // suppressHydrationWarning: skrypt mutuje te atrybuty <html> przed hydracją (zamierzone,
+    // wzorzec next-themes). useThemeValue (useSyncExternalStore) bezpiecznie godzi
+    // getServerSnapshot="dark" z klienckim odczytem atrybutu (bez ostrzeżeń hydracji).
     <html
       lang="pl"
+      data-koda-light=""
+      // backgroundColor INLINE na <html> = porcelana JUŻ od 1. bajtu, ZANIM
+      // załaduje się globals.css. Bez tego, w oknie „HTML jest, ale CSS jeszcze
+      // się nie wczytał" (zimny cache / wolny dev), <html> nie ma własnego tła
+      // (porcelana przychodzi z `body` przez CSS) → przeglądarka maluje SWOJE
+      // domyślne JASNE tło = biało-SZARE → stąd „szary ekran przed białym".
+      // Inline tło na <html> wypełnia tę lukę porcelaną (body i tak je przykryje
+      // po wczytaniu CSS). colorScheme:light → spójny chrom/scrollbar od startu.
+      style={{ colorScheme: "light", backgroundColor: "#f7f4f8" }}
       suppressHydrationWarning
       className={`${display.variable} ${inter.variable} ${syne.variable}`}
     >
@@ -202,14 +230,20 @@ export default function RootLayout({
         {/* Motyw PRZED malowaniem (zero FOUC): ustala motyw AUTOMATYCZNIE wg pory
             dnia (jasny 07:00–20:00, poza tym ciemny) — a jeśli jest WAŻNE ręczne
             nadpisanie (do najbliższego progu), bierze je. Ustawia html[data-koda-light]
-            + color-scheme, zanim załaduje się bundle. beforeInteractive → Next
-            wstrzykuje skrypt do <head> statycznego HTML. Logika i godziny progu
+            + color-scheme, ZANIM cokolwiek się namaluje.
+            ⚠️ SUROWY inline <script>, NIE next/script. next/script
+            strategy="beforeInteractive" w App Routerze NIE jest synchronicznym
+            inline-skryptem — serializuje się do kolejki `__next_s` przetwarzanej
+            przez bootstrap frameworka, więc odpala się DOPIERO po załadowaniu
+            bundla JS (czyli PO pierwszym malowaniu). Skutek: atrybut
+            html[data-koda-light] nie był ustawiony na 1. klatce → kurtyna intro
+            (var(--intro-cover)) i kanwa (var(--canvas-fallback)) brały tokeny
+            :root = CIEMNE → ułamek sekundy ciemnego błysku przy wejściu (jasny
+            motyw). Surowy inline <script> jako PIERWSZE dziecko <body> wykonuje
+            się SYNCHRONICZNIE podczas parsowania HTML, przed treścią → motyw
+            ustalony zanim cokolwiek widoczne się pokaże. Logika i godziny progu
             żyją w lib/theme-init.ts (jedno źródło, wspólne z theme.ts). */}
-        <Script
-          id="koda-theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* Automat na żywo: przełącza motyw na progu 07:00/20:00 i po powrocie do
             karty (gdy zakładka była w tle/uśpiona). Nic nie renderuje. */}
         <ThemeAutoSync />

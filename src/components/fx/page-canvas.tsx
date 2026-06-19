@@ -54,6 +54,11 @@ const HOLDS: Record<string, string> = {
   statement: "#1d0a18",
   cta: "#30132a",
   footer: "#0a0609",
+  // HOME: stopka siedzi pod ciemnym Statementem („świt"). Osobny hold = ten sam
+  // ciemny kolor co `footer` → w trybie CIEMNYM bez żadnej różnicy. Sens ma w
+  // jasnym (LIGHT_HOLDS niżej): tam musi zostać CIEMNY, by scrub statement→stopka
+  // nie rozjaśniał kanwy (prześwit przez półprzezroczysty horyzont = „biały pas").
+  "footer-home": "#0a0609",
 };
 
 /** Jasny motyw: odpowiedniki holdów (subtelne pastele — papier z światłem).
@@ -71,11 +76,29 @@ const LIGHT_HOLDS: Record<string, string> = {
   // tekst klimaksu jest czytelny. Finał: ciemny horyzont → ciemna stopka.
   statement: "#160a14",
   cta: "#f2e3ee",
+  // Stopka hold JASNY — żeby na PODSTRONACH jasny CTA (CTABand) został jasny aż do
+  // krawędzi stopki (życzenie usera: bez ciemnienia CTA, jak było). Subpages =
+  // data-canvas="footer".
   footer: "#efe9f1",
+  // ★ HOME = data-canvas="footer-home" (footer.tsx wg trasy): CIEMNY hold także w
+  // jasnym motywie. Bez tego scrub statement(#160a14)→footer(#efe9f1) rozjaśniał
+  // CAŁĄ kanwę przy zjeździe do stopki, a niebo świtu jest półprzezroczyste →
+  // jasna kanwa prześwitywała = „biały pas / rozjaśnianie poniżej sekcji". Teraz
+  // statement→footer-home zostaje ciemny do końca (świt gaśnie w ciemność, jak
+  // chce user). Stopka-element i tak jest ciemną wyspą (globals: html[data-koda-light]
+  // footer). Sam dół home = ciemny mimo light theme, dokładnie jak prosił user.
+  "footer-home": "#0a0609",
 };
 
 const FALLBACK = "#0b0b0d";
 const FALLBACK_LIGHT = "#f7f4f8";
+// Kolor PIERWSZEJ klatki canvasu (przed hydracją) — z CSS-zmiennej sterowanej
+// motywem PRZED malowaniem (globals: :root #0b0b0d / html[data-koda-light]
+// #f7f4f8). NIE z propa theme: useThemeValue() przy SSR/hydracji ma snapshot
+// "dark", więc inline-style wpisywał #0b0b0d → na jasnym motywie CIEMNY błysk
+// canvasu przez ułamek sekundy. Zmienna = poprawny motyw od 1. klatki; measure()
+// i tak nadpisze hexem (scrub) tuż po hydracji (useLayoutEffect, przed paintem).
+const CANVAS_FALLBACK_VAR = "var(--canvas-fallback)";
 
 /* Tani STATYCZNY gradient tła dla tierów bez scrubu (low/static): jeden malunek,
    ZERO przemalowań całego viewportu na każdą klatkę scrolla (na słabym iGPU ten
@@ -179,7 +202,10 @@ export function PageCanvas() {
   // Tylko medium/high scrubują kolor tła per klatkę; low/static = statyczny gradient.
   const scrub = useTierProfile().pageCanvasScrub;
   const stopsRef = useRef<Stops | null>(null);
-  const bg = useMotionValue<string>(light ? FALLBACK_LIGHT : FALLBACK);
+  // Init = CSS-zmienna (poprawny motyw na 1. klatce, bez błysku — patrz wyżej).
+  // measure() ustawi właściwy hex w useLayoutEffect (przed pierwszym paintem po
+  // hydracji), więc zmienna jest realnie widoczna tylko w klatkach pre-hydracji.
+  const bg = useMotionValue<string>(CANVAS_FALLBACK_VAR);
 
   const measure = useCallback(() => {
     const holds = light ? LIGHT_HOLDS : HOLDS;

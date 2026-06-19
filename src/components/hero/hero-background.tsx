@@ -77,12 +77,14 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
             background: "linear-gradient(180deg, #fbf9fc 0%, #f7f4f8 52%, #f3eef7 100%)",
           }}
         />
-        {/* Ukośna wstęga światła — echo ciemnej wstęgi aurory, ale jasne */}
+        {/* Ukośna wstęga światła — echo ciemnej wstęgi aurory, ale jasne. Sięga
+            dalej w prawo (…82%→99%), żeby na szerokim desktopie prawa strona nie
+            była płaską bielą. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(118deg, transparent 26%, rgba(207,67,184,0.07) 48%, rgba(124,76,222,0.06) 62%, transparent 80%)",
+              "linear-gradient(118deg, transparent 24%, rgba(207,67,184,0.08) 46%, rgba(124,76,222,0.07) 62%, rgba(124,76,222,0.04) 82%, transparent 99%)",
             maskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
             WebkitMaskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
           }}
@@ -118,6 +120,16 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
             WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
           }}
         />
+        {/* ★ Prawa krawędź — miękka fioletowo-różowa łuna ZAKOTWICZONA U PRAWEJ,
+            żeby na szerokim desktopie prawa strona (za kolumną „KODA") NIE była
+            płaską bielą, tylko częścią tej samej aurory (życzenie usera #6). */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(48% 62% at 100% 44%, rgba(124,76,222,0.13) 0%, rgba(179,42,157,0.06) 42%, rgba(124,76,222,0) 74%)",
+          }}
+        />
       </div>
     );
   }
@@ -138,7 +150,7 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(118deg, transparent 28%, rgba(196,92,240,0.10) 50%, rgba(111,120,240,0.08) 62%, transparent 78%)",
+            "linear-gradient(118deg, transparent 26%, rgba(196,92,240,0.11) 50%, rgba(111,120,240,0.09) 62%, rgba(111,120,240,0.05) 82%, transparent 99%)",
           maskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
           WebkitMaskImage: "linear-gradient(to bottom, black 66%, transparent 97%)",
         }}
@@ -174,6 +186,15 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
             "radial-gradient(120% 80% at 30% 38%, transparent 46%, rgba(7,5,12,0.72) 100%)",
           maskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
           WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
+        }}
+      />
+      {/* ★ Prawa krawędź (NAD winietą) — aurora sięga prawej, żeby na szerokim
+          desktopie prawa strona nie była płaską ciemną/„białą" przerwą (#6). */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(46% 62% at 100% 48%, rgba(124,76,222,0.16) 0%, rgba(111,120,240,0.07) 44%, rgba(124,76,222,0) 74%)",
         }}
       />
     </div>

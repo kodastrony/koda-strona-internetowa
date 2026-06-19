@@ -221,10 +221,17 @@ export function ProjectCard({
               }}
             >
               {/* Locked frame ratio — the #1 cohesion lever across cards
-                  (4:3 default; aspectClassName drives a responsive bento lead). */}
+                  (4:3 default; aspectClassName drives a responsive bento lead).
+                  container-type: inline-size → tytuł/kategoria skalują się od
+                  SZEROKOŚCI KARTY (cqi), nie viewportu. Dzięki temu w gęstej
+                  siatce 2×2 na telefonie (karty ~169px) tytuły nie są za duże /
+                  nie zawijają brzydko, a duże karty na desktopie zostają czytelne. */}
               <div
                 className={cn("relative", aspectClassName)}
-                style={aspectClassName ? undefined : { paddingBottom: `${aspectPct}%` }}
+                style={{
+                  ...(aspectClassName ? {} : { paddingBottom: `${aspectPct}%` }),
+                  containerType: "inline-size",
+                }}
               >
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
@@ -321,15 +328,17 @@ export function ProjectCard({
 
                 {/* Title + category (always visible — static HTML for SEO/a11y) */}
                 <div
-                  className="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-3"
-                  style={{ padding: "clamp(16px,3vw,28px)" }}
+                  className="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-2 sm:gap-3"
+                  style={{ padding: "clamp(11px,6cqi,28px)" }}
                 >
                   <div className="min-w-0">
                     <h3
                       style={{
                         fontFamily: "var(--font-heading)",
                         fontWeight: 800,
-                        fontSize: "clamp(1.3rem, 2.3vw, 1.85rem)",
+                        // cqi = % szerokości KARTY → skaluje się z rozmiarem karty
+                        // (gęsta siatka 2×2 na telefonie vs duże karty desktop).
+                        fontSize: "clamp(1.02rem, 8cqi, 1.85rem)",
                         letterSpacing: "-0.025em",
                         lineHeight: 1.04,
                         color: "#ffffff",
@@ -342,7 +351,7 @@ export function ProjectCard({
                       className="mt-1.5 flex items-center gap-2"
                       style={{
                         fontFamily: "var(--font-body)",
-                        fontSize: "clamp(0.64rem, 0.9vw, 0.76rem)",
+                        fontSize: "clamp(0.56rem, 3.2cqi, 0.76rem)",
                         fontWeight: 400,
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
@@ -366,8 +375,8 @@ export function ProjectCard({
                     aria-hidden="true"
                     className="grid shrink-0 place-items-center rounded-full"
                     style={{
-                      width: "clamp(38px,3.4vw,46px)",
-                      height: "clamp(38px,3.4vw,46px)",
+                      width: "clamp(30px,13cqi,46px)",
+                      height: "clamp(30px,13cqi,46px)",
                       color: hovered ? "#0b0b0d" : "#ffffff",
                       background: hovered ? `rgb(${project.rgb})` : "rgba(255,255,255,0.12)",
                       border: `1px solid ${hovered ? `rgb(${project.rgb})` : "rgba(255,255,255,0.22)"}`,

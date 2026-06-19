@@ -27,11 +27,19 @@ export type HeaderTheme = "dark" | "light" | "pink";
    Header i ScrollProgress czytają wynik z kontekstu (zero dodatkowych listenerów). */
 
 const HeaderThemeContext = createContext<HeaderTheme>("dark");
+// Czy sekcja za headerem to CIEMNA WYSPA (Statement/stopka). Header używa tego,
+// by POKAZAĆ (białe) logo i przełącznik nad takimi sekcjami — inaczej znikają
+// przy zjeździe (logo-hide), a user chce je WIDZIEĆ białe na finałowym CTA.
+const HeaderDarkIslandContext = createContext<boolean>(false);
 
 interface Section {
   top: number;
   bottom: number;
   theme: HeaderTheme;
+  /** Sekcja CIEMNA W OBU MOTYWACH (np. Statement „świt", stopka) — globalny
+   *  tryb jasny NIE remapuje jej „dark"→„light", więc chrom (logo/przełącznik/
+   *  burger) zostaje BIAŁY (czarny byłby niewidoczny na ciemnym tle). */
+  darkIsland: boolean;
 }
 
 export function HeaderThemeProvider({
@@ -42,6 +50,7 @@ export function HeaderThemeProvider({
   headerHeight?: number;
 }) {
   const [theme, setTheme] = useState<HeaderTheme>("dark");
+  const [darkIsland, setDarkIsland] = useState(false);
 
   useEffect(() => {
     let sections: Section[] = [];
@@ -54,6 +63,7 @@ export function HeaderThemeProvider({
           top: s.offsetTop,
           bottom: s.offsetTop + s.offsetHeight,
           theme: (s.dataset.headerTheme as HeaderTheme | undefined) ?? "dark",
+          darkIsland: s.hasAttribute("data-header-dark-island"),
         })
       );
     };
@@ -64,14 +74,20 @@ export function HeaderThemeProvider({
       if (!sections.length) return;
       const checkY = window.scrollY + headerHeight / 2;
       let found: HeaderTheme = "dark";
+      let foundDarkIsland = false;
       for (const s of sections) {
-        if (s.top <= checkY && s.bottom > checkY) found = s.theme;
+        if (s.top <= checkY && s.bottom > checkY) {
+          found = s.theme;
+          foundDarkIsland = s.darkIsland;
+        }
       }
-      // Globalny motyw jasny: sekcje deklarujące „dark" stają się „light"
-      // (różowy Statement zostaje „pink" w obu motywach — to klimaks). Bez
-      // mutowania DOM: provider mapuje, sekcje trzymają swój atrybut.
-      if (getTheme() === "light" && found === "dark") found = "light";
+      // Globalny motyw jasny: sekcje deklarujące „dark" stają się „light" (są
+      // jasne w trybie jasnym). WYJĄTEK: ciemne wyspy (data-header-dark-island,
+      // np. Statement „świt" / stopka) są ciemne w OBU motywach → chrom zostaje
+      // biały (czarne logo/przełącznik byłyby niewidoczne na ciemnym tle).
+      if (getTheme() === "light" && found === "dark" && !foundDarkIsland) found = "light";
       setTheme((prev) => (prev === found ? prev : found));
+      setDarkIsland((prev) => (prev === foundDarkIsland ? prev : foundDarkIsland));
     };
 
     const onScroll = () => {
@@ -101,10 +117,19 @@ export function HeaderThemeProvider({
     };
   }, [headerHeight]);
 
-  return createElement(HeaderThemeContext.Provider, { value: theme }, children);
+  return createElement(
+    HeaderThemeContext.Provider,
+    { value: theme },
+    createElement(HeaderDarkIslandContext.Provider, { value: darkIsland }, children)
+  );
 }
 
 /** Zwraca motyw sekcji aktualnie za headerem (z kontekstu — bez własnego listenera). */
 export function useHeaderTheme(): HeaderTheme {
   return useContext(HeaderThemeContext);
+}
+
+/** Czy header jest aktualnie nad CIEMNĄ WYSPĄ (Statement/stopka). */
+export function useHeaderDarkIsland(): boolean {
+  return useContext(HeaderDarkIslandContext);
 }

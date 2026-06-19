@@ -115,6 +115,16 @@
   --color-canvas-plum: #30132a;
   --color-canvas-plum-deep: #521648;
   --color-canvas-footer: #0a0609;
+  /* Kurtyna intro „dwóch linii" + baza PageCanvas (pierwsza klatka). Wartości
+     ciemne = domyślne; jasne w html[data-koda-light]. Pierwsza klatka jest jasna,
+     bo SSR renderuje <html data-koda-light> (light-first); theme-init usuwa atrybut
+     dla ciemnego motywu. measure() i tak nadpisuje canvas hexem po hydracji. */
+  --intro-cover: #120617;
+  --canvas-fallback: #0b0b0d;
+  /* Baza sekcji Statement (świt) = kolor jej holdu kanwy → niewidoczna normalnie,
+     ale ZASŁANIA rozjaśnianie kanwy przy zjeździe do stopki (przez półprzezroczyste
+     niebo shadera prześwitywała jasna kanwa = „biały pas"). Jasny wariant niżej. */
+  --statement-base: #1d0a18;
   --color-line: rgba(255, 255, 255, 0.08);
   --color-line-strong: rgba(255, 255, 255, 0.15);
   --color-ink: #f5f5f7;
@@ -154,6 +164,13 @@
 html[data-koda-light] {
   --color-bg: #f7f4f8;
   --color-bg-deep: #eee9f1;
+  /* Jasna kurtyna intro (porcelana z muśnięciem fioletu) — pierwsza klatka. */
+  --intro-cover: #efe7f5;
+  /* Jasny bazowy kolor PageCanvas na pierwszą klatkę = FALLBACK_LIGHT / hold „hero". */
+  --canvas-fallback: #f7f4f8;
+  /* Baza Statementu w jasnym = jego ciemny hold (#160a14) → ciemna wyspa zostaje
+     ciemna nawet gdy kanwa scrubuje do jasnej stopki (koniec „białego pasa"). */
+  --statement-base: #160a14;
   --color-graphite: #f1ecf4;
   --color-surface-1: #ffffff;
   --color-surface-2: #f6f0f6;
@@ -190,8 +207,10 @@ html[data-koda-light] {
   --color-dark-card: #ffffff;
 }
 
-/* Papier od pierwszej klatki (PageCanvas i tak maluje pogodę, ale gdyby
-   się nie zamontował, edge/overscroll nie błyska czernią). */
+/* Papier od pierwszej klatki: SSR renderuje <html data-koda-light> (light-first),
+   więc body od razu porcelanowe (ta reguła bije .bg-dark wyższą specyficznością);
+   theme-init usuwa atrybut dla ciemnego motywu. To też tło „canvas dokumentu", na
+   którym leży fixed PageCanvas (gdyby się nie zmontował, edge/overscroll nie błyska). */
 html[data-koda-light] body {
   background-color: #f7f4f8;
 }
