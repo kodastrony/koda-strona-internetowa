@@ -214,6 +214,13 @@ html[data-koda-light] {
 html[data-koda-light] body {
   background-color: #f7f4f8;
 }
+/* Ciemny motyw: nadpisz INLINE porcelanę z <body> (light-first, anty-szary-błysk)
+   z powrotem na ciemne tło dokumentu. !important bo bije inline style. SSR ma
+   data-koda-light (light-first), więc ta reguła łapie dopiero gdy theme-init
+   ZDEJMIE atrybut dla ciemnego motywu → wtedy backdrop dokumentu jest ciemny. */
+html:not([data-koda-light]) body {
+  background-color: #0b0b0d !important;
+}
 
 /* STOPKA = CIEMNA WYSPA (klasyczny wzorzec zaufania): lokalnie przywracamy
    ciemne tokeny, więc tekst/logo stopki działają bez zmian. */

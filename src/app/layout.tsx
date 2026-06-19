@@ -215,18 +215,26 @@ export default function RootLayout({
     <html
       lang="pl"
       data-koda-light=""
-      // backgroundColor INLINE na <html> = porcelana JUŻ od 1. bajtu, ZANIM
-      // załaduje się globals.css. Bez tego, w oknie „HTML jest, ale CSS jeszcze
-      // się nie wczytał" (zimny cache / wolny dev), <html> nie ma własnego tła
-      // (porcelana przychodzi z `body` przez CSS) → przeglądarka maluje SWOJE
-      // domyślne JASNE tło = biało-SZARE → stąd „szary ekran przed białym".
-      // Inline tło na <html> wypełnia tę lukę porcelaną (body i tak je przykryje
-      // po wczytaniu CSS). colorScheme:light → spójny chrom/scrollbar od startu.
-      style={{ colorScheme: "light", backgroundColor: "#f7f4f8" }}
+      // ⚠️ NIE ustawiać tła na <html>! PageCanvas (fixed -z-10) działa TYLKO gdy
+      // <html> NIE ma tła — wtedy tło body propaguje na „canvas dokumentu", a
+      // PageCanvas maluje NAD nim. Tło na <html> łamało ten inwariant → PageCanvas
+      // przestawał zasłaniać → jasne tło body prześwitywało przez przezroczyste
+      // sekcje (np. ciemna wyspa Statement robiła się jasna na górze). Tu zostaje
+      // tylko colorScheme:light (spójny chrom/scrollbar od startu, light-first).
+      style={{ colorScheme: "light" }}
       suppressHydrationWarning
       className={`${display.variable} ${inter.variable} ${syne.variable}`}
     >
-      <body className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased">
+      {/* Tło porcelana INLINE na <body> (NIE na <html> — to łamało PageCanvas).
+          Body to „canvas dokumentu", nad którym PageCanvas (-z-10) maluje, więc
+          tło body jest BEZPIECZNE i wypełnia lukę „przed wczytaniem globals.css"
+          porcelaną zamiast szarego domyślnego tła przeglądarki (light-first).
+          Ciemny motyw nadpisuje to z powrotem regułą html:not([data-koda-light]) body
+          w globals.css. */}
+      <body
+        style={{ backgroundColor: "#f7f4f8" }}
+        className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased"
+      >
         {/* Motyw PRZED malowaniem (zero FOUC): ustala motyw AUTOMATYCZNIE wg pory
             dnia (jasny 07:00–20:00, poza tym ciemny) — a jeśli jest WAŻNE ręczne
             nadpisanie (do najbliższego progu), bierze je. Ustawia html[data-koda-light]
