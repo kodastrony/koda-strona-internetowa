@@ -26,6 +26,11 @@ export async function generateMetadata({
     description: project.summary,
     alternates: { canonical: `/realizacje/${project.id}/` },
     openGraph: {
+      // Komplet pól OG (type/locale/siteName) — spójnie z pageMetadata(); bez nich
+      // podgląd społecznościowy/AI gubił og:type, og:locale i og:site_name (7 vs 10 tagów).
+      type: "article",
+      locale: "pl_PL",
+      siteName: "KODA Studio",
       title: `${project.title} — ${project.type} | KODA`,
       description: project.summary,
       url: `/realizacje/${project.id}/`,
@@ -38,7 +43,12 @@ export async function generateMetadata({
         },
       ],
     },
-    twitter: { card: "summary_large_image", images: [project.showcase] },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — ${project.type} | KODA`,
+      description: project.summary,
+      images: [project.showcase],
+    },
   };
 }
 

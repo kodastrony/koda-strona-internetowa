@@ -21,6 +21,18 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Statyczne media z public/ (zdjęcia realizacji .webp + filmy .mp4) — nazwy NIE
+# są content-hashowane, więc NIE „immutable" (zmiana pliku musi się rozejść).
+# 30 dni public daje mocny repeat-view (część to obrazy preload/LCP karty
+# realizacji na home) bez ryzyka przypięcia starej grafiki na zawsze. Lighthouse:
+# „uses-long-cache-ttl" dotyczył właśnie tych zasobów (chunki /_next już immutable).
+/realizacje/*
+  Cache-Control: public, max-age=2592000
+/*.mp4
+  Cache-Control: public, max-age=2592000
+/*.webp
+  Cache-Control: public, max-age=2592000
+
 # OG image (opengraph-image.tsx) + apple-icon — ścieżki BEZ rozszerzenia, więc
 # Cloudflare serwuje je jako application/octet-stream, a nosniff blokuje sniffing →
 # strict unfurlery/walidatory odrzucają obraz. Wymuszamy poprawny typ obrazu.
