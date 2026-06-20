@@ -25,7 +25,10 @@ function StepNumber({ n }: { n: string }) {
       aria-hidden="true"
       className="mb-4 font-heading font-bold"
       style={{ fontSize: "clamp(2.6rem,4.4vw,4rem)", lineHeight: 1, letterSpacing: "-0.04em" }}
-      initial={reduce ? false : { color: from }}
+      // initial NIE rozgałęzia po reduce (useReducedMotion różni się SSR↔klient →
+      // mismatch hydracji). Ten sam DOM/initial zawsze; reduced steruje tylko
+      // transition (duration:0 → po wejściu w widok kolor wskakuje od razu).
+      initial={{ color: from }}
       whileInView={{ color: to }}
       viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
       transition={reduce ? { duration: 0 } : { duration: 0.55, ease: EASE.out }}
@@ -54,7 +57,7 @@ function AnimatedCheck({ delay }: { delay: number }) {
         strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
-        initial={reduce ? false : { pathLength: 0 }}
+        initial={{ pathLength: 0 }}
         whileInView={{ pathLength: 1 }}
         viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
         transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}

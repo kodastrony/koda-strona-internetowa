@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion, type MotionStyle } from "motion/react";
 
 /* ── Parallax — scroll-linked drift for depth ─────────────────────────────
@@ -37,6 +37,17 @@ export function Parallax({
 }: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // ★ HYDRACJA: useReducedMotion() zwraca false na SERWERZE i w PIERWSZYM renderze
+  // klienta, a true (u usera z reduced-motion) dopiero po zamontowaniu. Gdybyśmy
+  // rozgałęziali RENDER po `reduce` od razu (jak wcześniej: <div> vs <motion.div>),
+  // SSR i pierwszy render klienta różniłyby się → mismatch hydracji (React #418/#425)
+  // na KAŻDEJ stronie z Parallaxem. Dlatego honorujemy reduced-motion DOPIERO po
+  // mount (`hydrated`), a pierwszy render zawsze = wariant ruchu (zgodny z SSR).
+  // Ten sam idiom co <FadeUp>: jeden element + ten sam DOM, różni się tylko styl.
+  const [hydrated, setHydrated] = useState(false);
+  // Mount flag (post-hydracja) — standardowy wzorzec; setState w efekcie świadomy.
+  /* eslint-disable-next-line react-hooks/set-state-in-effect */
+  useEffect(() => setHydrated(true), []);
 
   // 0 = element's top hits viewport bottom (entering); 1 = element's bottom
   // leaves the viewport top (gone). The whole pass through the screen.
@@ -45,21 +56,19 @@ export function Parallax({
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [scaleFrom ?? 1, 1, scaleFrom ?? 1]);
   const opacity = useTransform(scrollYProgress, [0, 0.18, 0.82, 1], [0.35, 1, 1, 0.35]);
 
-  if (reduce) {
-    return (
-      <div ref={ref} className={className} style={style}>
-        {children}
-      </div>
-    );
-  }
-
-  const motionStyle: MotionStyle = {
-    y,
-    willChange: "transform",
-    ...(scaleFrom ? { scale } : {}),
-    ...(fade ? { opacity } : {}),
-    ...style,
-  };
+  // Reduced motion → bez parallaxu (statyczny styl), ale TYLKO po hydracji (patrz
+  // wyżej). Zawsze renderujemy <motion.div ref={ref}> — zmienia się wyłącznie styl
+  // (MotionValues vs statyczny), więc element się nie przemontowuje i nie ma mismatchu.
+  const motionStyle: MotionStyle =
+    hydrated && reduce
+      ? { ...style }
+      : {
+          y,
+          willChange: "transform",
+          ...(scaleFrom ? { scale } : {}),
+          ...(fade ? { opacity } : {}),
+          ...style,
+        };
 
   return (
     <motion.div ref={ref} className={className} style={motionStyle}>

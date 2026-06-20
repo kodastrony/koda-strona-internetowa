@@ -113,7 +113,11 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-white/5 pt-8 text-xs text-ink-muted sm:flex-row sm:items-center">
-          <span>© {year} KODA. Wszelkie prawa zastrzeżone.</span>
+          {/* suppressHydrationWarning: rok liczony z new Date() jest „zapiekany" w
+              statycznym eksporcie w momencie buildu; gdyby stronę z buildu z roku N
+              otworzyć po 1 stycznia N+1 bez redeployu, SSR='N' a klient='N+1' = mismatch
+              (#418) na całej stronie. Tłumimy ten jeden węzeł (klient pokaże aktualny rok). */}
+          <span suppressHydrationWarning>© {year} KODA. Wszelkie prawa zastrzeżone.</span>
           <div className="flex gap-6">
             <Link href="/polityka-prywatnosci" className="transition-colors hover:text-white">
               Polityka prywatności

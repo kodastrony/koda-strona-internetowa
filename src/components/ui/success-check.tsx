@@ -10,31 +10,42 @@ import { EASE } from "@/lib/motion";
      2. the pink disc springs in (scale 0.4→1 with a gentle overshoot — never
         from scale(0): things don't appear from nothing),
      3. the checkmark DRAWS itself inside via an animated pathLength.
-   Reduced motion → the final state, instantly (no movement, no ripple). */
+   Reduced motion → the final state, instantly (no ripple, no spring, no draw).
+
+   ⚠️ HYDRACJA: NIE rozgałęziać renderowanego DOM ani propów `initial` po
+   useReducedMotion — zwraca `false` na serwerze, a `true` u klienta z reduced-
+   motion, więc SSR≠klient = React #418 (hydration mismatch, „tree regenerated").
+   Wzorzec jak <FadeUp>: ZAWSZE ten sam DOM + te same `initial`/`animate`, a
+   reduced-motion steruje WYŁĄCZNIE `transition` (duration:0 → element wskakuje
+   od razu w stan `animate`: pierścienie→opacity 0 = brak ripple, dysk→widoczny,
+   „ptaszek"→narysowany). Transition nie wpływa na SSR-HTML, więc hydracja gra. */
 export function SuccessCheck() {
   const reduce = useReducedMotion();
 
   return (
     <div className="relative mb-8 grid h-16 w-16 place-items-center">
-      {/* One-time ring burst — two rings, slightly offset (skipped for reduced motion) */}
-      {!reduce &&
-        [0, 0.14].map((d, i) => (
-          <motion.span
-            key={i}
-            aria-hidden="true"
-            className="absolute rounded-full"
-            style={{ width: 64, height: 64, border: "1.5px solid var(--color-accent)" }}
-            initial={{ scale: 0.7, opacity: 0.55 }}
-            animate={{ scale: 2.5, opacity: 0 }}
-            transition={{ duration: 1.05, ease: "easeOut", delay: 0.28 + d }}
-          />
-        ))}
+      {/* Ring burst — dwa pierścienie (lekko przesunięte w czasie). ZAWSZE w DOM
+          (hydration-safe); reduced-motion: transition duration 0 → od razu
+          opacity 0 (brak ripple). */}
+      {[0, 0.14].map((d, i) => (
+        <motion.span
+          key={i}
+          aria-hidden="true"
+          className="absolute rounded-full"
+          style={{ width: 64, height: 64, border: "1.5px solid var(--color-accent)" }}
+          initial={{ scale: 0.7, opacity: 0.55 }}
+          animate={{ scale: 2.5, opacity: 0 }}
+          transition={
+            reduce ? { duration: 0 } : { duration: 1.05, ease: "easeOut", delay: 0.28 + d }
+          }
+        />
+      ))}
 
-      {/* Pink disc — springs in (subtle overshoot) */}
+      {/* Pink disc — springs in (subtle overshoot); reduced → snaps to final */}
       <motion.span
         className="relative grid h-16 w-16 place-items-center rounded-full bg-pink"
         style={{ boxShadow: "0 12px 34px -10px rgba(207,67,184,0.55)" }}
-        initial={reduce ? false : { scale: 0.4, opacity: 0 }}
+        initial={{ scale: 0.4, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={
           reduce ? { duration: 0 } : { type: "spring", stiffness: 280, damping: 15, delay: 0.1 }
@@ -47,7 +58,7 @@ export function SuccessCheck() {
             strokeWidth="2.4"
             strokeLinecap="round"
             strokeLinejoin="round"
-            initial={reduce ? false : { pathLength: 0 }}
+            initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={reduce ? { duration: 0 } : { duration: 0.45, ease: EASE.out, delay: 0.45 }}
           />
