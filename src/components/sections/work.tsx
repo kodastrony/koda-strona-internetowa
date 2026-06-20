@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { EASE } from "@/lib/motion";
 import { FadeUp, Parallax } from "@/components/motion";
@@ -21,8 +22,58 @@ import { getProject } from "@/lib/projects";
 // /realizacje). Slice + Wycisk żyją na /realizacje.
 const GRID = ["rikoszet", "grabowski", "jr-modular", "drblocks"].map((id) => getProject(id)!);
 
+// Per-kafel parametry „floatu" (patrz koda-card-float w globals.css). Sąsiednie
+// kafle dryfują w PRZECIWNE strony po przekątnych (TL↑ TR↓ BL↓ BR↑) i są
+// rozstrojone (różne czasy + ujemny delay = inna faza od startu), więc siatka
+// 2×2 oddycha organicznie, a nie jedzie jak jeden blok. Amplituda < najmniejszy
+// gap (12px) → kafle nigdy na siebie nie nachodzą.
+const FLOAT = [
+  {
+    "--cf-y": "-9px",
+    "--cf-x": "4px",
+    "--cf-r": "-0.6deg",
+    "--cf-dur": "8.5s",
+    "--cf-delay": "-1.2s",
+  },
+  {
+    "--cf-y": "8px",
+    "--cf-x": "-5px",
+    "--cf-r": "0.6deg",
+    "--cf-dur": "10.2s",
+    "--cf-delay": "-3.6s",
+  },
+  {
+    "--cf-y": "7px",
+    "--cf-x": "-4px",
+    "--cf-r": "0.5deg",
+    "--cf-dur": "9.4s",
+    "--cf-delay": "-2.1s",
+  },
+  {
+    "--cf-y": "-8px",
+    "--cf-x": "5px",
+    "--cf-r": "-0.55deg",
+    "--cf-dur": "11.1s",
+    "--cf-delay": "-5.2s",
+  },
+] as unknown as React.CSSProperties[];
+
 export function Work() {
   const reduce = useReducedMotion();
+
+  // Float kafli PAUZUJE poza ekranem (ten sam wzorzec co koda-blob): uśpiona
+  // animacja nie tyka kompozytora. Duży rootMargin = budzi się przed wjazdem.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [floatOn, setFloatOn] = useState(true);
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setFloatOn(entry.isIntersecting), {
+      rootMargin: "40% 0px 40% 0px",
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <section data-header-theme="dark" data-canvas="work" className="relative">
@@ -75,15 +126,23 @@ export function Work() {
             Dwie kolumny NA KAŻDYM urządzeniu (siatka 2×2 = „cztery kwadraty”),
             stała proporcja 4:3 wspólna z resztą portfolio. Kolejność rikoszet →
             grabowski → jr-modular → drblocks daje rogi: TL, TR, BL, BR. */}
-        <div className="grid grid-cols-2" style={{ gap: "clamp(12px,2.4vw,32px)" }}>
+        <div ref={gridRef} className="grid grid-cols-2" style={{ gap: "clamp(12px,2.4vw,32px)" }}>
           {GRID.map((p, i) => (
-            <ProjectCard
+            // Wrapper „float" (ciągły, organiczny dryf) — OSOBNY element od
+            // ProjectCard, więc hover-tilt karty działa niezależnie. Reduced-motion
+            // gasi animację w CSS; off-screen pauzuje przez animationPlayState.
+            <div
               key={p.id}
-              project={p}
-              delay={i * 0.06}
-              priority={i < 2}
-              sizes="(min-width: 768px) 46vw, 47vw"
-            />
+              className="koda-card-float"
+              style={{ ...FLOAT[i], animationPlayState: floatOn ? "running" : "paused" }}
+            >
+              <ProjectCard
+                project={p}
+                delay={i * 0.06}
+                priority={i < 2}
+                sizes="(min-width: 768px) 46vw, 47vw"
+              />
+            </div>
           ))}
         </div>
 

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { SITE_CONFIG } from "@/lib/constants";
-import { useHeaderTheme, useHeaderDarkIsland } from "@/hooks/use-header-theme";
+import { useHeaderTheme } from "@/hooks/use-header-theme";
 import { useLogoHidden } from "@/hooks/use-logo-hide";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -26,10 +26,6 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState<Origin | null>(null);
   const theme = useHeaderTheme();
-  // Nad ciemną wyspą (Statement „świt" / stopka) chrom ma być WIDOCZNY i biały —
-  // logo i przełącznik wychodzą z trybu „schowane przy zjeździe", więc user widzi
-  // je białe na finałowym CTA (życzenie: „zmienia się na biały w dobrym momencie").
-  const onDarkIsland = useHeaderDarkIsland();
 
   // Wejście headera jest zsync z intro TYLKO gdy intro faktycznie gra: strona
   // główna („/"), pierwsze twarde wejście, bez reduced-motion. Na podstronach
@@ -74,14 +70,17 @@ export function Header() {
   // Gdy menu jest otwarte, KODA MUSI być widoczne (białe menu, ciemny napis) —
   // żeby było co kliknąć (powrót na stronę główną) i żeby nie znikało, gdy ktoś
   // otworzy menu po zjechaniu w dół (gdzie logo jest normalnie schowane).
-  const hideLogo = logoHidden && !logoFocused && !open && !onDarkIsland;
+  // ★ Logo ZNIKA przy zjeździe i ZOSTAJE schowane do końca (życzenie usera) —
+  // BEZ ponownego pokazywania nad ciemną wyspą Statement/CTA. Wraca tylko na
+  // górze strony albo przy fokusie (Tab, a11y).
+  const hideLogo = logoHidden && !logoFocused && !open;
 
   // ── Przełącznik motywu chowa się TAK SAMO jak logo ────────────────────────
   // (życzenie usera: ikonka ☀/☾ znika przy zjeździe i wraca na górze, dokładnie
   // jak wordmark KODA). Burger i pill „Kontakt" ZOSTAJĄ (menu zawsze dostępne).
   // Osobny stan focusu, by Tab na przełącznik wymuszał jego widoczność (a11y).
   const [toggleFocused, setToggleFocused] = useState(false);
-  const hideToggle = logoHidden && !toggleFocused && !open && !onDarkIsland;
+  const hideToggle = logoHidden && !toggleFocused && !open;
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
