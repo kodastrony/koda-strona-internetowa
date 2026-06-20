@@ -121,13 +121,14 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
           }}
         />
         {/* ★ Prawa krawędź — miękka fioletowo-różowa łuna ZAKOTWICZONA U PRAWEJ,
-            żeby na szerokim desktopie prawa strona (za kolumną „KODA") NIE była
-            płaską bielą, tylko częścią tej samej aurory (życzenie usera #6). */}
+            żeby prawa strona (za kolumną „KODA") NIE była płaską bielą z widocznym
+            pionowym szwem, tylko częścią tej samej aurory. SZEROKA, z płynnym
+            blendem od ~46% aż do krawędzi → brak nagłego brzegu poświaty. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(48% 62% at 100% 44%, rgba(124,76,222,0.13) 0%, rgba(179,42,157,0.06) 42%, rgba(124,76,222,0) 74%)",
+              "radial-gradient(84% 90% at 100% 44%, rgba(124,76,222,0.15) 0%, rgba(179,42,157,0.08) 30%, rgba(124,76,222,0.03) 54%, rgba(124,76,222,0) 80%)",
           }}
         />
       </div>
@@ -188,13 +189,18 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
           WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent 96%)",
         }}
       />
-      {/* ★ Prawa krawędź (NAD winietą) — aurora sięga prawej, żeby na szerokim
-          desktopie prawa strona nie była płaską ciemną/„białą" przerwą (#6). */}
+      {/* ★ Prawa krawędź (NAD winietą) — aurora sięga prawej, żeby prawa strona nie
+          była płaską ciemną przerwą z widocznym pionowym szwem. SZEROKA i MOCNA u
+          krawędzi: winieta (środek 30%) mocno przyciemnia prawą stronę, a maska
+          GlowField ucina poświatę ~88% → bez tej warstwy zostawał ciemny pas + szew
+          ~prawe 12% (a w ciemnym motywie poświata DRYFUJE, więc szew „jechał" w
+          prawo). Teraz łuna wypełnia prawą stronę PŁYNNIE aż do krawędzi (blend od
+          ~46%), kontrując winietę i przykrywając ruchomy szew. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(46% 62% at 100% 48%, rgba(124,76,222,0.16) 0%, rgba(111,120,240,0.07) 44%, rgba(124,76,222,0) 74%)",
+            "radial-gradient(82% 92% at 100% 46%, rgba(134,90,234,0.26) 0%, rgba(120,86,230,0.15) 28%, rgba(111,120,240,0.07) 50%, rgba(124,76,222,0.02) 66%, rgba(124,76,222,0) 82%)",
         }}
       />
     </div>
