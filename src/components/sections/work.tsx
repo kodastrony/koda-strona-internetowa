@@ -39,6 +39,7 @@ export function Work() {
           strength={0.8}
           drift
           driftDuration={19}
+          edgeFade="vertical"
           className="inset-0"
         />
       </Parallax>

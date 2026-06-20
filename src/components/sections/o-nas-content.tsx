@@ -117,6 +117,7 @@ export function ONasContent() {
           strength={0.8}
           drift
           driftDuration={27}
+          edgeFade="vertical"
           className="inset-x-0 z-0"
           style={{ top: "-16%", height: "80%" }}
         />

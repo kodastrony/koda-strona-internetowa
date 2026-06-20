@@ -31,6 +31,7 @@ export function Process() {
           strength={0.6}
           drift
           driftDuration={31}
+          edgeFade="vertical"
           className="inset-0"
         />
       </Parallax>

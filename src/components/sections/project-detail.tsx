@@ -274,6 +274,7 @@ export function ProjectDetail({
           strength={0.45}
           drift
           driftDuration={31}
+          edgeFade="vertical"
           className="inset-x-0 z-0"
           style={{ top: "-10%", height: "70%" }}
         />
@@ -559,6 +560,7 @@ export function ProjectDetail({
           strength={0.5}
           drift
           driftDuration={33}
+          edgeFade="vertical"
           className="inset-x-0 z-0"
           style={{ top: "-14%", height: "75%" }}
         />

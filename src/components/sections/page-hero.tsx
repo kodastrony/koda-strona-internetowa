@@ -56,6 +56,7 @@ export function PageHero({
           strength={0.9}
           drift
           driftDuration={29}
+          edgeFade="vertical"
           className="inset-0"
         />
       </Parallax>

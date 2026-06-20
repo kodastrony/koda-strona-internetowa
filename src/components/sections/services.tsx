@@ -98,6 +98,7 @@ export function Services() {
           strength={0.9}
           drift
           driftDuration={33}
+          edgeFade="vertical"
           className="inset-0"
         />
       </Parallax>

@@ -165,6 +165,7 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
           strength={1.25}
           drift
           driftDuration={23}
+          edgeFade="vertical"
           className="inset-0"
         />
       </motion.div>
@@ -176,6 +177,7 @@ export function HeroBackground({ light = false }: { light?: boolean }) {
           strength={1.0}
           drift
           driftDuration={31}
+          edgeFade="vertical"
           className="inset-0"
         />
       </motion.div>

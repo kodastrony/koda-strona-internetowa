@@ -233,6 +233,7 @@ export function UslugiContent() {
           strength={0.6}
           drift
           driftDuration={31}
+          edgeFade="vertical"
           className="inset-x-0 z-0"
           style={{ top: "-18%", height: "80%" }}
         />

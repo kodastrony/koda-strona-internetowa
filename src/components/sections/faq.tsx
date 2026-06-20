@@ -160,6 +160,7 @@ export function Faq() {
           strength={0.85}
           drift
           driftDuration={27}
+          edgeFade="vertical"
           className="inset-0"
         />
       </Parallax>

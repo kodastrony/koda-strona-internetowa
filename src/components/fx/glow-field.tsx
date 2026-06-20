@@ -4,9 +4,22 @@ import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 /** Miękkie wygaszenie poświaty na wszystkich 4 krawędziach pudełka (≈12% pasy).
- *  Składane przez mask-composite:intersect (iloczyn osi) — patrz <GlowField>. */
-const GLOW_EDGE_MASK =
+ *  Składane przez mask-composite:intersect (iloczyn osi) — patrz <GlowField>.
+ *  Dla pudełek WĘŻSZYCH niż viewport (karty, panele): brzeg gradientu wpada w
+ *  pole widzenia, więc trzeba go zgasić, inaczej twardy prostokątny „outline". */
+const GLOW_EDGE_MASK_BOTH =
   "linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%), " +
+  "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)";
+
+/** Tylko PIONOWE wygaszenie (góra/dół). Dla poświat PEŁNOEKRANOWYCH (wrapper
+ *  `inset-x-0` = pełna szerokość viewportu): pozioma maska 88% gasiła poświatę
+ *  ~12% PRZED prawą krawędzią ekranu → widoczny pionowy SZEW (poświata znika,
+ *  dalej goła kanwa = „biały pas przy prawej krawędzi"), który DODATKOWO jechał
+ *  z dryfem. Bez poziomej maski światło dochodzi do KRAWĘDZI EKRANU i jest cięte
+ *  czysto przez html{overflow-x:clip} (źródło światła zza kadru) — zero szwu w
+ *  polu widzenia. Pionowa maska zostaje: górę/dół pudełka trzeba wygasić, bo te
+ *  krawędzie wypadają WEWNĄTRZ ekranu (poziomy szew byłby widoczny). */
+const GLOW_EDGE_MASK_VERTICAL =
   "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)";
 
 /* ── GlowField — „oświetlenie sceny" zamiast płaskiego bloba ───────────────
@@ -49,6 +62,13 @@ interface GlowFieldProps {
   /** Podprogowy dryf (transform-only). Czas per-instancja, np. 19/26/33. */
   drift?: boolean;
   driftDuration?: number;
+  /** Które krawędzie wygaszać maską:
+   *  • "both" (domyślne) — wszystkie 4 (pudełka węższe od viewportu: karty/panele),
+   *  • "vertical" — tylko góra/dół; poświata dochodzi do KRAWĘDZI EKRANU (dla
+   *    poświat PEŁNOEKRANOWYCH `inset-x-0` — bez tego pozioma maska 88% robi szew
+   *    przy prawej/lewej krawędzi, patrz GLOW_EDGE_MASK_VERTICAL),
+   *  • "none" — bez maski. */
+  edgeFade?: "both" | "vertical" | "none";
   className?: string;
   style?: React.CSSProperties;
 }
@@ -60,10 +80,18 @@ export function GlowField({
   strength = 1,
   drift = false,
   driftDuration = 26,
+  edgeFade = "both",
   className,
   style,
 }: GlowFieldProps) {
   const blobRef = useRef<HTMLDivElement>(null);
+  // Pełnoekranowe poświaty (edgeFade≠"both") nie mają poziomej maski → przy
+  // dryfie pudełko musi WYSTAWAĆ poza ekran w poziomie, inaczej skrajna faza
+  // dryfu (translate −4%, scale 1) odsłaniałaby ~4% pas gołej kanwy przy prawej
+  // krawędzi (a ruch w prawo „przykrywałby" go — dokładnie zgłaszany szew).
+  // Bleed −8% z każdej strony pokrywa cały zakres dryfu (−4%…+5%) z zapasem;
+  // html{overflow-x:clip} ucina nadmiar (zero scrolla). Pionowy bleed jak dotąd.
+  const horizontalBleed = edgeFade !== "both";
 
   // Dryf PAUZUJE daleko poza ekranem (ten sam wzorzec co marquee): uśpiona
   // animacja nie tyka kompozytora i pozwala zdemotować/odzyskać teksturę
@@ -83,30 +111,50 @@ export function GlowField({
     return () => io.disconnect();
   }, [drift]);
 
+  // ★ Maska gaśnie poświatę do ZERA na krawędziach pudełka. Bez niej radialny
+  // gradient (zwł. duży „ambient", przesunięty ku brzegowi) jest NIEZEROWY na
+  // krawędzi warstwy GPU → twardy prostokątny „outline", który dodatkowo JEŹDZI
+  // z dryfem `koda-blob` (translate+scale) i parallaxem. "both" gasi 4 krawędzie
+  // (mask-composite:intersect = iloczyn osi) dla pudełek węższych od ekranu.
+  // "vertical" gasi tylko górę/dół — pełnoekranowa poświata dochodzi do krawędzi
+  // ekranu (cięta przez html{overflow-x:clip}), bez szwu przy prawej krawędzi.
+  const maskStyle: React.CSSProperties =
+    edgeFade === "none"
+      ? {}
+      : edgeFade === "vertical"
+        ? { maskImage: GLOW_EDGE_MASK_VERTICAL, WebkitMaskImage: GLOW_EDGE_MASK_VERTICAL }
+        : {
+            maskImage: GLOW_EDGE_MASK_BOTH,
+            WebkitMaskImage: GLOW_EDGE_MASK_BOTH,
+            maskComposite: "intersect",
+            WebkitMaskComposite: "source-in",
+          };
+
+  // Pełnoekranowy bleed (horizontalBleed) MUSI być cięty poziomo NA WRAPPERZE
+  // (= szerokość viewportu, inset-x-0), inaczej blob wystaje −8% poza ekran i
+  // robi poziomy scroll (root overflow-x:clip tego nie łapał). overflow-x:clip
+  // tnie nadmiar poziomy DOKŁADNIE na krawędzi ekranu (światło zza kadru), a
+  // overflow-y:visible ZACHOWUJE pionowy bleed (−8% góra/dół) bez zmian —
+  // [spec: clip + visible nie wymusza zmiany żadnej osi]. Poświata wypełnia więc
+  // całą szerokość przy każdej fazie dryfu, bez szwu i bez scrolla.
+  const clipStyle: React.CSSProperties = horizontalBleed
+    ? { overflowX: "clip", overflowY: "visible" }
+    : {};
+
   return (
     <div
       aria-hidden="true"
       className={cn("pointer-events-none absolute", className)}
-      // ★ Maska gaśnie poświatę do ZERA na WSZYSTKICH 4 krawędziach pudełka.
-      // Bez niej radialny gradient (zwł. duży „ambient", przesunięty ku brzegowi
-      // przy x≈8/90) jest NIEZEROWY na krawędzi warstwy GPU → twardy prostokątny
-      // „outline", który dodatkowo JEŹDZIŁ z dryfem `koda-blob` (translate+scale)
-      // i parallaxem. Teraz światło wtapia się miękko w ramkę (jak źródło zza
-      // kadru) — zero prostokąta. mask-composite:intersect = iloczyn obu osi.
-      style={{
-        maskImage: GLOW_EDGE_MASK,
-        WebkitMaskImage: GLOW_EDGE_MASK,
-        maskComposite: "intersect",
-        WebkitMaskComposite: "source-in",
-        ...style,
-      }}
+      style={{ ...maskStyle, ...clipStyle, ...style }}
     >
       <div
         ref={blobRef}
         className={cn("absolute", drift && "koda-blob")}
         style={{
-          // Bleed pionowy daje dryfowi zapas; krawędzie i tak gasi maska wrappera.
-          inset: drift ? "-8% 0" : "0",
+          // Bleed pionowy daje dryfowi zapas (krawędzie i tak gasi maska/clip).
+          // Pełnoekranowe (horizontalBleed) bleedują TEŻ w poziomie, by żadna
+          // faza dryfu nie odsłoniła pasa gołej kanwy przy bocznej krawędzi.
+          inset: drift ? (horizontalBleed ? "-8% -8%" : "-8% 0") : "0",
           backgroundImage: glowBackground(hue, x, y, strength),
           ...(drift ? ({ "--blob-dur": `${driftDuration}s` } as React.CSSProperties) : null),
         }}
