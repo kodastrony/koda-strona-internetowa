@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { getTheme, subscribeTheme } from "@/lib/theme";
-import { useTierProfile } from "@/lib/device-tier";
 
 /* ── Custom cursor — KODA (odwzorowanie baunfire.com) ──────────────────────
    NATYWNY kursor (biała strzałka) ZOSTAJE — to on jest wskaźnikiem. My dokładamy
@@ -30,13 +29,16 @@ const RING_LERP = 0.28; // ring — lekki „ogon" za kropką (jak baunfire)
 type Theme = "dark" | "light" | "pink";
 
 export function CustomCursor() {
-  const profile = useTierProfile();
   const rootRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!profile.cursor) return; // low/static → brak własnego kursora (zero rAF)
+    // Kursor marki na KAŻDYM fine-pointerze (redesign 2026-06-21): NIE bramkujemy
+    // go już tierem — pętla rAF PARKUJE się, gdy kursor stoi (zero pracy w spoczynku),
+    // więc na słabym desktopie też jest darmowa, a brak kursora tylko różnicował
+    // doświadczenie. Bramki realne zostają: tylko fine-pointer + bez reduced-motion
+    // (touch/coarse/reduced → sam natywny kursor; render i tak `hidden lg:block`).
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!fine || reduce) return; // touch / coarse / reduced → tylko natywny kursor
@@ -216,10 +218,7 @@ export function CustomCursor() {
       document.documentElement.removeEventListener("mouseenter", onEnter);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [profile.cursor]);
-
-  // low/static → brak własnego kursora w ogóle (div się nie montuje, zero rAF).
-  if (!profile.cursor) return null;
+  }, []);
 
   // Warstwa-pozycji ringu (rAF translate) → wewnątrz `__ring` (CSS scale = wypełnienie
   // od środka). Kropka osobno (stały rozmiar). Natywny kursor NIE jest chowany.

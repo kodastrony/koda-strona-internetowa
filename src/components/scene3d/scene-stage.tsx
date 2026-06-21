@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
-import { motion, useReducedMotion } from "motion/react";
-import { EASE } from "@/lib/motion";
+import { useReducedMotion } from "motion/react";
 import { useTier, downgradeTier, TIER_PROFILES } from "@/lib/device-tier";
 
 /* Watchdog reaguje TYLKO gdy karta jest WIDOCZNA. W tle przeglądarka dławi rAF
@@ -55,47 +54,9 @@ function useWatchdog(setDpr: (v: React.SetStateAction<number>) => void, currentD
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   SceneStage — wspólna „scena" canvasu 3D hero strony głównej.
-
-   Jedno miejsce odpowiedzialne za WSZYSTKIE obowiązki around-the-canvas:
-   - lazy chunk (Canvas montowany przez next/dynamic w hero-shell),
-   - DPR clamp [1 .. 1.75] + degradacja przy spadkach fps (PerformanceMonitor),
-   - pauza renderu poza viewportem (IntersectionObserver → frameloop),
-   - prefers-reduced-motion → frameloop "demand": JEDNA ładna klatka, zero
-     ruchu (sceny dostają reduced=true i mrożą uniformy czasu),
-   - brak WebGL / utrata kontekstu → statyczny poster (CSS),
-   - miękkie wejście (fade) zsynchronizowane z reveal'em treści hero.
-
-   Sceny dostają { reduced, quality } i NIE dotykają niczego poza canvasem.
-   ══════════════════════════════════════════════════════════════════════════ */
-
+/* Bazowe propsy sceny canvasu (rozszerzane przez SectionSceneProps). */
 export interface SceneProps {
   reduced: boolean;
-}
-
-interface SceneStageProps {
-  scene: React.ComponentType<SceneProps>;
-  /** Kamera startowa (pozycja + fov) — dobierana per wariant. */
-  camera?: { position: [number, number, number]; fov: number };
-  /** Maska wygaszająca dół canvasu — spójna z dekoracjami hero (szew!). */
-  maskStops?: string;
-  /** Statyczny zamiennik (brak WebGL / context lost / bail watchdoga). */
-  poster: React.ReactNode;
-  /**
-   * Ile svh pokrywa canvas licząc od GÓRY hero (default 100 = sam hero).
-   * >100 = scena „przelewa się" pod kolejną sekcję — fundament mostka
-   * hero→treść (animacja nie kończy się na krawędzi ekranu). Sekcja-rodzic
-   * NIE może mieć overflow-hidden; treść sekcji niżej maluje się NAD canvasem
-   * (kolejność DOM), więc tekst zostaje czytelny, a światło gra POD nim.
-   */
-  coverSvh?: number;
-  /** z-index warstwy canvasu (intro 3D podnosi canvas NAD overlay na czas gry). */
-  z?: number;
-  /** Miękki fade wejścia (intro 3D animuje narodziny samo → wyłącza fade). */
-  fadeIn?: boolean;
-  /** Clipping planes (reveal P→L w intro strony 3). */
-  localClipping?: boolean;
 }
 
 /* Reduced-motion: frameloop="demand" renderuje tylko na invalidate() — async
@@ -114,28 +75,6 @@ function StaticKick() {
       clearTimeout(t3);
     };
   }, [invalidate]);
-  return null;
-}
-
-/* FrameCap — limit klatek RENDERU bez przełączania na frameloop="demand".
-   renderPriority>0 WYŁĄCZA auto-render R3F → to MY wołamy gl.render() co `1/fps` s
-   (równe ~33 ms na low). Kluczowe: pętla rAF i pozostałe useFrame wciąż tykają
-   pełnym tempem, więc:
-     • PerformanceMonitor mierzy realny rAF (~60 gdy zdrowo) i NIE myli capa ze
-       spadkiem fps → zero fałszywego downgrade'u do static,
-     • pauza poza ekranem działa nadal (frameloop="never" zatrzymuje też ten hook),
-   a GPU rysuje o połowę rzadziej (płynne, równe tempo zamiast rozchwianego 60-celu,
-   którego słaby iGPU nie dowozi). Montowany tylko gdy profil ma frameCap (low). */
-function FrameCap({ fps }: { fps: number }) {
-  const acc = useRef(0);
-  useFrame((state, dt) => {
-    acc.current += dt;
-    const step = 1 / fps;
-    if (acc.current >= step) {
-      acc.current %= step; // reszta → równe tempo, bez dryfu
-      state.gl.render(state.scene, state.camera);
-    }
-  }, 1);
   return null;
 }
 
@@ -247,127 +186,6 @@ function useManualDrive(): boolean {
       new URLSearchParams(window.location.search).has("drive")
   );
   return manual;
-}
-
-export function SceneStage({
-  scene: Scene,
-  camera = { position: [0, 0, 8], fov: 42 },
-  maskStops = "black 62%, transparent 97%",
-  poster,
-  coverSvh = 100,
-  z = 0,
-  fadeIn = true,
-  localClipping = false,
-}: SceneStageProps) {
-  const reduced = !!useReducedMotion();
-  // Reaktywny tier — watchdog może go obniżyć w trakcie sesji (DPR ↓, a gdy
-  // zejdzie do „static” → bail na poster). Boot-params sceny są zamrożone osobno.
-  const liveTier = useTier();
-  const profile = TIER_PROFILES[liveTier];
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  // Pauza poza ekranem: oficjalny wzorzec R3F (frameloop 'always' ↔ 'never').
-  const [onScreen, setOnScreen] = useState(true);
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), {
-      rootMargin: "25% 0px 25% 0px",
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  // DPR: start = min(devicePixelRatio, limit tieru); spadki fps → schodzimy krokowo.
-  // Leniwy initializer (SSR-safe) zamiast setState w efekcie.
-  const [dpr, setDpr] = useState<number>(() =>
-    typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, profile.dprCap)
-  );
-  // DPR efektywny = min(stan watchdoga, limit tieru) — liczony przy renderze
-  // (bez setState-in-effect): gdy watchdog obniży tier, limit spada i DPR
-  // automatycznie się zaciska na kolejnym renderze.
-  const effectiveDpr = Math.min(dpr, profile.dprCap);
-  const watchdog = useWatchdog(setDpr, effectiveDpr);
-
-  const [lost, setLost] = useState(false);
-  // Klucz remontu Canvasu — przy ODZYSKANIU kontekstu WebGL (np. po wyczerpaniu
-  // limitu kontekstów przez wiele otwartych kart) montujemy ŚWIEŻY Canvas zamiast
-  // zostać na posterze na zawsze.
-  const [glKey, setGlKey] = useState(0);
-  const recover = useRef(0);
-
-  const manualDrive = useManualDrive();
-  const frameloop = manualDrive ? "never" : reduced ? "demand" : onScreen ? "always" : "never";
-
-  // Maska + fade wejścia liczone raz (obiekt stylu stabilny między renderami).
-  const maskStyle = useMemo<React.CSSProperties>(
-    () => ({
-      height: `${coverSvh}svh`,
-      zIndex: z,
-      maskImage: `linear-gradient(to bottom, ${maskStops})`,
-      WebkitMaskImage: `linear-gradient(to bottom, ${maskStops})`,
-    }),
-    [maskStops, coverSvh, z]
-  );
-
-  return (
-    <motion.div
-      ref={wrapRef}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-0"
-      style={maskStyle}
-      initial={{ opacity: fadeIn ? 0 : 1 }}
-      animate={{ opacity: 1 }}
-      transition={
-        reduced || !fadeIn ? { duration: 0 } : { duration: 1.3, ease: EASE.primary, delay: 0.05 }
-      }
-    >
-      {lost || !profile.webgl ? (
-        poster
-      ) : (
-        <Canvas
-          key={glKey}
-          // alpha: PageCanvas (fixed -z-10) zostaje JEDYNYM tłem strony —
-          // scena maluje się NA „pogodzie" kanwy, nie obok niej.
-          gl={{
-            antialias: profile.msaa,
-            alpha: true,
-            powerPreference: "high-performance",
-            stencil: false,
-          }}
-          dpr={effectiveDpr}
-          frameloop={frameloop}
-          camera={camera}
-          fallback={poster}
-          resize={{ polyfill: KickedResizeObserver as unknown as typeof ResizeObserver }}
-          style={{ position: "absolute", inset: 0 }}
-          onCreated={({ gl }) => {
-            if (localClipping) gl.localClippingEnabled = true;
-            gl.domElement.addEventListener("webglcontextlost", (e) => {
-              e.preventDefault();
-              setLost(true);
-              // Odzyskanie: po krótkim posterze przemontuj canvas (świeży kontekst).
-              if (recover.current < 5) {
-                recover.current += 1;
-                window.setTimeout(() => {
-                  setLost(false);
-                  setGlKey((k) => k + 1);
-                }, 2200);
-              }
-            });
-          }}
-        >
-          <PerformanceMonitor onDecline={watchdog.onDecline} onChange={watchdog.onChange}>
-            <Scene reduced={reduced} />
-          </PerformanceMonitor>
-          {reduced && <StaticKick />}
-          {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}
-          <DevFrameDriver />
-          <DevFpsMeter />
-        </Canvas>
-      )}
-    </motion.div>
-  );
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -511,7 +329,6 @@ export function SectionStage({
             <Scene reduced={reduced} getProgress={getProgress} />
           </PerformanceMonitor>
           {reduced && <StaticKick />}
-          {!reduced && profile.frameCap ? <FrameCap fps={profile.frameCap} /> : null}
           <DevFrameDriver />
           <DevFpsMeter />
         </Canvas>

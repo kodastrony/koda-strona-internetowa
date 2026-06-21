@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTierProfile } from "@/lib/device-tier";
 
 /** Live prefers-reduced-motion read via matchMedia (reliable, no hook-timing
  *  quirks). SSR-safe: false on first render (server matches), true after mount. */
@@ -35,11 +34,13 @@ export function VideoShowcase({
   label: string;
 }) {
   const reduce = usePrefersReduced();
-  // Hook MUSI być wołany bezwarunkowo (nie po `reduce ||`, bo `||` by go ucięło).
-  const profile = useTierProfile();
-  // low/static → traktuj jak reduced: bez autoodtwarzania, poster + kontrolki
-  // (opt-in). Oszczędza dekodowanie wideo (GPU/CPU) na słabym sprzęcie.
-  const noAutoplay = reduce || !profile.smoothScroll;
+  // Autoodtwarzanie wyłącza TYLKO reduced-motion (redesign 2026-06-21). Wcześniej
+  // gate'owane też tierem (!smoothScroll) → na KAŻDYM telefonie (low) zamiast pętli
+  // wideo był statyczny poster — a ta sekcja krzyczy „Bo statyczny obraz tego nie
+  // odda". To było dokładnie sprzężenie tier→wygląd, które redesign usuwa. Klip jest
+  // wyciszony, lazy (src dopiero przy zbliżeniu), pauzowany poza ekranem (IO) i w
+  // pętli → autoplay w kadrze jest tani; bateria/transfer chronione pauzą off-view.
+  const noAutoplay = reduce;
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [load, setLoad] = useState(false);

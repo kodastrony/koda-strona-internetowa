@@ -5,14 +5,27 @@ import { useSyncExternalStore } from "react";
 /* ══════════════════════════════════════════════════════════════════════════
    device-tier — JEDNO ŹRÓDŁO PRAWDY o możliwościach urządzenia.
 
-   Problem: na słabym sprzęcie (stary laptop z iGPU, tani telefon, wolne łącze)
-   ciężka scena 3D ładowała się ~20 s i chodziła ~1 FPS, bo kod traktował każdy
-   szeroki ekran jako „mocny". Tu wykrywamy REALNE możliwości RAZ na kliencie i
-   klasyfikujemy urządzenie do jednego z czterech tierów. Profil tieru steruje
-   WSZYSTKIM (czy w ogóle WebGL, oktawy mgławicy, Environment, DPR, akcenty,
-   płynny scroll, kursor…). Detekcja jest PROAKTYWNA; uzupełnia ją REAKTYWNY
-   watchdog (scene-stage.tsx), który w razie pomyłki obniża tier na żywo —
-   razem pokrywają KAŻDE urządzenie, także nieznane.
+   Problem HISTORYCZNY: na słabym sprzęcie ciężka scena 3D-hero (litery/mgławica/
+   Environment) ładowała się ~20 s i chodziła ~1 FPS, bo kod traktował każdy
+   szeroki ekran jako „mocny". Ten 3D-hero ZNIKNĄŁ — strona jest dziś lekka (2D
+   hero + JEDEN opcjonalny shader „świtu" w Statement).
+
+   ★ NOWA FILOZOFIA (redesign 2026-06-21): TIER NIE STERUJE WYGLĄDEM.
+   Wygląd strony (kolory tła per sekcja = PageCanvas, ciemna wyspa Statement,
+   grain, kursor marki) jest IDENTYCZNY na każdym urządzeniu — bo te efekty są
+   tanie (scrub tła ≈ 0,18 µs/klatkę, grain = statyczna tekstura). Gdy tier je
+   wyłączał, urządzenia rozjeżdżały się wizualnie (np. ciemna wyspa Statement
+   robiła się jasna na telefonie = biały tekst na porcelanie). Dlatego tier
+   steruje już TYLKO budżetem GPU JEDYNEGO ciężkiego (fill-rate-bound) elementu —
+   shadera świtu — oraz wygładzaniem scrolla (Lenis). Świt to PROGRESYWNE
+   ULEPSZENIE: pod nim zawsze leży CSS-owy „świt" (HorizonPoster), więc słabe
+   urządzenie dostaje TEN SAM ciemny, świecący finał, tylko statyczny zamiast
+   animowanego shadera. Degradacja = wersja look-alike, NIGDY „nic".
+
+   Wykrywamy REALNE możliwości RAZ na kliencie i klasyfikujemy urządzenie do
+   jednego z czterech tierów. Detekcja jest PROAKTYWNA; uzupełnia ją REAKTYWNY
+   watchdog (scene-stage.tsx), który w razie pomyłki obniża tier na żywo (świt →
+   CSS-świt) — razem pokrywają KAŻDE urządzenie, także nieznane.
 
    Architektura store'a = lustro src/lib/theme.ts: modułowy stan + pub/sub +
    useSyncExternalStore (SSR-safe). getServerSnapshot = "high" (neutralny —
@@ -29,75 +42,55 @@ export type Tier = "static" | "low" | "medium" | "high";
 export const TIER_ORDER: Tier[] = ["static", "low", "medium", "high"];
 
 export interface TierProfile {
-  /** Czy montować WebGL w SceneStage (false → statyczny poster). */
+  /** Czy montować WebGL „świt" (HorizonBackdropLazy → SectionStage). To JEDYNY
+      WebGL na stronie i jedyny element naprawdę kosztowny (fill-rate-bound: koszt
+      rośnie z DPR×rozdzielczość). false → CSS-owy świt (HorizonPoster), który
+      wygląda jak ten sam ciemny, świecący finał, tylko statycznie. */
   webgl: boolean;
-  /** Czy w ogóle ładować/montować canvas „świtu" w Statement (jedyny WebGL na
-      stronie; leniwy + IO-pauza). false → sam gradient CSS sekcji. */
-  horizon: boolean;
   /** Górny limit DPR canvasu świtu (live — watchdog może zejść w dół). */
   dprCap: number;
   /** MSAA na canvasie świtu (boot). */
   msaa: boolean;
-  /** Limit klatek RENDERU świtu (live). undefined = pełny rAF. Na słabym sprzęcie
-      30 = równe 33 ms (FrameCap render-priority; PerformanceMonitor wciąż widzi
-      pełny rAF → zero fałszywego downgrade'u). */
-  frameCap?: number;
-  /** Płynny scroll Lenis (rAF co klatkę; Lenis i tak nie wygładza dotyku). */
+  /** Płynny scroll Lenis (rAF co klatkę; Lenis i tak nie wygładza dotyku). Jedyny
+      NIE-wizualny wybór per-tier: na bardzo słabym CPU natywny scroll bywa
+      gładszy niż Lenis, który nie nadąża (gumowanie). */
   smoothScroll: boolean;
-  /** Własny kursor (rAF) — i tak montowany TYLKO przy fine-pointerze. */
-  cursor: boolean;
-  /** PageCanvas: scroll-scrubbed (przemalowanie tła co klatkę scrolla) vs tani
-      statyczny gradient. false na słabym sprzęcie — repaint konkurował o GPU. */
-  pageCanvasScrub: boolean;
-  /** Pełnoekranowa, NIERUCHOMA warstwa grain (statyczna alfa). false = taniej. */
-  grain: boolean;
 }
 
-/* ── Profile tierów (po odchudzeniu strony: 2D hero + JEDEN leniwy canvas świtu) ──
-   Strona NIE jest już ciężka (zniknął 3D-hero z literami/mgławicą/Environment),
-   więc tiery sterują dziś tylko: świtem (mały shader-quad nad stopką, IO-pauza),
-   DPR/MSAA tego canvasu, płynnym scrollem, kursorem, scrubem tła i grainem.
-   Dlatego pełne doznanie jest TANIE → wpuszczamy do niego więcej urządzeń.
+/* ── Profile tierów (redesign 2026-06-21) ───────────────────────────────────
+   Tier steruje TYLKO budżetem GPU shadera świtu (mount / DPR / MSAA) i wygładza-
+   niem scrolla. WSZYSTKO inne, co decyduje o WYGLĄDZIE (scrub tła PageCanvas,
+   grain, kursor marki, ciemna wyspa + świt Statement), działa NA KAŻDYM tierze —
+   bo jest tanie i jego brak rozjeżdżał urządzenia wizualnie (główny bug: ciemna
+   wyspa Statement → jasna porcelana na telefonie). Świt = progresywne ulepszenie
+   nad CSS-owym świtem, więc nawet bez WebGL finał wygląda tak samo (statycznie).
 
-   high   = mocny desktop/laptop + nowoczesny telefon/tablet: wszystko, DPR≤2, MSAA.
-   medium = solidne urządzenie: wszystko jak high, DPR≤1.5, bez MSAA.
-   low    = słaby GPU / stary telefon: BEZ świtu (poster) + natywny scroll + bez
-            kursora/scruba/grainu, DPR 1 → gwarantowana płynność na lekkiej stronie.
-   static = brak/sw WebGL, save-data, skrajnie słaby sprzęt: identycznie „lite" jak low
-            (czysty poster + cała treść). */
+   high   = mocny desktop/laptop + nowoczesny tablet: świt-WebGL, DPR≤2, MSAA.
+   medium = solidne urządzenie: świt-WebGL, DPR≤1.5, bez MSAA.
+   low    = słaby GPU / telefon: CSS-świt zamiast shadera (oszczędza GPU/baterię)
+            + natywny scroll. Reszta wyglądu IDENTYCZNA jak high (scrub/grain/
+            kursor/ciemna wyspa).
+   static = brak/sw WebGL, save-data, skrajnie słaby sprzęt: jak low. */
 const LITE: TierProfile = {
   webgl: false,
-  horizon: false,
   dprCap: 1,
   msaa: false,
-  frameCap: 30,
   smoothScroll: false,
-  cursor: false,
-  pageCanvasScrub: false,
-  grain: false,
 };
 export const TIER_PROFILES: Record<Tier, TierProfile> = {
   static: LITE,
   low: LITE,
   medium: {
     webgl: true,
-    horizon: true,
     dprCap: 1.5,
     msaa: false,
     smoothScroll: true,
-    cursor: true,
-    pageCanvasScrub: true,
-    grain: true,
   },
   high: {
     webgl: true,
-    horizon: true,
     dprCap: 2,
     msaa: true,
     smoothScroll: true,
-    cursor: true,
-    pageCanvasScrub: true,
-    grain: true,
   },
 };
 

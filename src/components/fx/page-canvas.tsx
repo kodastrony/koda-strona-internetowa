@@ -4,7 +4,6 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValue } from "motion/react";
 import { useThemeValue } from "@/lib/theme";
-import { useTierProfile } from "@/lib/device-tier";
 
 /* ══════════════════════════════════════════════════════════════════════════
    PageCanvas — ONE scroll-scrubbed background for the whole page.
@@ -100,15 +99,6 @@ const FALLBACK_LIGHT = "#f7f4f8";
 // i tak nadpisze hexem (scrub) tuż po hydracji (useLayoutEffect, przed paintem).
 const CANVAS_FALLBACK_VAR = "var(--canvas-fallback)";
 
-/* Tani STATYCZNY gradient tła dla tierów bez scrubu (low/static): jeden malunek,
-   ZERO przemalowań całego viewportu na każdą klatkę scrolla (na słabym iGPU ten
-   repaint konkurował z hero = zacinanie). Sekcje są przezroczyste, więc kosmos
-   hero maluje się na tym, a reszta strony dostaje spokojne, ciemne „kosmiczne"
-   tło. Górny stop = FALLBACK, więc przeskok z 1-klatkowego scrubu (SSR=high) jest
-   niewidoczny. Stopy ~uśredniają łuk holdów (hero→usługi→świt→stopka). */
-const STATIC_BG_DARK = "linear-gradient(180deg, #0b0b0d 0%, #15111e 50%, #0c0710 100%)";
-const STATIC_BG_LIGHT = "linear-gradient(180deg, #f7f4f8 0%, #f1ecf6 50%, #efe9f1 100%)";
-
 /* ── OKLCH math (wystarczająco mała, żeby nie ciągnąć biblioteki) ────────── */
 
 type Lch = { L: number; C: number; h: number };
@@ -199,8 +189,6 @@ export function PageCanvas() {
   const pathname = usePathname();
   const theme = useThemeValue();
   const light = theme === "light";
-  // Tylko medium/high scrubują kolor tła per klatkę; low/static = statyczny gradient.
-  const scrub = useTierProfile().pageCanvasScrub;
   const stopsRef = useRef<Stops | null>(null);
   // Init = CSS-zmienna (poprawny motyw na 1. klatce, bez błysku — patrz wyżej).
   // measure() ustawi właściwy hex w useLayoutEffect (przed pierwszym paintem po
@@ -275,9 +263,11 @@ export function PageCanvas() {
   // useLayoutEffect: pierwszy pomiar PRZED malowaniem klatki (deep-linki typu
   // /#faq dostają od razu właściwy kolor zamiast błysku czerni).
   useLayoutEffect(() => {
-    // Tier bez scrubu (low/static): tło to statyczny gradient — pomijamy CAŁĄ
-    // maszynerię measure/scroll/rAF/ResizeObserver (zero przemalowań na klatkę).
-    if (!scrub) return;
+    // Scrub działa na KAŻDYM tierze (redesign 2026-06-21): koszt to ≈0,18 µs/
+    // klatkę (math) + jeden solid-fill repaint promowanej warstwy fixed — najtańszy
+    // możliwy paint. Brak scrubu rozjeżdżał WYGLĄD (utrata holdów per sekcja →
+    // m.in. ciemna wyspa Statement robiła się jasna). Maszyneria measure/scroll/
+    // rAF/RO jest lekka i bezpieczna także na telefonie (scroll natywny ją karmi).
     measure();
 
     // Własny listener scrolla (passive) zamiast useScroll: progi i odczyt są
@@ -321,16 +311,19 @@ export function PageCanvas() {
       window.removeEventListener("resize", remeasure);
       window.visualViewport?.removeEventListener("resize", remeasure);
     };
-  }, [measure, bg, pathname, light, scrub]);
+  }, [measure, bg, pathname, light]);
 
-  // Pastelowa poświata jasnego motywu (dawny LightWeather) — wspólne dziecko obu
-  // wariantów tła. Crossfade opacity przy przełączeniu ☀/☾.
+  // Pastelowa poświata jasnego motywu (dawny LightWeather). Opacity z CSS-zmiennej
+  // (--canvas-pastel-opacity: 0 ciemny / 1 jasny, ustawiana html[data-koda-light]
+  // PRZED malowaniem) — poprawna od 1. klatki na jasnym wczytaniu (JS-owy `light`
+  // miał snapshot SSR="dark" → rogi wfadowywały się 700 ms po hydracji). transition
+  // wciąż animuje crossfade przy ręcznym ☀/☾ (zmienna zmienia się z atrybutem).
   const pastel = (
     <div
       aria-hidden="true"
       className="absolute inset-0 transition-opacity duration-700 ease-out"
       style={{
-        opacity: light ? 1 : 0,
+        opacity: "var(--canvas-pastel-opacity)",
         // Pastelowa „pogoda" papieru — różowo-fioletowo-indygowe światło w rogach
         // (echo ciemnej aurory marki). Trochę mocniejsze niż wcześniej + trzeci,
         // indygowy akcent u dołu = porcelana ŻYJE kolorem, nie jest płaska. Alfy
@@ -343,27 +336,14 @@ export function PageCanvas() {
     />
   );
 
-  // Tier bez scrubu (low/static): ZWYKŁY div ze statycznym gradientem (longhand
-  // backgroundImage — zero kolizji shorthand/longhand z motion-owym backgroundColor;
-  // brak MotionValue). Osobny element od wariantu scrub → przy zmianie tieru tło
-  // po prostu się przemontowuje (jednorazowo, niezauważalnie).
-  if (!scrub) {
-    return (
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{ backgroundImage: light ? STATIC_BG_LIGHT : STATIC_BG_DARK }}
-      >
-        {pastel}
-      </div>
-    );
-  }
-
   return (
     <motion.div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10"
-      style={{ backgroundColor: bg }}
+      // translateZ(0): własna warstwa kompozytora. Kolor tła zmienia się co klatkę
+      // scrolla NA KAŻDYM tierze (też mobile) — promocja trzyma ten repaint w
+      // izolowanej warstwie, zamiast brudzić korzeń z treścią/grainem nad spodem.
+      style={{ backgroundColor: bg, transform: "translateZ(0)" }}
     >
       {pastel}
     </motion.div>

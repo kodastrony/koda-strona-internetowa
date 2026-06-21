@@ -121,6 +121,13 @@
      dla ciemnego motywu. measure() i tak nadpisuje canvas hexem po hydracji. */
   --intro-cover: #120617;
   --canvas-fallback: #0b0b0d;
+  /* Pastelowa „pogoda" PageCanvas (różowo-fioletowe rogi) widoczna TYLKO w jasnym
+     motywie. Sterowana zmienną (NIE JS-owym `light`), bo useThemeValue ma snapshot
+     SSR="dark" → na jasnym pierwszym wczytaniu rogi wfadowywały się przez 700 ms po
+     hydracji. Zmienna ustawiona przez html[data-koda-light] (theme-init PRZED
+     malowaniem) → poprawna od 1. klatki, a transition-opacity i tak animuje
+     crossfade przy ręcznym ☀/☾. */
+  --canvas-pastel-opacity: 0;
   /* Baza sekcji Statement (świt) = kolor jej holdu kanwy → niewidoczna normalnie,
      ale ZASŁANIA rozjaśnianie kanwy przy zjeździe do stopki (przez półprzezroczyste
      niebo shadera prześwitywała jasna kanwa = „biały pas"). Jasny wariant niżej. */
@@ -168,6 +175,8 @@ html[data-koda-light] {
   --intro-cover: #efe7f5;
   /* Jasny bazowy kolor PageCanvas na pierwszą klatkę = FALLBACK_LIGHT / hold „hero". */
   --canvas-fallback: #f7f4f8;
+  /* Pastelowa „pogoda" rogów PageCanvas tylko w jasnym motywie (patrz :root). */
+  --canvas-pastel-opacity: 1;
   /* Baza Statementu w jasnym = jego ciemny hold (#160a14) → ciemna wyspa zostaje
      ciemna nawet gdy kanwa scrubuje do jasnej stopki (koniec „białego pasa"). */
   --statement-base: #160a14;
@@ -358,6 +367,10 @@ html[data-koda-light] .cta-footer-wash {
   z-index: var(--z-grain);
   pointer-events: none;
   opacity: 0.04;
+  /* Własna warstwa kompozytora: statyczna tekstura jest PRZESUWANA, nie
+     rasteryzowana od nowa przy scrollu (kanwa pod spodem scrubuje kolor co klatkę
+     na każdym tierze — promocja izoluje grain od jej repaintu). */
+  transform: translateZ(0);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 160px 160px;
 }

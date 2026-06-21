@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { SectionStage, type SectionSceneProps } from "../scene-stage";
 import { BRAND, GLSL_DITHER, GLSL_SIMPLEX_3D } from "../lib";
-import { ScenePoster } from "../scene-poster";
+import { HorizonPoster } from "./horizon-poster";
 
 /* ══════════════════════════════════════════════════════════════════════════
    HORYZONT — ŚWIT NAD PLANETĄ (tło finałowej sekcji = Statement).
@@ -171,7 +171,7 @@ export function HorizonBackdrop() {
       scene={HorizonScene}
       camera={{ position: [0, 0, 8], fov: 42 }}
       maskStops="transparent 0%, black 16%, black 90%, transparent 100%"
-      poster={<ScenePoster hue={335} />}
+      poster={<HorizonPoster />}
     />
   );
 }
