@@ -11,15 +11,18 @@ export const dynamic = "force-static";
 // dyskontował <lastmod> w całej witrynie — marnując jedyny sygnał priorytetu
 // indeksowania, którego potrzebuje nowa domena. Tu trzymamy realne daty edycji:
 // bumpuj datę strony WYŁĄCZNIE, gdy jej treść faktycznie się zmieni.
+// 2026-08-17: jednorazowy bump WSZYSTKICH stron ze wspólnym OG — tego dnia realnie
+// zmieniły się ich metadane (nowy og:image + alt, nowe ikony), a Google trzymał
+// w wynikach stary czarny baner i favicon; lastmod = prośba o szybszy recrawl.
 const LASTMOD: Record<string, string> = {
-  "/": "2026-06-17",
-  "/uslugi/": "2026-06-17",
-  "/uslugi/strony-3d/": "2026-06-17",
-  "/cennik/": "2026-06-17",
-  "/realizacje/": "2026-06-15",
-  "/o-nas/": "2026-06-17",
-  "/kontakt/": "2026-06-17",
-  "/polityka-prywatnosci/": "2026-06-14",
+  "/": "2026-08-17",
+  "/uslugi/": "2026-08-17",
+  "/uslugi/strony-3d/": "2026-08-17",
+  "/cennik/": "2026-08-17",
+  "/realizacje/": "2026-08-17",
+  "/o-nas/": "2026-08-17",
+  "/kontakt/": "2026-08-17",
+  "/polityka-prywatnosci/": "2026-08-17",
 };
 
 // Realizacje (case studies) — data publikacji portfolio (stała).
