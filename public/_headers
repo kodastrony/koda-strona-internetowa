@@ -33,10 +33,9 @@
 /*.webp
   Cache-Control: public, max-age=2592000
 
-# OG image (opengraph-image.tsx) + apple-icon — ścieżki BEZ rozszerzenia, więc
-# Cloudflare serwuje je jako application/octet-stream, a nosniff blokuje sniffing →
-# strict unfurlery/walidatory odrzucają obraz. Wymuszamy poprawny typ obrazu.
+# OG image (opengraph-image.tsx) — ścieżka BEZ rozszerzenia, więc Cloudflare
+# serwuje ją jako application/octet-stream, a nosniff blokuje sniffing → strict
+# unfurlery/walidatory odrzucają obraz. Wymuszamy poprawny typ obrazu.
+# (apple-icon jest od 08.2026 statycznym plikiem apple-icon.png — typ z rozszerzenia.)
 /opengraph-image
-  Content-Type: image/png
-/apple-icon
   Content-Type: image/png

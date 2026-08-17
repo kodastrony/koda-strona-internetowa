@@ -6,7 +6,8 @@ import type { NextConfig } from "next";
 // dlatego BEZ basePath (inaczej assety szukałyby /<repo>/... → 404 na własnej domenie).
 // trailingSlash → każda podstrona to /sciezka/index.html, co Apache na OVH serwuje
 // natywnie (czyste URL-e bez .html). Routy plikowe (robots.txt, sitemap.xml,
-// opengraph-image, apple-icon, icon.svg) mają już `export const dynamic = "force-static"`.
+// opengraph-image) mają `export const dynamic = "force-static"`; ikony (icon.svg,
+// favicon.ico, apple-icon.png) to zwykłe pliki statyczne w app/.
 //
 // Bez flagi (lokalny `next dev` / `next build`) konfiguracja jest DOMYŚLNA — pełny
 // Next z optymalizacją obrazów (pod lokalne testy oraz ewentualny przyszły SSR/Vercel).

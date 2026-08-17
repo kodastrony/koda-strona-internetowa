@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0b0b0d" />
-  <text x="16" y="23" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#cf43b8">K</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="KODA Studio">
+  <!-- KODA Studio — ikona marki (jasny motyw „aurora", 2026-08). Litera K i kropka =
+       kontury z Syne 800 (font wordmarku KODA.), wypełnienie: gradient magenta→fiolet
+       jak pigułka CTA i awatar z profilu Useme. Tło: porcelana #f7f4f8 z dwiema plamami
+       aurory. Generator: _portfolio-research/koda-ikony.mjs (MAIN KODA). -->
+  <defs>
+    <clipPath id="tile"><rect width="512" height="512" rx="112" ry="112"/></clipPath>
+    <radialGradient id="aur1" cx="0.84" cy="0.06" r="0.85">
+      <stop offset="0" stop-color="#cf43b8" stop-opacity="0.22"/><stop offset="1" stop-color="#cf43b8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aur2" cx="0.02" cy="0.98" r="0.85">
+      <stop offset="0" stop-color="#9676de" stop-opacity="0.20"/><stop offset="1" stop-color="#9676de" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="k" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b32a9d"/><stop offset="1" stop-color="#7c4cde"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="512" height="512" fill="#f7f4f8"/>
+    <rect width="512" height="512" fill="url(#aur1)"/>
+    <rect width="512" height="512" fill="url(#aur2)"/>
+  </g>
+  <path d="M603 315V371L1180 0H808L318 340L770 640H1126ZM70 640H320V0H70Z" fill="url(#k)" transform="translate(56.32 347.413) scale(0.286 -0.286) translate(-70 0)"/>
+  <path d="M304 151V0H50V151Z" fill="#b32a9d" transform="translate(383.121 347.413) scale(0.286 -0.286) translate(-50 0)"/>
 </svg>
