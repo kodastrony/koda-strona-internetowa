@@ -49,6 +49,19 @@ public/
   logos/            # SVG logo (różne warianty kolorystyczne)
 ```
 
+## Grafiki marki (OG + ikony)
+
+Od 08.2026 wszystkie karty udostępniania i ikony są JASNE (porcelana + aurora),
+spójne z awatarem i banerem z profilu Useme (`../marketing/useme-grafiki/`):
+
+- `src/app/opengraph-image.tsx` — baner OG/Twitter 1200×630 renderowany Satori
+  przy buildzie. Fonty czyta z `src/assets/og-fonts/` (subsety Geologica 600 /
+  Inter 400–700 / Syne 800, OFL) — celowo NIE z Google Fonts (API zaczęło zwracać
+  WOFF i baner po cichu spadał na sans-serif). Brak pliku fontu = build się wywala.
+- `src/app/icon.svg`, `favicon.ico` (16/32/48/64/256), `apple-icon.png` (180, pełny
+  kwadrat pod maskę iOS) — generator: `../_portfolio-research/koda-ikony.mjs`
+  (litera „K." z konturów Syne 800, gradient magenta→fiolet).
+
 ## Zmienne środowiskowe
 
 | Zmienna         | Wartość w CI | Opis                                       |
