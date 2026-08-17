@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="KODA Studio">
-  <!-- KODA Studio — ikona marki (jasny motyw „aurora", 2026-08). Litera K i kropka =
-       kontury z Syne 800 (font wordmarku KODA.), wypełnienie: gradient magenta→fiolet
-       jak pigułka CTA i awatar z profilu Useme. Tło: porcelana #f7f4f8 z dwiema plamami
+  <!-- KODA Studio — ikona marki (jasny motyw „aurora", 2026-08). Litera K = kontur
+       z Syne 800 (font wordmarku KODA.), wypełnienie: gradient magenta→fiolet jak
+       pigułka CTA i awatar z profilu Useme. Tło: porcelana #f7f4f8 z dwiema plamami
        aurory. Generator: _portfolio-research/koda-ikony.mjs (MAIN KODA). -->
   <defs>
     <clipPath id="tile"><rect width="512" height="512" rx="112" ry="112"/></clipPath>
@@ -20,6 +20,5 @@
     <rect width="512" height="512" fill="url(#aur1)"/>
     <rect width="512" height="512" fill="url(#aur2)"/>
   </g>
-  <path d="M603 315V371L1180 0H808L318 340L770 640H1126ZM70 640H320V0H70Z" fill="url(#k)" transform="translate(56.32 347.413) scale(0.286 -0.286) translate(-70 0)"/>
-  <path d="M304 151V0H50V151Z" fill="#b32a9d" transform="translate(383.121 347.413) scale(0.286 -0.286) translate(-50 0)"/>
+  <path d="M603 315V371L1180 0H808L318 340L770 640H1126ZM70 640H320V0H70Z" fill="url(#k)" transform="translate(71.68 362.275) scale(0.332 -0.332) translate(-70 0)"/>
 </svg>

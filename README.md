@@ -52,15 +52,20 @@ public/
 ## Grafiki marki (OG + ikony)
 
 Od 08.2026 wszystkie karty udostępniania i ikony są JASNE (porcelana + aurora),
-spójne z awatarem i banerem z profilu Useme (`../marketing/useme-grafiki/`):
+spójne z awatarem i tłem profilu Useme (`../marketing/useme-grafiki/`):
 
 - `src/app/opengraph-image.tsx` — baner OG/Twitter 1200×630 renderowany Satori
-  przy buildzie. Fonty czyta z `src/assets/og-fonts/` (subsety Geologica 600 /
-  Inter 400–700 / Syne 800, OFL) — celowo NIE z Google Fonts (API zaczęło zwracać
-  WOFF i baner po cichu spadał na sans-serif). Brak pliku fontu = build się wywala.
+  przy buildzie, 1:1 z „tłem profilu" Useme (`tlo-koda.jpg`): wielki pastelowy
+  wordmark „KODA." + „Strony internetowe premium." + zakres. Fonty czyta z
+  `src/assets/og-fonts/` (używane: Inter 400/700 + Syne 800; Geologica 600 i
+  Inter 500/600 zostały z poprzedniej wersji banera) — celowo NIE z Google Fonts
+  (API zaczęło zwracać WOFF i baner po cichu spadał na sans-serif). Brak pliku
+  fontu = build się wywala. Szybki podgląd bez builda: `ImageResponse` z
+  `next/dist/compiled/@vercel/og/index.node.js` z drzewem `{type, props}`.
 - `src/app/icon.svg`, `favicon.ico` (16/32/48/64/256), `apple-icon.png` (180, pełny
   kwadrat pod maskę iOS) — generator: `../_portfolio-research/koda-ikony.mjs`
-  (litera „K." z konturów Syne 800, gradient magenta→fiolet).
+  (samo „K" z konturu Syne 800, bez kropki, 72% szerokości kafla, gradient
+  magenta→fiolet).
 
 ## Zmienne środowiskowe
 
