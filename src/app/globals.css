@@ -155,6 +155,10 @@
        glows/borders, so none; the light world is flat porcelain → a soft,
        plum-tinted lift makes cards/frames sit ABOVE the page (premium depth). */
   --color-on-accent: #0b0b0d;
+  /* Kolor OTWARTEGO pytania FAQ: w ciemnym = pink-bright (jak dotąd); w jasnym
+     osobny, głębszy magenta (patrz override niżej) — #bd2fa4 na podświetlonym
+     glow-em ciepłym tle karty mierzył 4,04:1 (<AA). */
+  --color-faq-open: #ff5ec8;
   --dot-grid: rgba(255, 255, 255, 0.025);
   --shadow-card: none;
   --shadow-card-hover: none;
@@ -205,6 +209,8 @@ html[data-koda-light] {
      dot-grid = atrament z alfą (widoczny na porcelanie). shadow-card = miękki,
      śliwkowy cień: karty/ramki UNOSZĄ się nad papierem (głębia bez „flat"). */
   --color-on-accent: #ffffff;
+  /* Jasny motyw: otwarte pytanie FAQ ≥4,5:1 na glow-tintowanym tle karty. */
+  --color-faq-open: #9a2487;
   --dot-grid: rgba(26, 16, 34, 0.05);
   --shadow-card: 0 16px 40px -24px rgba(42, 14, 46, 0.22), 0 3px 10px -6px rgba(42, 14, 46, 0.1);
   --shadow-card-hover:
@@ -305,6 +311,50 @@ html[data-koda-light] .cta-footer-wash {
 }
 @media (prefers-reduced-motion: reduce) {
   .koda-blob {
+    animation: none;
+  }
+}
+
+/* ── PageHero — wejścia w CZYSTYM CSS (audyt CWV 2026-08-26) ───────────────
+   Wcześniej label/H1/lead podstron wjeżdżały FadeUp/Reveal (motion/react), więc
+   tekst-LCP czekał na hydrację bundla JS → LCP 5–7 s na mobile (element render
+   delay 1,2–2,3 s na KAŻDEJ podstronie). Te klasy grają tę SAMĄ choreografię
+   (te same beziery, delaye i dystanse), ale od PIERWSZEGO malowania — bez JS.
+   fill: backwards = stan „from" w czasie delayu; bez JS animacje i tak grają. */
+@keyframes ph-fade-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@keyframes ph-wipe {
+  from {
+    clip-path: inset(-40% 100% -40% 0);
+  }
+}
+@keyframes ph-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+.ph-label-in {
+  animation: ph-fade-left 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.05s backwards;
+}
+.ph-title-in {
+  /* Spoczynkowy clip -40% pion — nie ucina descenderów/diakrytyków (jak Reveal). */
+  clip-path: inset(-40% 0% -40% 0);
+  animation: ph-wipe 0.85s cubic-bezier(0.23, 1, 0.32, 1) 0.12s backwards;
+}
+.ph-lead-in {
+  animation: ph-fade-up 0.6s cubic-bezier(0.19, 1, 0.22, 1) 0.15s backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ph-label-in,
+  .ph-title-in,
+  .ph-lead-in {
+    /* Globalna reguła zeruje duration, ale NIE delay — bez tego elementy byłyby
+       niewidoczne przez czas delayu (fill backwards). Tu: od razu stan końcowy. */
     animation: none;
   }
 }

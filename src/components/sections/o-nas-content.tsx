@@ -62,12 +62,29 @@ export function ONasContent() {
           {/* Supporting paragraphs — the read, set apart from the statement */}
           <div className="flex max-w-[58ch] flex-col gap-6 md:col-span-7">
             <FadeUp inView delay={0.08}>
+              {/* Zdanie definicyjne (wzorzec encyklopedyczny) — samodzielny, cytowalny
+                  pasaż z podmiotem „KODA Studio" + lokalizacją: odpowiada wprost na
+                  „co to KODA Studio / kto robi strony w Bielsku-Białej" (AEO). */}
               <p
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "clamp(1.08rem,1.35vw,1.28rem)",
                   lineHeight: 1.6,
                   color: "var(--color-ink)",
+                }}
+              >
+                KODA Studio to niezależne studio z Bielska-Białej, które projektuje i koduje strony
+                internetowe dla firm z całej Polski — od projektu, przez autorski kod, po opiekę po
+                starcie.
+              </p>
+            </FadeUp>
+            <FadeUp inView delay={0.1}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink-muted)",
                 }}
               >
                 Większość stron dla polskich firm wygląda jak szablon, działa jak szablon i daje
@@ -172,6 +189,79 @@ export function ONasContent() {
                 </div>
               </FadeUp>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Technologia i warsztat — sygnał ekspertyzy (E-E-A-T), same fakty ── */}
+      <section data-header-theme="dark" data-canvas="base" className="relative">
+        <div
+          className="container-koda grid grid-cols-1 gap-x-12 gap-y-9 md:grid-cols-12"
+          style={{
+            borderTop: "1px solid var(--color-line)",
+            paddingTop: "clamp(48px,6vw,96px)",
+            paddingBottom: "clamp(60px,8vw,120px)",
+          }}
+        >
+          <div className="md:col-span-5">
+            <FadeUp inView>
+              <h2
+                className="font-heading font-semibold md:sticky md:top-32"
+                style={{
+                  fontSize: "clamp(1.8rem,3.6vw,2.8rem)",
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.03em",
+                  color: "var(--color-ink)",
+                  textWrap: "balance",
+                }}
+              >
+                Technologia dobrana pod projekt, nie z automatu
+              </h2>
+            </FadeUp>
+          </div>
+          <div className="flex max-w-[58ch] flex-col gap-6 md:col-span-7">
+            <FadeUp inView delay={0.08}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink-muted)",
+                }}
+              >
+                Nie budujemy każdej strony w tym samym silniku. Prosty landing kodujemy lekko i bez
+                zbędnych zależności, stronę firmową stawiamy na Next.js, a projekt z interaktywną
+                grafiką — na Three.js i React Three Fiber. Wybór technologii zależy od tego, co
+                strona ma robić, nie od tego, co akurat mamy pod ręką.
+              </p>
+            </FadeUp>
+            <FadeUp inView delay={0.12}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink-muted)",
+                }}
+              >
+                Każdą realizację sprawdzamy przed oddaniem pod kątem szybkości (Core Web Vitals),
+                dostępności (WCAG 2.2 AA) i działania na telefonie, tablecie i dużym ekranie. Każdą
+                możesz też sprawdzić sam: w portfolio linkujemy do żywych stron, nie tylko zrzutów
+                ekranu.
+              </p>
+            </FadeUp>
+            <FadeUp inView delay={0.16}>
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+                  lineHeight: 1.65,
+                  color: "var(--color-ink)",
+                }}
+              >
+                Pracujemy z Bielska-Białej — zdalnie, dla firm z całej Polski.
+              </p>
+            </FadeUp>
           </div>
         </div>
       </section>

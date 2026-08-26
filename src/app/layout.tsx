@@ -31,7 +31,12 @@ const ORG_JSON_LD = {
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
       email: CONTACT.email,
-      logo: `${SITE_CONFIG.url}/icon.svg`,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_CONFIG.url}/icon.svg`,
+        width: 512,
+        height: 512,
+      },
       description: SITE_CONFIG.description,
       areaServed: "PL",
       sameAs: ["https://github.com/kodastrony"],
@@ -54,11 +59,22 @@ const ORG_JSON_LD = {
       "@id": `${SITE_CONFIG.url}/#business`,
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
+      image: [`${SITE_CONFIG.url}/icon.svg`, `${SITE_CONFIG.url}/opengraph-image`],
       parentOrganization: { "@id": `${SITE_CONFIG.url}/#organization` },
       description: SITE_CONFIG.tagline,
       knowsLanguage: "pl",
+      // Realne, weryfikowalne kompetencje (6 żywych dem + treść /uslugi/) —
+      // czysty sygnał encyjny dla AI search, zero fabrykacji.
+      knowsAbout: [
+        "Projektowanie stron internetowych",
+        "Strony internetowe 3D (WebGL, Three.js, React Three Fiber)",
+        "Animacje webowe",
+        "SEO techniczne i Core Web Vitals",
+        "Dostępność cyfrowa (WCAG 2.2 AA)",
+      ],
       areaServed: [
         { "@type": "Country", name: "Polska" },
+        { "@type": "AdministrativeArea", name: "województwo śląskie" },
         { "@type": "City", name: CONTACT.city },
       ],
       serviceType: [
@@ -158,17 +174,8 @@ export const metadata: Metadata = {
   },
   description:
     "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
-  keywords: [
-    "strony internetowe dla firm",
-    "tworzenie stron internetowych",
-    "projektowanie stron www",
-    "strona internetowa dla firmy",
-    "strony internetowe na miarę",
-    "strony internetowe bez szablonów",
-    "agencja interaktywna",
-    "strony internetowe Bielsko-Biała",
-    "KODA Studio",
-  ],
+  // Bez meta keywords: Google ignoruje od 2009, część audytorów flaguje jako
+  // przestarzałe, a lista zdradzała strategię fraz konkurencji (audyt 2026-08-26).
   authors: [{ name: "KODA Studio", url: "https://kodastrony.pl" }],
   creator: "KODA Studio",
   openGraph: {
@@ -275,7 +282,7 @@ export default function RootLayout({
             (logo + menu + CTA) i skoczyć do treści. Ukryty do momentu focusu (Tab). */}
         <a
           href="#main"
-          className="sr-only rounded-full bg-pink px-5 py-3 font-heading text-[13px] font-bold text-white shadow-lg focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[400]"
+          className="sr-only rounded-full bg-[#b32a9d] px-5 py-3 font-heading text-[13px] font-bold text-white shadow-lg focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[400]"
         >
           Przejdź do treści
         </a>

@@ -45,6 +45,10 @@ export function VideoShowcase({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [load, setLoad] = useState(false);
   const [visible, setVisible] = useState(false);
+  // WCAG 2.2.2 (poziom A): auto-odtwarzana, zapętlona animacja >5 s MUSI mieć
+  // mechanizm pauzy. userPaused = jawna decyzja użytkownika (przycisk niżej) —
+  // wygrywa z auto-play przy scrollu, dopóki użytkownik sam nie wznowi.
+  const [userPaused, setUserPaused] = useState(false);
 
   // Observe viewport: attach src on first approach, track visibility.
   useEffect(() => {
@@ -61,13 +65,13 @@ export function VideoShowcase({
     return () => io.disconnect();
   }, []);
 
-  // Play only when loaded + visible + motion allowed; pause otherwise.
+  // Play only when loaded + visible + motion allowed + not user-paused.
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !load) return;
-    if (visible && !noAutoplay) v.play().catch(() => {});
+    if (visible && !noAutoplay && !userPaused) v.play().catch(() => {});
     else v.pause();
-  }, [load, visible, noAutoplay]);
+  }, [load, visible, noAutoplay, userPaused]);
 
   return (
     <div
@@ -103,6 +107,30 @@ export function VideoShowcase({
         />
         Nagranie na żywo
       </span>
+      {/* Pauza/wznowienie pętli (WCAG 2.2.2 A). Ukryty, gdy reduced-motion
+          pokazuje natywne kontrolki (wtedy pauza już jest). Styl = ciemne szkło
+          jak badge wyżej; ≥44px pola dotyku. */}
+      {!noAutoplay && (
+        <button
+          type="button"
+          onClick={() => setUserPaused((p) => !p)}
+          aria-pressed={userPaused}
+          aria-label={userPaused ? "Wznów animację" : "Zatrzymaj animację"}
+          className="absolute right-0 bottom-0 z-[2] m-3 flex h-11 w-11 items-center justify-center rounded-full text-white transition-transform duration-200 hover:scale-105 active:scale-95"
+          style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
+        >
+          {userPaused ? (
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <path d="M3 1.5 12 7 3 12.5z" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <rect x="2.5" y="1.5" width="3.4" height="11" rx="1" />
+              <rect x="8.1" y="1.5" width="3.4" height="11" rx="1" />
+            </svg>
+          )}
+        </button>
+      )}
     </div>
   );
 }

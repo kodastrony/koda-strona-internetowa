@@ -7,7 +7,7 @@ import { Magnetic } from "@/components/motion/magnetic";
 import { GlowField } from "@/components/fx/glow-field";
 import { PillLink } from "@/components/ui/pill-link";
 import { EASE } from "@/lib/motion";
-import { CONTACT } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 import { FAQS } from "@/lib/faq";
 
 /* ── FAQ — objection-killer before the final CTA (also the nav "FAQ" target) ─
@@ -62,7 +62,7 @@ function FaqItem({
             className="pt-1 font-heading text-[13px] font-bold"
             style={{
               letterSpacing: "0.04em",
-              color: open ? "var(--color-pink-bright)" : "var(--color-ink-faint)",
+              color: open ? "var(--color-faq-open)" : "var(--color-ink-faint)",
               transition: "color 300ms ease",
             }}
           >
@@ -74,7 +74,7 @@ function FaqItem({
               fontSize: "clamp(1.05rem,1.7vw,1.45rem)",
               letterSpacing: "-0.02em",
               lineHeight: 1.3,
-              color: open ? "var(--color-pink-bright)" : "var(--color-ink)",
+              color: open ? "var(--color-faq-open)" : "var(--color-ink)",
             }}
           >
             {faq.q}
@@ -251,12 +251,10 @@ export function Faq() {
               Masz inne pytanie?{" "}
               {/* pink-bright: #cf43b8 spadał pod AA dokładnie tam, gdzie
                   foreshadow + plum są najmocniejsze (dół FAQ przy Statement). */}
-              <a
-                href={`mailto:${CONTACT.email}`}
+              <EmailLink
                 className="text-pink-bright underline decoration-pink-bright/40 underline-offset-4 transition-colors hover:decoration-pink-bright"
-              >
-                Napisz do nas
-              </a>
+                label="Napisz do nas"
+              />
             </p>
           </div>
         </div>

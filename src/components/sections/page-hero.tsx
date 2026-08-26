@@ -1,8 +1,7 @@
 "use client";
 
-import { FadeUp, Reveal, Parallax } from "@/components/motion";
+import { Parallax } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
-import { EASE } from "@/lib/motion";
 
 /* ── PageHero — shared sub-page header ─────────────────────────────────────
    One consistent, on-brand opening for every sub-page (/uslugi, /realizacje,
@@ -65,12 +64,17 @@ export function PageHero({
           nagłówek dochodzi do logo, „KODA" płynnie znika i ZOSTAJE schowane
           (na mobile inaczej wordmark zasłaniałby całą treść). Powrót na górę =
           logo wraca. Stabilny box (nie animowany) — patrz useLogoHidden. */}
+      {/* Wejścia label/H1/lead w CZYSTYM CSS (.ph-*-in, globals.css) — ta sama
+          choreografia co dawne FadeUp/Reveal, ale grana od pierwszego malowania,
+          bez czekania na hydrację JS. Tekst hero to LCP każdej podstrony: audyt
+          CWV 2026-08-26 mierzył przez to LCP 5–7 s (element render delay do
+          2,3 s) — po zmianie tekst maluje się tuż po FCP. */}
       <div data-logo-hide-anchor className="container-koda relative z-10">
-        <FadeUp x={-24} y={0} duration={0.6} ease={EASE.out} delay={0.05}>
+        <div className="ph-label-in">
           <span className="label-koda">{label}</span>
-        </FadeUp>
+        </div>
 
-        <Reveal className="mt-5" duration={0.85} ease={EASE.out} delay={0.12}>
+        <div className="ph-title-in mt-5">
           <h1
             style={{
               fontFamily: "var(--font-heading)",
@@ -84,12 +88,12 @@ export function PageHero({
             {title}
             <span style={{ color: "var(--color-accent)" }}>.</span>
           </h1>
-        </Reveal>
+        </div>
 
         {lead && (
-          <FadeUp y={22} duration={0.6} ease={EASE.expo} delay={0.22} className="mt-7">
+          <div className="ph-lead-in mt-7">
             <p className="text-lead">{lead}</p>
-          </FadeUp>
+          </div>
         )}
       </div>
     </section>

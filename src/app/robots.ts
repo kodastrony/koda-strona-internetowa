@@ -32,6 +32,14 @@ const AI_AND_SEARCH_BOTS = [
   // Common Crawl (zbiór, na którym trenują modele) + Amazon
   "CCBot",
   "Amazonbot",
+  // Meta AI (Llama / Meta AI search)
+  "meta-externalagent",
+  // DuckDuckGo AI (DuckAssist)
+  "DuckAssistBot",
+  // Mistral (Le Chat)
+  "MistralAI-User",
+  // ByteDance (Doubao) — spójnie ze strategią „wpuszczamy wszystkie silniki AI"
+  "Bytespider",
 ];
 
 export default function robots(): MetadataRoute.Robots {
@@ -40,7 +48,8 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "*", allow: "/" },
       { userAgent: AI_AND_SEARCH_BOTS, allow: "/" },
     ],
+    // Bez `host:` — dyrektywa wyłącznie yandexowa, martwa od 2018; walidatory
+    // robots.txt flagują ją jako nieznaną (a wartość i tak miała zły format).
     sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
-    host: SITE_CONFIG.url,
   };
 }

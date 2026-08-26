@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/page-hero";
 import { UslugiContent } from "@/components/sections/uslugi-content";
 import { CTABand } from "@/components/sections/cta-band";
-import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
+import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 import { SERVICES } from "@/lib/services-data";
 import { SITE_CONFIG } from "@/lib/constants";
+import { LASTMOD } from "@/app/sitemap";
 
 const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
@@ -17,17 +18,34 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 // AI; zero markupu Review/AggregateRating (self-serving = nieuprawniony).
 const SERVICES_JSON_LD = {
   "@context": "https://schema.org",
-  "@graph": SERVICES.map((s) => ({
-    "@type": "Service",
-    "@id": `${SITE_CONFIG.url}/uslugi/#${s.id}`,
-    name: s.title,
-    description: s.lead,
-    serviceType: s.title,
-    url: `${SITE_CONFIG.url}/uslugi/#${s.id}`,
-    provider: { "@id": `${SITE_CONFIG.url}/#organization` },
-    areaServed: { "@type": "Country", name: "Polska" },
-    inLanguage: "pl-PL",
-  })),
+  "@graph": [
+    // OfferCatalog spina biznes (#business z layoutu) z ofertą — TYLKO tutaj,
+    // bo węzły Service z @id istnieją wyłącznie na tej stronie (referencja z
+    // layout.tsx wisiałaby na pozostałych 13 stronach). Parser scala ten węzeł
+    // z pełnym ProfessionalService po tym samym @id.
+    {
+      "@id": `${SITE_CONFIG.url}/#business`,
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Usługi KODA Studio",
+        itemListElement: SERVICES.map((s) => ({
+          "@type": "Offer",
+          itemOffered: { "@id": `${SITE_CONFIG.url}/uslugi/#${s.id}` },
+        })),
+      },
+    },
+    ...SERVICES.map((s) => ({
+      "@type": "Service",
+      "@id": `${SITE_CONFIG.url}/uslugi/#${s.id}`,
+      name: s.title,
+      description: s.lead,
+      serviceType: s.title,
+      url: `${SITE_CONFIG.url}/uslugi/#${s.id}`,
+      provider: { "@id": `${SITE_CONFIG.url}/#organization` },
+      areaServed: { "@type": "Country", name: "Polska" },
+      inLanguage: "pl-PL",
+    })),
+  ],
 };
 
 export const metadata: Metadata = pageMetadata({
@@ -35,6 +53,15 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Projektowanie UX/UI, strony internetowe 2D i 3D, SEO oraz opieka po starcie — dla firm z Bielska-Białej i całej Polski. Pod konkretny cel, nie pod szablon.",
   path: "/uslugi/",
+});
+
+// WebPage — jawny węzeł „ta strona" (breadcrumb po @id, isPartOf → #website).
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/uslugi/",
+  name: "Usługi — strony internetowe, 3D i SEO",
+  description:
+    "Projektowanie UX/UI, strony internetowe 2D i 3D, SEO oraz opieka po starcie — dla firm z Bielska-Białej i całej Polski. Pod konkretny cel, nie pod szablon.",
+  dateModified: LASTMOD["/uslugi/"],
 });
 
 export default function UslugiPage() {
@@ -47,6 +74,10 @@ export default function UslugiPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(SERVICES_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
       <PageHero
         label="Usługi"

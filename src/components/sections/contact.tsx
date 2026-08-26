@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { EASE, cssBezier } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { CONTACT, SITE_CONFIG } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 
 /* ════════════════════════════════════════════════════════════════════
    KONTAKT — minimal na BIAŁYM tle. Formularz po LEWEJ, po prawej wielka
@@ -115,9 +116,11 @@ function FloatingField({
     "transition-[background-color,box-shadow] duration-200",
     "disabled:opacity-50 disabled:cursor-not-allowed",
     multiline ? "min-h-[120px] resize-none pt-7 pb-3" : "h-[58px] pt-6 pb-1",
+    // Ringi w PEŁNEJ alfie: rgba(...,0.4/0.45) na bieli mierzyły 1,6–1,7:1
+    // (WCAG 1.4.11 wymaga ≥3:1 dla wskaźnika fokusa) — solidny róż = 4,1:1.
     invalid
-      ? "bg-[#fbeef2] shadow-[0_0_0_1.5px_rgba(204,43,94,0.45)]"
-      : "focus:bg-[#ececec] focus:shadow-[0_0_0_2px_rgba(207,67,184,0.4)]"
+      ? "bg-[#fbeef2] shadow-[0_0_0_1.5px_rgb(204,43,94)]"
+      : "focus:bg-[#ececec] focus:shadow-[0_0_0_2px_rgb(207,67,184)]"
   );
 
   const labelStyle: React.CSSProperties = {
@@ -232,6 +235,9 @@ function FileAttach({
 
   return (
     <div className="flex flex-col gap-2.5">
+      {/* tabIndex=-1 + aria-label: input jest sr-only (wizualnie 1×1 px), a mimo to
+          był fokusowalny Tabem BEZ etykiety (axe critical). Klawiatura używa
+          przycisku-dropzone niżej; sam input zostaje dla natywnego no-JS POST. */}
       <input
         ref={inputRef}
         id={id}
@@ -240,6 +246,8 @@ function FileAttach({
         multiple
         accept={ACCEPT_ATTR}
         className="sr-only"
+        tabIndex={-1}
+        aria-label="Dołącz pliki do wiadomości"
         aria-describedby={error ? `${id}-error` : undefined}
         disabled={disabled}
         onChange={(e) => {
@@ -554,8 +562,9 @@ export function Contact() {
             Logo widoczne na wejściu /kontakt, znika gdy nagłówek dojedzie do niego
             na scrollu (koniec zasłaniania pól, zob. zrzut „E-mail") i zostaje schowane. */}
         <div data-logo-hide-anchor className="mx-auto w-full max-w-[640px] lg:mx-0 lg:w-[56%]">
-          {/* ── Nagłówek ── */}
-          <FadeUp inView x={-14} y={0} duration={0.6}>
+          {/* ── Nagłówek — wejścia w CZYSTYM CSS (.ph-*-in): akapit intro to LCP
+              tej strony; wcześniej czekał na hydrację JS (audyt CWV 2026-08-26). ── */}
+          <div className="ph-label-in">
             {/* Eyebrow = ten sam token co na pozostałych stronach (.label-koda),
                 ale ciemny kolor pod białe tło kontaktu (accent-róż na bieli był < AA). */}
             <span
@@ -565,8 +574,8 @@ export function Contact() {
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-pink" />
               Kontakt
             </span>
-          </FadeUp>
-          <FadeUp inView delay={0.07}>
+          </div>
+          <div className="ph-lead-in" style={{ animationDelay: "0.07s" }}>
             <h1
               id="contact-heading"
               className="mt-5 font-heading font-extrabold text-[#0f0f0f]"
@@ -579,19 +588,15 @@ export function Contact() {
             >
               Zacznijmy projekt<span className="text-pink">.</span>
             </h1>
-          </FadeUp>
-          <FadeUp inView delay={0.13}>
+          </div>
+          <div className="ph-lead-in" style={{ animationDelay: "0.13s" }}>
             <p className="mt-5 max-w-[460px] font-body text-[16px] leading-relaxed text-black/60">
-              Opowiedz nam o projekcie, a wrócimy z pomysłem i wyceną w ciągu 24 godzin. Wolisz
-              e-mail?{" "}
-              <a
-                href={`mailto:${CONTACT.email}`}
-                className="text-[#0f0f0f] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:decoration-pink"
-              >
-                {CONTACT.email}
-              </a>
+              Opowiedz nam o projekcie, a wrócimy z pomysłem i wyceną w ciągu 24 godzin. Im więcej
+              szczegółów podasz — cel strony, przykłady, budżet — tym szybciej wrócimy z konkretem
+              zamiast kolejnych pytań. Wolisz e-mail?{" "}
+              <EmailLink className="text-[#0f0f0f] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:decoration-pink" />
             </p>
-          </FadeUp>
+          </div>
 
           {/* ── Formularz (kaskada per-pole) ── */}
           <form
@@ -790,13 +795,7 @@ export function Contact() {
                 >
                   Nie udało się wysłać — serwer formularza jest chwilowo niedostępny. Spróbuj
                   ponownie za chwilę lub napisz bezpośrednio na{" "}
-                  <a
-                    href={`mailto:${CONTACT.email}`}
-                    className="font-semibold underline underline-offset-2"
-                  >
-                    {CONTACT.email}
-                  </a>
-                  .
+                  <EmailLink className="font-semibold underline underline-offset-2" />.
                 </p>
               )}
             </FadeUp>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CONTACT } from "@/lib/constants";
-import { pageMetadata } from "@/lib/seo";
+import { EmailLink } from "@/components/ui/email-link";
+import { LASTMOD } from "@/app/sitemap";
+import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Polityka prywatności",
@@ -9,8 +10,30 @@ export const metadata: Metadata = pageMetadata({
   path: "/polityka-prywatnosci/",
 });
 
+// Jedyna strona non-home, która nie miała breadcrumbu — teraz spójnie z resztą.
+const BREADCRUMB_JSON_LD = breadcrumbLd([
+  { name: "Strona główna", path: "/" },
+  { name: "Polityka prywatności", path: "/polityka-prywatnosci/" },
+]);
+
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/polityka-prywatnosci/",
+  name: "Polityka prywatności",
+  description: "Polityka prywatności i ochrony danych osobowych KODA Studio.",
+  dateModified: LASTMOD["/polityka-prywatnosci/"],
+});
+
 export default function PolitykaPrywatnosciPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
+      />
     <section
       data-header-theme="dark"
       data-canvas="base"
@@ -45,9 +68,7 @@ export default function PolitykaPrywatnosciPage() {
           <p>
             Administratorem Twoich danych osobowych jest <strong>KODA Studio</strong>, działający
             pod adresem e-mail{" "}
-            <a href={`mailto:${CONTACT.email}`} className="text-pink underline underline-offset-4">
-              {CONTACT.email}
-            </a>
+            <EmailLink className="text-pink underline underline-offset-4" />
             .
           </p>
 
@@ -122,9 +143,7 @@ export default function PolitykaPrywatnosciPage() {
           </h2>
           <p>
             W sprawach ochrony danych osobowych skontaktuj się z nami pod adresem:{" "}
-            <a href={`mailto:${CONTACT.email}`} className="text-pink underline underline-offset-4">
-              {CONTACT.email}
-            </a>
+            <EmailLink className="text-pink underline underline-offset-4" />
           </p>
         </div>
 
@@ -138,5 +157,6 @@ export default function PolitykaPrywatnosciPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

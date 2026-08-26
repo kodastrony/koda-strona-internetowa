@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/page-hero";
 import { RealizacjeContent } from "@/components/sections/realizacje-content";
 import { CTABand } from "@/components/sections/cta-band";
-import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
+import { LASTMOD } from "@/app/sitemap";
+import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
@@ -16,12 +17,24 @@ export const metadata: Metadata = pageMetadata({
   path: "/realizacje/",
 });
 
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/realizacje/",
+  name: "Realizacje stron internetowych",
+  description:
+    "Realizacje KODA — strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Realne marki i autorskie koncepty.",
+  dateModified: LASTMOD["/realizacje/"],
+});
+
 export default function RealizacjePage() {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
       <PageHero
         label="Wybrane projekty"

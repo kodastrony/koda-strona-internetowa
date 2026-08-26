@@ -80,14 +80,51 @@ export interface Crumb {
  * until now — added to every non-home page.
  */
 export function breadcrumbLd(trail: Crumb[]) {
+  // @id wyliczane ze ścieżki bieżącej strony (ostatni okruszek) — dzięki temu
+  // WebPage.breadcrumb może referencjonować ten węzeł po @id (spójny graf).
+  const current = trail[trail.length - 1];
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${SITE_CONFIG.url}${current.path}#breadcrumb`,
     itemListElement: trail.map((c, i) => ({
       "@type": "ListItem",
       position: i + 1,
       name: c.name,
       item: `${SITE_CONFIG.url}${c.path}`,
     })),
+  };
+}
+
+export interface WebPageInput {
+  /** np. "/uslugi/" — ze slashem, jak w Crumb.path. Home = "/". */
+  path: string;
+  name: string;
+  description: string;
+  /** ISO 8601 — ta sama data co w sitemap.ts (LASTMOD), jedno źródło prawdy. */
+  dateModified: string;
+  /** @id węzła, o którym ta strona „jest" (Article/Service/CreativeWork…). Opcjonalne. */
+  mainEntityId?: string;
+}
+
+/**
+ * WebPage JSON-LD — jawny węzeł „ta strona" (standardowy wzorzec grafu, m.in.
+ * Yoast): oddziela stronę od jej głównego tematu (mainEntity) i spina breadcrumb
+ * po @id. Uzupełnia graf encji z layoutu (isPartOf → #website) — czysty sygnał
+ * dla Google i silników AI, zero nowych treści (name/description = metadane strony).
+ */
+export function webPageLd({ path, name, description, dateModified, mainEntityId }: WebPageInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${SITE_CONFIG.url}${path}#webpage`,
+    url: `${SITE_CONFIG.url}${path}`,
+    name,
+    description,
+    inLanguage: "pl-PL",
+    isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
+    dateModified,
+    ...(path !== "/" ? { breadcrumb: { "@id": `${SITE_CONFIG.url}${path}#breadcrumb` } } : {}),
+    ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
   };
 }

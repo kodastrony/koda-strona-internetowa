@@ -111,26 +111,29 @@ export function ProjectDetail({
             zjedziesz poza hero, i ZOSTAJE schowane przez całą realizację (na
             mobile inaczej zasłaniałoby treść). Powrót do gry headera: scroll w
             górę albo otwarcie menu. Stabilny box — patrz useLogoHidden. */}
+        {/* Wejścia hero w CZYSTYM CSS (.ph-*-in) — jak PageHero: tekst-LCP
+            (intro/tagline) maluje się tuż po FCP zamiast czekać na hydrację JS
+            (audyt CWV 2026-08-26: element render delay 1,2 s na case studies). */}
         <div data-logo-hide-anchor className="container-koda relative z-10">
-          <FadeUp x={-20} y={0} duration={0.5} ease={EASE.out}>
+          <div className="ph-label-in" style={{ animationDelay: "0s" }}>
             <Link
               href="/realizacje"
               className="inline-flex items-center gap-2 font-heading text-[12px] font-bold tracking-[0.16em] text-[var(--color-ink-muted)] uppercase transition-colors duration-300 hover:text-pink"
             >
               ← Realizacje
             </Link>
-          </FadeUp>
+          </div>
 
-          <FadeUp y={0} x={-10} duration={0.6} ease={EASE.out} delay={0.08} className="mt-7">
+          <div className="ph-label-in mt-7" style={{ animationDelay: "0.08s" }}>
             <span
               className="font-heading text-[12px] font-bold tracking-[0.2em] uppercase"
               style={{ color: "var(--color-accent)" }}
             >
               {project.concept ? "Projekt koncepcyjny" : `${project.client} · ${project.year}`}
             </span>
-          </FadeUp>
+          </div>
 
-          <Reveal className="mt-4" duration={0.85} ease={EASE.out} delay={0.12}>
+          <div className="ph-title-in mt-4">
             <h1
               style={{
                 fontFamily: "var(--font-heading)",
@@ -144,9 +147,9 @@ export function ProjectDetail({
               {project.title}
               <span style={{ color: "var(--color-accent)" }}>.</span>
             </h1>
-          </Reveal>
+          </div>
 
-          <FadeUp y={18} duration={0.6} ease={EASE.out} delay={0.18} className="mt-3">
+          <div className="ph-lead-in mt-3" style={{ animationDelay: "0.18s" }}>
             <p
               className="font-heading"
               style={{
@@ -158,11 +161,11 @@ export function ProjectDetail({
             >
               {project.tagline}
             </p>
-          </FadeUp>
+          </div>
 
-          <FadeUp y={22} duration={0.6} ease={EASE.expo} delay={0.24} className="mt-7">
+          <div className="ph-lead-in mt-7" style={{ animationDelay: "0.24s" }}>
             <p className="text-lead">{project.intro}</p>
-          </FadeUp>
+          </div>
 
           {/* Metadata row */}
           <FadeUp inView delay={0.06} className="mt-9">
@@ -246,12 +249,18 @@ export function ProjectDetail({
                   // tła za sobą. Translate odpadł: nadlanie %-em nie nadążało za
                   // przesuwem na wąskich ekranach (wąska ramka = małe nadlanie px).
                   <Parallax speed={0} scaleFrom={1.07} className="absolute inset-0">
+                    {/* fetchPriority + srcset 640/1680: showcase to obraz-LCP tej
+                        strony; wariant -640 (pre-generowany) oszczędza 20–115 KB
+                        na mobile (audyt obrazów 2026-08-26). */}
                     <img
                       src={project.showcase}
+                      srcSet={`${project.showcase.replace("-showcase.webp", "-showcase-640.webp")} 640w, ${project.showcase} 1680w`}
+                      sizes="(max-width: 767px) 92vw, min(72vw, 1200px)"
                       alt={`${project.title} — strona główna`}
                       width={1680}
                       height={1050}
                       loading="eager"
+                      fetchPriority="high"
                       decoding="async"
                       className="h-full w-full object-cover object-top"
                     />

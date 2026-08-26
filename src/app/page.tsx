@@ -6,7 +6,8 @@ import { Process } from "@/components/sections/process";
 import { Faq } from "@/components/sections/faq";
 import { Statement } from "@/components/sections/statement";
 import { FAQS } from "@/lib/faq";
-import { jsonLd } from "@/lib/seo";
+import { LASTMOD } from "@/app/sitemap";
+import { jsonLd, webPageLd } from "@/lib/seo";
 import { SITE_CONFIG } from "@/lib/constants";
 
 // Strona główna — jawne metadane (nie tylko dziedziczenie z layoutu): tytuł
@@ -37,6 +38,15 @@ const FAQ_JSON_LD = {
   })),
 };
 
+// WebPage — jawny węzeł „ta strona" także na home (spójnie z podstronami).
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/",
+  name: "Strony internetowe dla firm — projekt i kod | KODA Studio",
+  description:
+    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+  dateModified: LASTMOD["/"],
+});
+
 export default function HomePage() {
   // Brak <main> tutaj — layout.tsx już renderuje <main className="flex-1">.
   // Narracja konwertująca: hook → co robimy → dowód (realizacje) → jak
@@ -46,6 +56,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(FAQ_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
       <Hero />
 

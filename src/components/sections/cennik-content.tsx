@@ -26,23 +26,27 @@ export interface CennikFaq {
 export const CENNIK_FAQ: CennikFaq[] = [
   {
     q: "Ile kosztuje strona internetowa dla małej firmy?",
-    a: "Solidna strona firmowa dla małej lub średniej firmy kosztuje na rynku najczęściej od 3 000 do 8 000 zł netto. Prosta wizytówka zaczyna się od ok. 2 000 zł, a rozbudowana strona z indywidualnym projektem, animacjami czy 3D — od kilkunastu tysięcy. Konkretną kwotę dla Twojego projektu podajemy po krótkiej rozmowie, bezpłatnie i bez zobowiązań.",
+    a: "Solidna strona firmowa dla małej lub średniej firmy kosztuje na rynku najczęściej od 3 000 do 8 000 zł netto. Prosta wizytówka zaczyna się od ok. 2 000 zł, a rozbudowana strona z indywidualnym projektem, animacjami czy 3D — od kilkunastu tysięcy. Konkretną kwotę dla Twojego projektu podajemy w KODA po krótkiej rozmowie, bezpłatnie i bez zobowiązań.",
   },
   {
     q: "Czy tania strona z kreatora się opłaca?",
-    a: "Na start jest tania (zwykle 100–500 zł rocznie za abonament), ale płacisz za to inaczej: szablonowym wyglądem jak u tysięcy innych firm, słabszym SEO, wolniejszym ładowaniem i trudną rozbudową. Jeśli strona ma realnie pozyskiwać klientów, autorski kod zwykle zwraca się szybciej niż pozorna oszczędność na starcie.",
+    a: "Na start jest tania (zwykle 100–500 zł rocznie za abonament), ale płacisz za to inaczej: szablonowym wyglądem jak u tysięcy innych firm, słabszym SEO, wolniejszym ładowaniem i trudną rozbudową. Jeśli strona ma realnie pozyskiwać klientów, autorski kod — taki, jaki piszemy w KODA — zwykle zwraca się szybciej niż pozorna oszczędność na starcie.",
   },
   {
     q: "Ile kosztuje strona z animacjami albo w 3D?",
-    a: "To nasza specjalność i zwykle zaczyna się od kilkunastu tysięcy złotych — animacje i sceny 3D to dodatkowy czas projektu i programowania, ale też efekt „wow”, który wyróżnia markę. Zakres najłatwiej ocenić, oglądając nasze realizacje, a dokładną wycenę przygotujemy pod Twój pomysł.",
+    a: "To specjalność KODA i zwykle zaczyna się od kilkunastu tysięcy złotych — animacje i sceny 3D to dodatkowy czas projektu i programowania, ale też efekt „wow”, który wyróżnia markę. Zakres najłatwiej ocenić, oglądając nasze realizacje, a dokładną wycenę przygotujemy pod Twój pomysł.",
+  },
+  {
+    q: "Ile trwa zrobienie strony internetowej?",
+    a: "Prosta strona firmowa powstaje zwykle w 2–4 tygodnie, a rozbudowana — z indywidualnym projektem, animacjami czy grafiką 3D — w 6–10 tygodni. Najwięcej czasu zajmują treści i rundy poprawek, dlatego w KODA termin ustalamy w umowie przed startem, razem z zakresem — i go pilnujemy.",
   },
   {
     q: "Płaci się za stronę raz, czy co miesiąc?",
-    a: "Za zaprojektowanie i zbudowanie strony płacisz jednorazowo — strona, domena i wszystkie pliki są Twoje, a po starcie przekazujemy Ci pełne dostępy. Dochodzą tylko niewielkie, stałe koszty utrzymania (domena i hosting) oraz — opcjonalnie — opieka techniczna w stałej, rozsądnej opłacie.",
+    a: "Za zaprojektowanie i zbudowanie strony w KODA płacisz jednorazowo — strona, domena i wszystkie pliki są Twoje, a po starcie przekazujemy Ci pełne dostępy. Dochodzą tylko niewielkie, stałe koszty utrzymania (domena i hosting) oraz — opcjonalnie — opieka techniczna w stałej, rozsądnej opłacie.",
   },
   {
     q: "Dlaczego nie macie gotowego cennika?",
-    a: "Bo uczciwa cena zależy od zakresu: liczby podstron, treści, funkcji i terminu. Zamiast podawać kwotę „z sufitu”, wolimy poznać Twój projekt i podać konkret, który zapisujemy w umowie — bez ukrytych kosztów później. Wycena jest bezpłatna i bez zobowiązań.",
+    a: "Bo uczciwa cena zależy od zakresu: liczby podstron, treści, funkcji i terminu. Zamiast podawać kwotę „z sufitu”, w KODA wolimy poznać Twój projekt i podać konkret, który zapisujemy w umowie — bez ukrytych kosztów później. Wycena jest bezpłatna i bez zobowiązań.",
   },
 ];
 
@@ -161,6 +165,9 @@ export function CennikContent() {
               podstron, treści, funkcji i tego, kto ją tworzy.
             </p>
             <p className="mt-4" style={{ ...bodyStyle, maxWidth: "62ch" }}>
+              <span style={{ color: "var(--color-ink-faint)" }}>
+                Stan na: sierpień 2026.
+              </span>{" "}
               Poniżej znajdziesz orientacyjne widełki rynkowe na 2026 rok i to, co realnie wpływa na
               cenę. W KODA nie mamy sztywnego cennika — każdy projekt wyceniamy indywidualnie i{" "}
               <Link
@@ -324,10 +331,16 @@ export function CennikContent() {
         </FadeUp>
 
         {/* Mobile (<md): te same dane jako czytelne karty — zero poziomego scrolla */}
+        {/* FadeUp WEWNĄTRZ <li> — div między <ul> a <li> to nieprawidłowy HTML
+            (axe: list structure), psuł semantykę listy dla czytników. */}
         <ul className="mt-8 flex flex-col gap-4 md:hidden" role="list">
           {WORK_MODELS.map((m, i) => (
-            <FadeUp inView key={m.name} delay={0.04 * i}>
-              <li className="rounded-2xl p-5" style={{ border: "1px solid var(--color-line)" }}>
+            <li
+              key={m.name}
+              className="rounded-2xl p-5"
+              style={{ border: "1px solid var(--color-line)" }}
+            >
+              <FadeUp inView delay={0.04 * i}>
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <span
                     className="font-heading font-semibold"
@@ -374,8 +387,8 @@ export function CennikContent() {
                     </dd>
                   </div>
                 </dl>
-              </li>
-            </FadeUp>
+              </FadeUp>
+            </li>
           ))}
         </ul>
       </div>

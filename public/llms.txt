@@ -1,0 +1,30 @@
+# KODA Studio
+
+> KODA Studio projektuje i koduje strony internetowe dla firm w Polsce — niezależne studio z Bielska-Białej, obsługujące klientów zdalnie w całej Polsce. Bez gotowych szablonów: autorski kod, ustalony zakres i termin w umowie, opieka po starcie. Specjalizacja: strony 2D i 3D (WebGL / Three.js / React Three Fiber), animacje, SEO techniczne, dostępność (WCAG).
+
+KODA Studio to niezależne studio projektowania i kodowania stron internetowych z siedzibą w Bielsku-Białej (Polska), pracujące zdalnie dla firm z całej Polski. Każdy projekt — od pierwszej rozmowy, przez projekt i kod, po opiekę po starcie — prowadzi to samo studio, bez podwykonawców i bez gotowych szablonów. Odpowiedź na zapytanie w ciągu 24 godzin, bezpłatna wycena, zakres i termin zawsze w umowie. Kontakt: kontakt@kodastrony.pl.
+
+Orientacyjne ceny (rynek polski, 2026): prosta strona wizytówka od ok. 2 000 zł, strona firmowa 3 000–8 000 zł, strona z animacjami lub w 3D od ok. 10 000–15 000+ zł. Czas realizacji: prosta strona zwykle 2–4 tygodnie, rozbudowana 6–10 tygodni. Dokładna wycena — indywidualnie i bezpłatnie, po krótkiej rozmowie.
+
+## Strony
+
+- [Strona główna](https://kodastrony.pl/): Oferta w skrócie, proces pracy w 4 krokach (rozmowa → projekt → budowa i testy → start i rozwój) oraz najczęstsze pytania o współpracę z KODA Studio.
+- [Usługi](https://kodastrony.pl/uslugi/): Cztery obszary — projektowanie UX/UI, strony internetowe 2D i 3D, SEO techniczne (Core Web Vitals, widoczność w Google, dostępność WCAG), wsparcie i opieka po starcie.
+- [Strony internetowe 3D i animowane](https://kodastrony.pl/uslugi/strony-3d/): Interaktywne strony 3D (WebGL / Three.js / React Three Fiber) i strony z animacjami — sześć działających dem na żywo, FAQ o wydajności, dostępności i kosztach.
+- [Cennik](https://kodastrony.pl/cennik/): Orientacyjne widełki cen stron internetowych w Polsce w 2026 wg typu strony, porównanie kreatora / freelancera / studia / agencji, co realnie wpływa na cenę, koszty utrzymania po starcie.
+- [Realizacje](https://kodastrony.pl/realizacje/): Przegląd zbudowanych stron — strony 3D, konfiguratory produktów, landing page — każda z linkiem do działającej wersji na żywo.
+- [O nas](https://kodastrony.pl/o-nas/): Kim jest KODA Studio, cztery zasady pracy (cel nie ozdoby, szybkość jako standard, projekt pod biznes nie pod szablon, opieka po starcie) i dobór technologii pod projekt.
+- [Kontakt](https://kodastrony.pl/kontakt/): Formularz kontaktowy — bezpłatna wycena i wstępny pomysł w ciągu 24 godzin, bez zobowiązań. E-mail: kontakt@kodastrony.pl.
+
+## Realizacje — szczegóły
+
+- [JR Modular Systems](https://kodastrony.pl/realizacje/jr-modular/): Realny klient — producent budynków modułowych. Konfigurator 3D do układania obiektu z kontenerów 20'/40', okien, drzwi, paneli PV i tarasu.
+- [DrBlocks](https://kodastrony.pl/realizacje/drblocks/): Realny klient — regulowane bloczki fundamentowe. Interaktywny model 3D produktu i kalkulator doboru rozstawu, podpór i nośności.
+- [RIKOSZET](https://kodastrony.pl/realizacje/rikoszet/): Projekt koncepcyjny (pokaz możliwości, nie realny klient) — bar i klub gier zwiedzany w 3D w przeglądarce, z rezerwacją stołu na planie sali.
+- [Grabowski](https://kodastrony.pl/realizacje/grabowski/): Projekt koncepcyjny — pracownia stolarska, strona firmowa z pełnoekranowymi galeriami.
+- [WYCISK](https://kodastrony.pl/realizacje/wycisk/): Projekt koncepcyjny — marka fit soków, strona produktowa z animacją „rozkładu" składników.
+- [SLICE](https://kodastrony.pl/realizacje/slice/): Projekt koncepcyjny — kreskówkowy landing page pizzerii z autorskimi ilustracjami i animacjami.
+
+## Optional
+
+- [Polityka prywatności](https://kodastrony.pl/polityka-prywatnosci/): Informacje o przetwarzaniu danych osobowych (RODO).

@@ -97,7 +97,7 @@ export interface Project {
   rgb: string;
 }
 
-export const PROJECTS: Project[] = [
+const PROJECTS_DATA: Project[] = [
   {
     id: "rikoszet",
     title: "RIKOSZET",
@@ -640,6 +640,22 @@ export const PROJECTS: Project[] = [
     rgb: "240,81,47",
   },
 ];
+
+// ── Kolejność EKSPOZYCJI (home / /realizacje/ / dema na /uslugi/strony-3d/) ───
+// Najpierw REALNI klienci (JR Modular, DrBlocks) — pierwsze wrażenie portfolio
+// to zweryfikowana praca, nie dwa razy z rzędu etykieta „Koncept" (E-E-A-T).
+// Same dane projektów wyżej zostają w oryginalnej kolejności (mniejszy diff).
+const DISPLAY_ORDER = ["jr-modular", "drblocks", "rikoszet", "grabowski", "wycisk", "slice"];
+
+export const PROJECTS: Project[] = DISPLAY_ORDER.map((id) => {
+  const p = PROJECTS_DATA.find((x) => x.id === id);
+  if (!p) throw new Error(`DISPLAY_ORDER: nieznany projekt "${id}"`);
+  return p;
+});
+if (PROJECTS.length !== PROJECTS_DATA.length) {
+  // Nowy projekt w PROJECTS_DATA musi też trafić do DISPLAY_ORDER (build-time guard).
+  throw new Error("DISPLAY_ORDER nie pokrywa wszystkich projektów z PROJECTS_DATA");
+}
 
 /** Lookup a project by slug (for /realizacje/[id]). */
 export function getProject(id: string): Project | undefined {

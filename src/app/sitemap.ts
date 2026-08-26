@@ -11,22 +11,27 @@ export const dynamic = "force-static";
 // dyskontował <lastmod> w całej witrynie — marnując jedyny sygnał priorytetu
 // indeksowania, którego potrzebuje nowa domena. Tu trzymamy realne daty edycji:
 // bumpuj datę strony WYŁĄCZNIE, gdy jej treść faktycznie się zmieni.
-// 2026-08-17: jednorazowy bump WSZYSTKICH stron ze wspólnym OG — tego dnia realnie
-// zmieniły się ich metadane (nowy og:image + alt, nowe ikony), a Google trzymał
-// w wynikach stary czarny baner i favicon; lastmod = prośba o szybszy recrawl.
-const LASTMOD: Record<string, string> = {
-  "/": "2026-08-17",
-  "/uslugi/": "2026-08-17",
-  "/uslugi/strony-3d/": "2026-08-17",
-  "/cennik/": "2026-08-17",
-  "/realizacje/": "2026-08-17",
-  "/o-nas/": "2026-08-17",
-  "/kontakt/": "2026-08-17",
-  "/polityka-prywatnosci/": "2026-08-17",
+// 2026-08-26: overhaul SEO/AEO — realne zmiany TREŚCI na wszystkich stronach
+// (answer-first FAQ z liczbami, nowe pytania, sygnały lokalne Bielsko-Biała,
+// sekcja „Technologia" na /o-nas/, akapit intro na /realizacje/, WebPage JSON-LD
+// wszędzie). Poprzedni bump: 2026-08-17 (nowe OG/ikony).
+// export: te same daty zasilają WebPage.dateModified w JSON-LD (lib/seo.ts →
+// webPageLd) — jedno źródło prawdy, zero rozjazdu sitemap↔schema.
+export const LASTMOD: Record<string, string> = {
+  "/": "2026-08-26",
+  "/uslugi/": "2026-08-26",
+  "/uslugi/strony-3d/": "2026-08-26",
+  "/cennik/": "2026-08-26",
+  "/realizacje/": "2026-08-26",
+  "/o-nas/": "2026-08-26",
+  "/kontakt/": "2026-08-26",
+  "/polityka-prywatnosci/": "2026-08-26",
 };
 
-// Realizacje (case studies) — data publikacji portfolio (stała).
-const PROJECT_LASTMOD = "2026-06-15";
+// Realizacje (case studies) — 2026-08-26: nowe OG (JPG 1200×630), disclaimer
+// „koncept" w JSON-LD, pauza wideo (wcześniej: publikacja portfolio 2026-06-15).
+// export: j.w. — WebPage.dateModified na stronach case studies.
+export const PROJECT_LASTMOD = "2026-08-26";
 
 // Trailing slashes match the served URLs (next.config trailingSlash:true →
 // /uslugi/ etc.) and the per-page canonicals, so search engines see one

@@ -8,6 +8,7 @@ import { EASE, type Bezier } from "@/lib/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { HorizonBackdropLazy } from "@/components/scene3d/scenes/horizon-lazy";
 import { CONTACT } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 
 /* ── Final CTA "moment" — the conversion climax before the footer ──────────
    NOT a full-bleed pink slab (that was the old flashbang). Instead the brand
@@ -451,12 +452,10 @@ export function Statement() {
               <QuoteButton href="/kontakt" label="Zacznijmy projekt" />
             </Magnetic>
             {/* Pełna biel — white/85 spadał pod 4.5:1 na jasnym końcu gradientu. */}
-            <a
-              href={`mailto:${CONTACT.email}`}
+            <EmailLink
               className="text-[14px] text-white underline-offset-4 transition-[text-decoration-color] hover:underline"
-            >
-              Napisz: {CONTACT.email}
-            </a>
+              label={`Napisz: ${CONTACT.email}`}
+            />
           </motion.div>
         </div>
       </div>

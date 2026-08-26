@@ -190,7 +190,13 @@ export function ProjectCard({
   const img = imageSrc ?? project.image;
   const has640 = !imageSrc;
   const src640 = project.image.replace(/\.webp$/, "-640.webp");
-  const srcSet = has640 ? `${src640} 640w, ${project.image} 1200w` : imageSrcSet;
+  // Pośredni wariant 960w: bez niego telefony z DPR ≥2,5 (92vw ≈ 380px CSS →
+  // ~950px fizycznych) brały pełne 1200w — Lighthouse liczył ~334 KB nadmiaru
+  // na /realizacje/ (audyt CWV 2026-08-26).
+  const src960 = project.image.replace(/\.webp$/, "-960.webp");
+  const srcSet = has640
+    ? `${src640} 640w, ${src960} 960w, ${project.image} 1200w`
+    : imageSrcSet;
 
   return (
     <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>

@@ -100,7 +100,8 @@ function HeroCopy({ play }: { play: boolean }) {
             maxWidth: "46ch",
           }}
         >
-          Projektujemy i kodujemy strony internetowe dla firm w Polsce. Od zera, pod konkretny cel.
+          Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej, dla całej
+          Polski. Od zera, pod konkretny cel.
         </p>
       </FadeUp>
 
@@ -114,10 +115,12 @@ function HeroCopy({ play }: { play: boolean }) {
         className="mt-10"
       >
         <Magnetic strength={0.4}>
+          {/* #b32a9d (nie #cf43b8): biały tekst 11–13px bold na #cf43b8 = 4,08:1
+              (<AA 4,5). Na #b32a9d = 5,62:1 — AA w obu motywach, róż zostaje. */}
           <PillLink
             href="/kontakt"
-            bg="#cf43b8"
-            border="#cf43b8"
+            bg="#b32a9d"
+            border="#b32a9d"
             className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
           >
             Bezpłatna wycena

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import { EASE } from "@/lib/motion";
 import { NAV_LINKS, CONTACT, SITE_CONFIG } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 
 /* ════════════════════════════════════════════════════════════════════
    KODA — full-screen menu overlay (baunfire-style)
@@ -302,17 +303,14 @@ export function MenuOverlay({
           >
             {/* Ciemny ink (AA na bieli) + RÓŻOWE podkreślenie jako akcent marki —
                 pink-jako-tekst na bieli dawał 4.08:1 (<AA). */}
-            <a
-              href={`mailto:${CONTACT.email}`}
+            <EmailLink
               className="underline decoration-pink/50 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink"
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "clamp(0.95rem, 1.3vw, 1.15rem)",
                 color: "#0f0f0f",
               }}
-            >
-              {CONTACT.email}
-            </a>
+            />
             <span
               style={{
                 fontFamily: "var(--font-body)",

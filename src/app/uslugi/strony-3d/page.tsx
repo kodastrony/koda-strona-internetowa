@@ -3,7 +3,8 @@ import { PageHero } from "@/components/sections/page-hero";
 import { Strony3DContent, STRONY3D_FAQ } from "@/components/sections/strony-3d-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
+import { LASTMOD } from "@/app/sitemap";
+import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Strony internetowe 3D i animowane",
@@ -16,6 +17,8 @@ export const metadata: Metadata = pageMetadata({
 const SERVICE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Service",
+  // @id — spójnie z usługami na /uslugi/; FAQPage i WebPage referencjonują ten węzeł.
+  "@id": `${SITE_CONFIG.url}/uslugi/strony-3d/#service`,
   name: "Strony internetowe 3D i animowane",
   serviceType: "Projektowanie i kodowanie interaktywnych stron 3D oraz stron z animacjami",
   description:
@@ -31,6 +34,10 @@ const SERVICE_JSON_LD = {
 const FAQ_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  // Spięcie z grafem encji (jak FAQ na stronie głównej) — @id + isPartOf + about.
+  "@id": `${SITE_CONFIG.url}/uslugi/strony-3d/#faq`,
+  isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
+  about: { "@id": `${SITE_CONFIG.url}/uslugi/strony-3d/#service` },
   mainEntity: STRONY3D_FAQ.map((f) => ({
     "@type": "Question",
     name: f.q,
@@ -43,6 +50,16 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Usługi", path: "/uslugi/" },
   { name: "Strony 3D i animowane", path: "/uslugi/strony-3d/" },
 ]);
+
+// WebPage — jawny węzeł „ta strona" (mainEntity → Service, breadcrumb po @id).
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/uslugi/strony-3d/",
+  name: "Strony internetowe 3D i animowane",
+  description:
+    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 6 działających dem. Szybkie i na każdym ekranie.",
+  dateModified: LASTMOD["/uslugi/strony-3d/"],
+  mainEntityId: `${SITE_CONFIG.url}/uslugi/strony-3d/#service`,
+});
 
 export default function Strony3DPage() {
   return (
@@ -58,6 +75,10 @@ export default function Strony3DPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
       <PageHero
         label="Usługi · 3D i animacje"

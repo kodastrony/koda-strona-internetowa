@@ -3,7 +3,8 @@ import { PageHero } from "@/components/sections/page-hero";
 import { CennikContent, CENNIK_FAQ } from "@/components/sections/cennik-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { SITE_CONFIG } from "@/lib/constants";
-import { breadcrumbLd, jsonLd, pageMetadata } from "@/lib/seo";
+import { LASTMOD } from "@/app/sitemap";
+import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Ile kosztuje strona internetowa? Cennik 2026",
@@ -17,12 +18,16 @@ export const metadata: Metadata = pageMetadata({
 const ARTICLE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Article",
+  // @id — FAQPage niżej i WebPage referencjonują ten węzeł (spójny graf strony).
+  "@id": `${SITE_CONFIG.url}/cennik/#article`,
   headline: "Ile kosztuje strona internetowa w 2026? Cennik i co wpływa na cenę",
   description:
     "Orientacyjne widełki cen stron internetowych w Polsce w 2026 roku wg typu strony, czynniki wpływające na cenę oraz porównanie kreatora, freelancera i agencji.",
   inLanguage: "pl-PL",
   datePublished: "2026-06-17",
-  dateModified: "2026-06-17",
+  // dateModified = realna data ostatniej zmiany TREŚCI artykułu (2026-08-26:
+  // nowe FAQ o czasie realizacji + widoczna data „Stan na"). Spójne z sitemap.
+  dateModified: "2026-08-26",
   author: { "@id": `${SITE_CONFIG.url}/#organization` },
   publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
   isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
@@ -36,6 +41,10 @@ const ARTICLE_JSON_LD = {
 const FAQ_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  // Spięcie z grafem encji (jak FAQ na stronie głównej) — @id + isPartOf + about.
+  "@id": `${SITE_CONFIG.url}/cennik/#faq`,
+  isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
+  about: { "@id": `${SITE_CONFIG.url}/cennik/#article` },
   mainEntity: CENNIK_FAQ.map((f) => ({
     "@type": "Question",
     name: f.q,
@@ -47,6 +56,16 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
   { name: "Cennik", path: "/cennik/" },
 ]);
+
+// WebPage — jawny węzeł „ta strona" (mainEntity → Article, breadcrumb po @id).
+const WEBPAGE_JSON_LD = webPageLd({
+  path: "/cennik/",
+  name: "Ile kosztuje strona internetowa? Cennik 2026",
+  description:
+    "Ile kosztuje strona internetowa w 2026? Widełki cen wg typu strony, co wpływa na cenę i porównanie: kreator, freelancer, agencja. Bezpłatna wycena w KODA.",
+  dateModified: LASTMOD["/cennik/"],
+  mainEntityId: `${SITE_CONFIG.url}/cennik/#article`,
+});
 
 export default function CennikPage() {
   return (
@@ -62,6 +81,10 @@ export default function CennikPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
       <PageHero
         label="Cennik"

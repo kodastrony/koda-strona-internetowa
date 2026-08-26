@@ -8,6 +8,24 @@ export function RealizacjeContent() {
   return (
     <section data-header-theme="dark" data-canvas="base" className="relative">
       <div className="container-koda" style={{ paddingBottom: "clamp(40px, 6vw, 90px)" }}>
+        {/* Akapit wprowadzający — samodzielny, cytowalny pasaż (AEO): kto, co,
+            fakt weryfikowalny (żywe strony) i uczciwy podział klient/koncept. */}
+        <FadeUp inView>
+          <p
+            className="mb-[clamp(36px,4.5vw,64px)] max-w-[62ch]"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "clamp(1.05rem,1.3vw,1.22rem)",
+              lineHeight: 1.65,
+              color: "var(--color-ink-muted)",
+            }}
+          >
+            Każdą stronę w tym portfolio KODA zaprojektowała i zakodowała od zera — bez szablonów —
+            i każda działa na żywo: klikniesz i sprawdzisz sam. Część powstała dla realnych klientów
+            (JR Modular Systems, DrBlocks), pozostałe to jasno oznaczone projekty koncepcyjne, które
+            pokazują nasz standard pracy — od konfiguratorów 3D po animowane strony produktowe.
+          </p>
+        </FadeUp>
         <h2 className="sr-only">Wszystkie realizacje</h2>
         <div
           className="grid grid-cols-1 md:grid-cols-2"

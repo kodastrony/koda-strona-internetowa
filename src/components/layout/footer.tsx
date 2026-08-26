@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_CONFIG, NAV_LINKS, CONTACT } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, cssBezier } from "@/lib/motion";
 
@@ -96,12 +97,7 @@ export function Footer() {
             <p className="label-koda" style={{ color: "var(--color-pink-bright)" }}>
               Kontakt
             </p>
-            <a
-              href={`mailto:${CONTACT.email}`}
-              className="text-sm text-ink-muted transition-colors duration-300 hover:text-pink"
-            >
-              {CONTACT.email}
-            </a>
+            <EmailLink className="text-sm text-ink-muted transition-colors duration-300 hover:text-pink" />
             <p className="text-sm text-ink-muted">{CONTACT.city}, Polska</p>
             <p className="text-sm text-ink-muted">Odpowiadamy w 24 h</p>
             <p className="text-sm text-ink-muted">
@@ -117,7 +113,8 @@ export function Footer() {
               statycznym eksporcie w momencie buildu; gdyby stronę z buildu z roku N
               otworzyć po 1 stycznia N+1 bez redeployu, SSR='N' a klient='N+1' = mismatch
               (#418) na całej stronie. Tłumimy ten jeden węzeł (klient pokaże aktualny rok). */}
-          <span suppressHydrationWarning>© {year} KODA. Wszelkie prawa zastrzeżone.</span>
+          {/* „KODA Studio" (nie samo „KODA.") — spójna nazwa encji z JSON-LD/NAP. */}
+          <span suppressHydrationWarning>© {year} KODA Studio. Wszelkie prawa zastrzeżone.</span>
           <div className="flex gap-6">
             <Link href="/polityka-prywatnosci" className="transition-colors hover:text-white">
               Polityka prywatności

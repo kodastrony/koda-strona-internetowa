@@ -22,23 +22,23 @@ export interface Strony3DFaq {
 export const STRONY3D_FAQ: Strony3DFaq[] = [
   {
     q: "Czy strona 3D nie spowalnia ładowania?",
-    a: "Nie musi. Sceny 3D budujemy na autorskim, lekkim kodzie z systemem, który dopasowuje jakość grafiki do mocy urządzenia — na słabszym telefonie scena się upraszcza, zamiast zacinać. Pierwszy ekran pojawia się od razu (statyczny poster), a 3D dogrywa się w tle, więc strona pozostaje szybka i zdaje Core Web Vitals.",
+    a: "Nie musi. W KODA sceny 3D budujemy na autorskim, lekkim kodzie z systemem, który dopasowuje jakość grafiki do mocy urządzenia — na słabszym telefonie scena się upraszcza, zamiast zacinać. Pierwszy ekran pojawia się od razu (statyczny poster), a 3D dogrywa się w tle, więc strona pozostaje szybka i zdaje Core Web Vitals.",
   },
   {
     q: "Czy strona 3D działa na telefonie?",
-    a: "Tak. Każdą scenę testujemy od telefonu po ekran 4K. Na słabszym sprzęcie automatycznie obniżamy jakość albo przełączamy na statyczną grafikę, więc animacja nigdy nie psuje płynności. Wspieramy też tryb ograniczonego ruchu (reduced motion) dla osób wrażliwych na animacje.",
+    a: "Tak. Każdą scenę KODA testuje od telefonu po ekran 4K. Na słabszym sprzęcie automatycznie obniżamy jakość albo przełączamy na statyczną grafikę, więc animacja nigdy nie psuje płynności. Wspieramy też tryb ograniczonego ruchu (reduced motion) dla osób wrażliwych na animacje.",
   },
   {
     q: "Ile kosztuje strona z animacjami albo w 3D?",
-    a: "Zwykle zaczyna się od kilkunastu tysięcy złotych — animacje i sceny 3D to dodatkowy czas projektu i programowania. Orientacyjne widełki znajdziesz na stronie cennika, a dokładną wycenę przygotujemy pod Twój pomysł, bezpłatnie i bez zobowiązań.",
+    a: "Zwykle zaczyna się od kilkunastu tysięcy złotych — animacje i sceny 3D to dodatkowy czas projektu i programowania. Orientacyjne widełki znajdziesz na stronie cennika, a dokładną wycenę KODA przygotuje pod Twój pomysł, bezpłatnie i bez zobowiązań.",
   },
   {
     q: "Czy efekty 3D pomagają w Google i wyszukiwarkach AI?",
-    a: "Same animacje nie podnoszą pozycji, ale ich efekt — dłuższy czas na stronie i wyróżnienie marki — to realny sygnał jakości. Całą treść trzymamy w kodzie HTML (czytelnym dla Google i silników AI) i pilnujemy szybkości, więc 3D dodaje charakteru, nie szkodząc widoczności.",
+    a: "Same animacje nie podnoszą pozycji, ale ich efekt — dłuższy czas na stronie i wyróżnienie marki — to realny sygnał jakości. W KODA całą treść trzymamy w kodzie HTML (czytelnym dla Google i silników AI) i pilnujemy szybkości, więc 3D dodaje charakteru, nie szkodząc widoczności.",
   },
   {
     q: "Czym różni się strona 3D od zwykłej animowanej?",
-    a: "Strona animowana porusza płaskimi elementami (przewijanie, przejścia, ruch grafiki 2D). Strona 3D dokłada prawdziwą przestrzeń — interaktywne sceny WebGL, które można obracać i zwiedzać, jak wirtualny model produktu czy wnętrza. Robimy oba podejścia i dobieramy je do celu, nie odwrotnie.",
+    a: "Strona animowana porusza płaskimi elementami (przewijanie, przejścia, ruch grafiki 2D). Strona 3D dokłada prawdziwą przestrzeń — interaktywne sceny WebGL, które można obracać i zwiedzać, jak wirtualny model produktu czy wnętrza. W KODA robimy oba podejścia i dobieramy je do celu, nie odwrotnie.",
   },
 ];
 

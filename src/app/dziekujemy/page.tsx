@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FadeUp } from "@/components/motion";
 import { PillLink } from "@/components/ui/pill-link";
 import { SuccessCheck } from "@/components/ui/success-check";
-import { CONTACT } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 
 // Strona-podziękowanie — cel `_next` po wysłaniu formularza (FormSubmit).
 // noindex: nie chcemy jej w wynikach wyszukiwania.
@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "Dziękujemy",
   description: "Wiadomość wysłana — odezwiemy się w ciągu 24 godzin.",
   robots: { index: false, follow: false },
+  // Self-canonical — bez tego strona DZIEDZICZY canonical "/" z layoutu (mieszany
+  // sygnał: noindex + canonical na home). Nieszkodliwe, ale walidatory to flagują.
+  alternates: { canonical: "/dziekujemy/" },
 };
 
 export default function DziekujemyPage() {
@@ -102,12 +105,7 @@ export default function DziekujemyPage() {
             style={{ fontSize: "0.9rem", lineHeight: 1.6 }}
           >
             Pilne? Napisz wprost:{" "}
-            <a
-              href={`mailto:${CONTACT.email}`}
-              className="text-[var(--color-ink-muted)] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink"
-            >
-              {CONTACT.email}
-            </a>
+            <EmailLink className="text-[var(--color-ink-muted)] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink" />
           </p>
         </FadeUp>
 

@@ -1,6 +1,7 @@
-# KODA Studio — kodastrony.pl
+# KODA Studio — [kodastrony.pl](https://kodastrony.pl)
 
-Strona agencji KODA Studio. Statyczny eksport Next.js 16 hostowany na OVH.
+Strona agencji KODA Studio — live na [https://kodastrony.pl](https://kodastrony.pl).
+Statyczny eksport Next.js 16 hostowany na Cloudflare Pages (failover: OVH).
 
 ## Stack
 

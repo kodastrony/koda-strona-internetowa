@@ -3,6 +3,7 @@
 import { FadeUp, Parallax } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACT } from "@/lib/constants";
+import { EmailLink } from "@/components/ui/email-link";
 import { PillLink } from "@/components/ui/pill-link";
 
 /* ── CTABand — shared closing call-to-action ───────────────────────────────
@@ -118,21 +119,20 @@ export function CTABand({
           className="mt-10 flex flex-col items-center gap-5"
         >
           <Magnetic strength={0.4}>
+            {/* #b32a9d: biały tekst na #cf43b8 = 4,08:1 (<AA); na #b32a9d = 5,62:1. */}
             <PillLink
               href="/kontakt"
-              bg="#cf43b8"
-              border="#cf43b8"
+              bg="#b32a9d"
+              border="#b32a9d"
               className="px-9 py-4 text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
             >
               Bezpłatna wycena
             </PillLink>
           </Magnetic>
-          <a
-            href={`mailto:${CONTACT.email}`}
+          <EmailLink
             className="text-[14px] text-ink-muted underline-offset-4 transition-colors duration-300 hover:text-pink hover:underline"
-          >
-            lub napisz: {CONTACT.email}
-          </a>
+            label={`lub napisz: ${CONTACT.email}`}
+          />
         </FadeUp>
       </div>
     </section>

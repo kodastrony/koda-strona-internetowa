@@ -12,14 +12,17 @@ import { getProject } from "@/lib/projects";
 // Homepage "Nasze realizacje" — a curated teaser shown as a 2×2 grid of four
 // equal square-ish cards (życzenie usera „4 kwadraty, jak wcześniej"):
 //   ┌────────────┬────────────┐
-//   │  RIKOSZET  │  GRABOWSKI │   (lewy-górny / prawy-górny)
+//   │ JR MODULAR │  DRBLOCKS  │   (lewy-górny / prawy-górny)
 //   ├────────────┼────────────┤
-//   │ JR MODULAR │  DRBLOCKS  │   (lewy-dolny / prawy-dolny)
+//   │  RIKOSZET  │  GRABOWSKI │   (lewy-dolny / prawy-dolny)
 //   └────────────┴────────────┘
 // Kolejność w DOM = kolejność czytania siatki, więc grid-cols-2 układa je
-// dokładnie w te rogi. Karty to wspólny <ProjectCard> (ten sam komponent co na
-// /realizacje). Slice + Wycisk żyją na /realizacje.
-const GRID = ["rikoszet", "grabowski", "jr-modular", "drblocks"].map((id) => getProject(id)!);
+// dokładnie w te rogi. GÓRNY rząd = REALNI klienci (audyt treści 2026-08-26:
+// pierwsze wrażenie portfolio nie powinno zaczynać się dwiema etykietami
+// „Koncept" przed prawdziwymi wdrożeniami — E-E-A-T). Karty to wspólny
+// <ProjectCard> (ten sam komponent co na /realizacje). Slice + Wycisk żyją
+// na /realizacje.
+const GRID = ["jr-modular", "drblocks", "rikoszet", "grabowski"].map((id) => getProject(id)!);
 
 export function Work() {
   const reduce = useReducedMotion();

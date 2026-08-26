@@ -191,9 +191,10 @@ export function UslugiContent() {
                   maxWidth: "56ch",
                 }}
               >
-                To zależy od zakresu: liczby podstron, treści, integracji i terminu. Dlatego nie
-                podajemy cen z sufitu — opisz nam krótko projekt, a wrócimy z konkretną kwotą.
-                Bezpłatnie i bez zobowiązań.
+                Na polskim rynku strona dla firmy kosztuje najczęściej od 3 000 do 15 000 zł netto
+                — dokładna kwota zależy od zakresu: liczby podstron, treści, integracji i terminu.
+                Dlatego nie podajemy cen z sufitu — opisz nam krótko projekt, a wrócimy z konkretną
+                kwotą. Bezpłatnie i bez zobowiązań.
               </p>
             </FadeUp>
             <FadeUp inView delay={0.16}>

@@ -128,7 +128,8 @@ export function Header() {
   // nigdy nie „nachodzi"/zlewa się z treścią za nim podczas scrolla).
   //   • ciemne/białe tło → różowy pill, biały tekst (akcent marki)
   //   • różowe tło        → biały pill, ciemny tekst (róż-na-różu by zniknął)
-  const pillBg = onPink ? "#ffffff" : "#cf43b8";
+  // #b32a9d (nie #cf43b8): biały tekst pigułki = 5,62:1 (AA); na #cf43b8 było 4,08.
+  const pillBg = onPink ? "#ffffff" : "#b32a9d";
   const pillText = onPink ? "#0f0f0f" : "#ffffff";
   const pillShadow = onPink
     ? "shadow-[0_6px_20px_-10px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.45)]"
