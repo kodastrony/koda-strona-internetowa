@@ -15,22 +15,16 @@ export interface Service {
   short: string;
   /** Opis usługi do Service.description w JSON-LD (na /uslugi NIE renderowany). */
   lead: string;
-  /** Chipy „co dostajesz" — 2–4 SŁOWA każdy (anty-slop: zero akapitów). */
+  /** 6 TICKÓW „co oferujemy" — jedyna treść sekcji poza nazwą (życzenie Natana). */
   points: string[];
-  /** GIGANT wiersza indeksu na /uslugi (H2): krótki WYNIK dla klienta. */
-  outcome: string;
-  /** JEDNA linijka pod gigantem (≤12 słów) — jedyna proza wiersza. */
-  tagline: string;
-  /** Weryfikowalny DOWÓD: żywe realizacje / mierzalny wynik / umowa. */
-  proof: { label: string; href?: string; external?: boolean };
-  /** Hue poświaty wiersza (system hue strony: 300/324/335/273). */
+  /** Hue poświaty sekcji (system hue strony: 300/324/335/273). */
   hue: number;
 }
 
-// /uslugi = „WIELKI INDEKS" (redesign 2026-08-26 po korekcie Natana): gigantyczna
-// typografia wyników zamiast akapitów. Budżet copy: outcome 2–4 słowa, tagline
-// ≤12 słów, chipy 2–4 słowa. Obietnice TYLKO 24 h + umowa; liczby TYLKO
-// sprawdzalne (100/100 Lighthouse tej strony). lead żyje wyłącznie w JSON-LD.
+// /uslugi v4 (2026-08-26, doszlif Natana): sekcja = numer + NAZWA + 6 ticków.
+// Zero dodatkowych linii tekstu i przekierowań. Ticki niosą KONKRET: nazwany
+// stack (02), keywordy SEO/AEO (03) i warunki opieki z gwarancją 14 dni oraz
+// telefonem (04 — zakres zamówiony przez Natana). lead żyje tylko w JSON-LD.
 export const SERVICES: Service[] = [
   {
     n: "01",
@@ -39,14 +33,13 @@ export const SERVICES: Service[] = [
     short: "Układ i ścieżki, które prowadzą odwiedzającego prosto do kontaktu.",
     lead: "Projektujemy układ i ścieżki strony pod jeden cel: odwiedzający ma szybko zrozumieć ofertę i wysłać zapytanie. Makiety do akceptacji przed kodowaniem.",
     points: [
-      "Cel i grupa docelowa",
-      "Ścieżka do kontaktu",
-      "Design spójny z marką",
-      "Makiety przed kodem",
+      "Strategia: cel i grupa docelowa",
+      "Ścieżka klienta do kontaktu",
+      "Design spójny z Twoją marką",
+      "Makiety do akceptacji przed kodem",
+      "Responsywność: telefon, tablet, desktop",
+      "Mikroanimacje i interakcje",
     ],
-    outcome: "Projekt, który sprzedaje",
-    tagline: "Układ i ścieżki pod jedno: zapytanie od klienta.",
-    proof: { label: "Zobacz na realizacjach", href: "/realizacje" },
     hue: 300,
   },
   {
@@ -54,11 +47,15 @@ export const SERVICES: Service[] = [
     id: "strony",
     title: "Strony internetowe 2D i 3D",
     short: "Szybkie strony na autorskim kodzie. Budowane pod Twój biznes, nie pod szablon.",
-    lead: "Strony firmowe, landingi i wizytówki na autorskim, lekkim kodzie — bez szablonów i zbędnych wtyczek. Z animacjami i scenami 3D, gdy pasują do marki.",
-    points: ["Autorski kod", "Animacje i 3D", "Każdy ekran", "Wszystko Twoje"],
-    outcome: "Strona szybsza niż konkurencja",
-    tagline: "Autorski kod od zera — błyskawiczny, dopracowany, w pełni Twój.",
-    proof: { label: "Przetestuj dema na żywo", href: "/realizacje" },
+    lead: "Strony firmowe, landingi i wizytówki na autorskim kodzie: Next.js 16, React 19, Tailwind CSS 4, TypeScript, sceny 3D w Three.js/WebGL, animacje Motion i Lenis, hosting edge CDN.",
+    points: [
+      "Next.js 16 + React 19",
+      "Tailwind CSS 4 + TypeScript",
+      "Sceny 3D: Three.js / WebGL",
+      "Animacje: Motion + Lenis",
+      "Edge CDN — serwery blisko klienta",
+      "Autorski kod, zero szablonów",
+    ],
     hue: 324,
   },
   {
@@ -66,20 +63,15 @@ export const SERVICES: Service[] = [
     id: "optymalizacja",
     title: "SEO (Pozycjonowanie strony)",
     short: "Szybkość, widoczność w Google i analityka, która mówi wprost, co przynosi klientów.",
-    lead: "Techniczne fundamenty widoczności w standardzie: szybkość (Core Web Vitals), SEO techniczne, dane strukturalne pod Google i silniki AI, analityka i dostępność WCAG.",
+    lead: "Techniczne fundamenty widoczności w standardzie: Core Web Vitals, SEO techniczne, AEO / AI Search (ChatGPT, Perplexity, Google AI Overviews), dane strukturalne schema.org, analityka bez cookies i dostępność WCAG 2.2.",
     points: [
-      "Core Web Vitals",
-      "SEO techniczne",
-      "Analityka bez cookies",
-      "Dostępność WCAG",
+      "Core Web Vitals: 100/100",
+      "SEO techniczne + sitemap",
+      "AEO / AI Search: ChatGPT, Perplexity",
+      "Dane strukturalne schema.org",
+      "Analityka bez cookies (RODO-friendly)",
+      "Dostępność WCAG 2.2 AA",
     ],
-    outcome: "Widoczność w Google i AI",
-    tagline: "Szybkość, techniczne SEO i dostępność w standardzie, nie w dopłacie.",
-    proof: {
-      label: "Ta strona: 100/100 w Lighthouse — zmierz sam",
-      href: "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fkodastrony.pl%2Fuslugi%2F",
-      external: true,
-    },
     hue: 335,
   },
   {
@@ -87,16 +79,15 @@ export const SERVICES: Service[] = [
     id: "wsparcie",
     title: "Wsparcie i opieka",
     short: "Po starcie zostajemy: aktualizacje, bezpieczeństwo i rozwój, gdy firma rośnie.",
-    lead: "Po wdrożeniu zostajemy na pokładzie: aktualizacje, monitoring bezpieczeństwa, kopie zapasowe i rozbudowa strony razem z rozwojem firmy.",
+    lead: "Po wdrożeniu zostajemy na pokładzie: gwarancja techniczna 14 dni, wsparcie telefoniczne, odpowiedź w 24 h, aktualizacje, kopie zapasowe, monitoring bezpieczeństwa i rozbudowa strony.",
     points: [
-      "Aktualizacje",
-      "Bezpieczeństwo i kopie",
-      "Rozbudowa strony",
-      "Odpowiedź w 24 h",
+      "Gwarancja techniczna: 14 dni po starcie",
+      "Wsparcie telefoniczne: 511 107 468",
+      "Odpowiedź w 24 godziny",
+      "Aktualizacje i kopie zapasowe",
+      "Monitoring bezpieczeństwa 24/7",
+      "Rozbudowa: nowe sekcje i funkcje",
     ],
-    outcome: "Opieka po starcie",
-    tagline: "Zostajemy na pokładzie — strona rośnie razem z firmą.",
-    proof: { label: "Zakres i zasady zapisane w umowie" },
     hue: 273,
   },
 ];

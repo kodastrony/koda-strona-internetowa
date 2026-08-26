@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { EASE } from "@/lib/motion";
 import { FadeUp, Parallax } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
 import { ProcessSteps } from "@/components/sections/process-steps";
@@ -28,6 +29,34 @@ import { SERVICES, type Service } from "@/lib/services-data";
    • Opieka → realizacja + pulsujący badge „Odpowiadamy w 24 h".
    Naprzemienne strony, hue-poświata per usługa. Wycena/Proces bez zmian.
    ══════════════════════════════════════════════════════════════════════════ */
+
+/* Ptaszek rysujący się pathLength po wejściu w widok — ticki oferty zapalają
+   się kaskadą (wzorzec z pierwotnej wersji strony). */
+function AnimatedCheck({ delay }: { delay: number }) {
+  const reduce = useReducedMotion();
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      className="mt-1 shrink-0"
+    >
+      <motion.path
+        d="M3 8.5L6.5 12L13 4.5"
+        stroke="var(--color-pink-bright)"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
+        transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}
+      />
+    </svg>
+  );
+}
 
 /* Odliczanie do wartości przy wejściu w widok (SEO-wyniki). rAF + ease-out,
    reduced-motion → od razu wartość końcowa. */
@@ -225,7 +254,8 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
           paddingBottom: "clamp(52px, 6.5vw, 104px)",
         }}
       >
-        {/* Tekst — minimalny: nazwa, wynik, chipy, dowód */}
+        {/* Tekst — TYLKO numer, nazwa i 6 ticków (doszlif Natana: bez dodatkowych
+            linii i przekierowań; konkret niosą ticki). */}
         <div className={reversed ? "md:order-2 md:col-span-5" : "md:col-span-5"}>
           <FadeUp inView>
             <span
@@ -249,95 +279,22 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
               {s.title}
             </h2>
           </FadeUp>
-          <FadeUp inView delay={0.1}>
-            <p
-              className="mt-4 font-heading font-semibold"
-              style={{
-                fontSize: "clamp(1.08rem, 1.5vw, 1.3rem)",
-                lineHeight: 1.4,
-                color: "var(--color-accent)",
-              }}
+          <FadeUp inView delay={0.12}>
+            <ul
+              className="mt-7 grid grid-cols-1 gap-x-7 gap-y-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
+              role="list"
             >
-              {s.outcome}.
-            </p>
-          </FadeUp>
-          <FadeUp inView delay={0.14}>
-            <p
-              className="mt-2 font-body"
-              style={{
-                fontSize: "clamp(0.98rem, 1.15vw, 1.08rem)",
-                lineHeight: 1.55,
-                color: "var(--color-ink-muted)",
-                maxWidth: "42ch",
-              }}
-            >
-              {s.tagline}
-            </p>
-          </FadeUp>
-          <FadeUp inView delay={0.18}>
-            <ul className="mt-6 flex flex-wrap gap-2.5" role="list">
-              {s.points.map((p) => (
+              {s.points.map((p, idx) => (
                 <li
                   key={p}
-                  className="flex items-center gap-2 rounded-full font-body"
-                  style={{
-                    border: "1px solid var(--color-line-strong)",
-                    padding: "8px 14px",
-                    fontSize: "0.9rem",
-                    color: "var(--color-ink)",
-                  }}
+                  className="flex items-start gap-3 font-body"
+                  style={{ fontSize: "0.97rem", lineHeight: 1.45, color: "var(--color-ink)" }}
                 >
-                  <span
-                    aria-hidden="true"
-                    className="h-1 w-1 rounded-full"
-                    style={{ backgroundColor: `oklch(0.55 0.19 ${s.hue})` }}
-                  />
-                  {p}
+                  <AnimatedCheck delay={idx * 0.09} />
+                  <span>{p}</span>
                 </li>
               ))}
             </ul>
-          </FadeUp>
-          <FadeUp inView delay={0.22}>
-            <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2">
-              {s.proof.href ? (
-                s.proof.external ? (
-                  <a
-                    href={s.proof.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${s.proof.label} (otwiera się w nowej karcie)`}
-                    className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-                    style={{ color: "var(--color-ink)" }}
-                  >
-                    {s.proof.label} ↗
-                  </a>
-                ) : (
-                  <Link
-                    href={s.proof.href}
-                    className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-                    style={{ color: "var(--color-ink)" }}
-                  >
-                    {s.proof.label} →
-                  </Link>
-                )
-              ) : (
-                <span
-                  className="font-heading text-[0.95rem] font-semibold"
-                  style={{ color: "var(--color-ink-muted)" }}
-                >
-                  {s.proof.label}
-                </span>
-              )}
-              {s.id === "strony" && (
-                <Link
-                  href="/uslugi/strony-3d"
-                  className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-                  style={{ color: "var(--color-ink)" }}
-                >
-                  Strony 3D i animowane →
-                </Link>
-              )}
-            </div>
           </FadeUp>
         </div>
 
