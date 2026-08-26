@@ -79,9 +79,11 @@ export default function UslugiPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
+      {/* H1 z frazą „strony internetowe" (audyt on-page: H1 bez keyworda na
+          stronie usługowej) — „dla Ciebie" zostaje, ton bez zmian. */}
       <PageHero
         label="Usługi"
-        title="Co dla Ciebie zrobimy"
+        title="Strony internetowe, które robimy dla Ciebie"
         lead="Cztery obszary, jeden cel: strona, która dobrze wygląda i pozyskuje klientów. Od pierwszej rozmowy po wsparcie długo po starcie."
         hue={300}
       />

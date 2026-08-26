@@ -6,6 +6,9 @@ import { PillLink } from "@/components/ui/pill-link";
 export const metadata: Metadata = {
   title: "Strona nie znaleziona (404)",
   robots: { index: false, follow: false },
+  // Bez canonicala: bez tego override strona 404 DZIEDZICZY canonical "/"
+  // z layoutu (mieszany sygnał: 404 wskazujące na home — flagowane przez audyty).
+  alternates: { canonical: null },
 };
 
 // Custom 404 — renders inside the root layout (header/footer present).
