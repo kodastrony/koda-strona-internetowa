@@ -57,14 +57,15 @@ function CheckBadge({ delay }: { delay: number }) {
   );
 }
 
-/* Renderer pogrubień w tickach: „**fraza**" → <strong> (dane w services-data). */
+/* Renderer podświetleń w tickach: „**fraza**" → RÓŻOWY semibold (highlight —
+   życzenie Natana; #b32a9d na porcelanie = 5,6:1, AA). Reszta ink-muted. */
 function Emph({ text }: { text: string }) {
   const parts = text.split(/\*\*(.+?)\*\*/g);
   return (
     <>
       {parts.map((p, i) =>
         i % 2 === 1 ? (
-          <strong key={i} className="font-semibold" style={{ color: "var(--color-ink)" }}>
+          <strong key={i} className="font-semibold" style={{ color: "var(--color-accent)" }}>
             {p}
           </strong>
         ) : (
@@ -106,121 +107,285 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
   );
 }
 
-/* ── Wizual 1: pływający stos zrzutów realnych projektów (Projektowanie) ── */
-function FloatStack() {
-  const shot: React.CSSProperties = {
-    border: "1px solid var(--color-line)",
-    borderRadius: 14,
-    boxShadow: "var(--shadow-card-hover)",
-    display: "block",
+/* ── Wizual 1 (Projektowanie): makieta-wireframe, która SIĘ SKŁADA ──────────
+   Stylizowane okno przeglądarki z szkieletem projektu: bloki wjeżdżają
+   kaskadą przy scrollu (jak makieta nabierająca kształtu), CTA pulsuje różem.
+   Czysty CSS/DOM — zero zdjęć, w tokenach marki. */
+function WireBlock({
+  delay,
+  className,
+  style,
+  children,
+}: {
+  delay: number;
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}) {
+  return (
+    <FadeUp inView delay={delay} y={14} duration={0.5} className={className}>
+      <div className="h-full w-full" style={style}>
+        {children}
+      </div>
+    </FadeUp>
+  );
+}
+
+function WireframeVisual() {
+  const bone: React.CSSProperties = {
+    backgroundColor: "rgba(36, 27, 43, 0.07)",
+    borderRadius: 8,
   };
   return (
-    <div className="group relative" style={{ aspectRatio: "4 / 3.1" }} aria-hidden="false">
-      <Parallax speed={-20} className="absolute" style={{ inset: "0 18% 22% 0" }}>
-        <img
-          src="/realizacje/jr-g1.webp"
-          alt="Projekt strony JR Modular Systems — sekcja konfiguratora 3D"
-          width={1200}
-          height={800}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:-rotate-1"
-          style={{ ...shot, transform: "rotate(-2.2deg)" }}
-        />
-      </Parallax>
-      <Parallax speed={26} className="absolute" style={{ inset: "26% 0 0 24%" }}>
-        <img
-          src="/realizacje/drblocks-g2.webp"
-          alt="Projekt strony DrBlocks — kalkulator doboru bloczków"
-          width={1200}
-          height={800}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:rotate-1"
-          style={{ ...shot, transform: "rotate(2.4deg)" }}
-        />
-      </Parallax>
+    <Parallax speed={14}>
+      <div
+        aria-hidden="true"
+        className="relative overflow-hidden"
+        style={{
+          border: "1px solid var(--color-line)",
+          borderRadius: 18,
+          background: "var(--color-surface-1)",
+          boxShadow: "var(--shadow-card-hover)",
+        }}
+      >
+        {/* Pasek przeglądarki */}
+        <div
+          className="flex items-center gap-2 px-5"
+          style={{ height: 44, borderBottom: "1px solid var(--color-line)" }}
+        >
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: "rgba(36,27,43,0.12)" }}
+            />
+          ))}
+          <span
+            className="ml-3 hidden h-5 flex-1 rounded-full sm:block"
+            style={{ backgroundColor: "rgba(36,27,43,0.05)", maxWidth: 280 }}
+          />
+        </div>
+
+        {/* Szkielet projektu — składa się kaskadą */}
+        <div className="grid grid-cols-6 gap-3 p-5 sm:gap-4 sm:p-7">
+          {/* nav */}
+          <WireBlock delay={0.05} className="col-span-2">
+            <div style={{ ...bone, height: 14, width: "70%" }} />
+          </WireBlock>
+          <WireBlock delay={0.1} className="col-span-4">
+            <div className="flex justify-end gap-2.5">
+              {[44, 52, 40].map((w, i) => (
+                <div key={i} style={{ ...bone, height: 12, width: w }} />
+              ))}
+              <div
+                style={{ height: 12, width: 62, borderRadius: 999, backgroundColor: "rgba(179,42,157,0.25)" }}
+              />
+            </div>
+          </WireBlock>
+          {/* hero */}
+          <WireBlock delay={0.18} className="col-span-6 sm:col-span-4">
+            <div style={{ ...bone, height: 26, width: "88%" }} />
+            <div className="mt-2.5" style={{ ...bone, height: 26, width: "62%" }} />
+            <div className="mt-4" style={{ ...bone, height: 11, width: "78%", opacity: 0.7 }} />
+            <div className="mt-2" style={{ ...bone, height: 11, width: "64%", opacity: 0.7 }} />
+            {/* CTA — pulsuje różem (highlight ścieżki do kontaktu) */}
+            <div
+              className="koda-pulse mt-5"
+              style={{
+                height: 34,
+                width: 132,
+                borderRadius: 999,
+                backgroundColor: "var(--color-accent)",
+                opacity: 0.9,
+              }}
+            />
+          </WireBlock>
+          <WireBlock delay={0.26} className="col-span-6 sm:col-span-2">
+            <div style={{ ...bone, height: "100%", minHeight: 120, borderRadius: 12 }} />
+          </WireBlock>
+          {/* trzy kafle */}
+          {[0.34, 0.4, 0.46].map((d, i) => (
+            <WireBlock key={i} delay={d} className="col-span-2">
+              <div style={{ ...bone, height: 54, borderRadius: 10 }} />
+              <div className="mt-2" style={{ ...bone, height: 9, width: "80%", opacity: 0.7 }} />
+              <div className="mt-1.5" style={{ ...bone, height: 9, width: "55%", opacity: 0.7 }} />
+            </WireBlock>
+          ))}
+        </div>
+      </div>
+    </Parallax>
+  );
+}
+
+/* ── Wizual 3 (SEO): zegary jak z SEO-checkera — realne wyniki tej strony ──
+   Pierścienie w stylu Lighthouse/PageSpeed (SVG, stroke rysuje się przy
+   scrollu, liczba odlicza). Docelowo Natan podmieni na żywe widgety
+   checkerów — ten sam slot. */
+function Gauge({ score, label, delay }: { score: number; label: string; delay: number }) {
+  const reduce = useReducedMotion();
+  const ref = useRef<SVGCircleElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-15% 0px -15% 0px" });
+  const R = 52;
+  const C = 2 * Math.PI * R;
+  const target = C * (1 - score / 100);
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative" style={{ width: 128, height: 128 }}>
+        <svg width="128" height="128" viewBox="0 0 128 128" aria-hidden="true">
+          <circle
+            cx="64"
+            cy="64"
+            r={R}
+            fill="none"
+            stroke="rgba(36,27,43,0.08)"
+            strokeWidth="9"
+          />
+          <circle
+            ref={ref}
+            cx="64"
+            cy="64"
+            r={R}
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth="9"
+            strokeLinecap="round"
+            strokeDasharray={C}
+            strokeDashoffset={inView ? target : C}
+            transform="rotate(-90 64 64)"
+            style={{
+              transition: reduce
+                ? "none"
+                : `stroke-dashoffset 1.2s cubic-bezier(0.23, 1, 0.32, 1) ${delay}s`,
+            }}
+          />
+        </svg>
+        <div
+          className="absolute inset-0 grid place-items-center font-heading font-extrabold"
+          style={{ fontSize: "2rem", letterSpacing: "-0.03em", color: "var(--color-ink)" }}
+        >
+          <CountUp to={score} />
+        </div>
+      </div>
+      <div
+        className="text-center font-heading font-bold uppercase"
+        style={{ fontSize: "10.5px", letterSpacing: "0.14em", color: "var(--color-ink-muted)" }}
+      >
+        {label}
+      </div>
     </div>
   );
 }
 
-/* ── Wizual 3: realne, mierzalne wyniki TEJ strony (SEO) ── */
 function ScoreStrip() {
-  const scores: { n: number; decimals: number; label: string }[] = [
-    { n: 100, decimals: 0, label: "Lighthouse SEO" },
-    { n: 100, decimals: 0, label: "Dostępność" },
-    { n: 0, decimals: 2, label: "CLS (stabilność)" },
-  ];
   return (
     <div>
-      <div className="flex flex-wrap items-end gap-x-10 gap-y-6">
-        {scores.map((s) => (
-          <div key={s.label}>
-            <div
-              className="font-heading font-extrabold"
-              style={{
-                fontSize: "clamp(3.4rem, 6.5vw, 5.5rem)",
-                lineHeight: 0.95,
-                letterSpacing: "-0.04em",
-                color: "var(--color-accent)",
-              }}
-            >
-              <CountUp to={s.n} decimals={s.decimals} />
-            </div>
-            <div
-              className="mt-2 font-heading font-bold uppercase"
-              style={{
-                fontSize: "11px",
-                letterSpacing: "0.14em",
-                color: "var(--color-ink-muted)",
-              }}
-            >
-              {s.label}
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-8 md:justify-start">
+        <Gauge score={100} label="Lighthouse SEO" delay={0} />
+        <Gauge score={100} label="Dostępność" delay={0.12} />
+        <Gauge score={96} label="Best Practices" delay={0.24} />
       </div>
-      <p
-        className="mt-5 font-body"
-        style={{ fontSize: "0.9rem", color: "var(--color-ink-faint)" }}
-      >
-        Zmierzone na tej stronie — Google Lighthouse, sierpień 2026.
+      <p className="mt-6 font-body" style={{ fontSize: "0.9rem", color: "var(--color-ink-faint)" }}>
+        Wyniki tej strony — Google Lighthouse, sierpień 2026.
       </p>
     </div>
   );
 }
 
-/* ── Wizual 4: opieka — realizacja + żywy badge 24 h ── */
-function CareVisual() {
+/* ── Wizual 4 (Opieka): mini-czat wsparcia — bąbelki wskakują kaskadą ──────
+   Przykładowa (stylizowana) wymiana z opieki: pokazuje responsywność lepiej
+   niż zdjęcie. Bez konkretnych godzin/obietnic poza zatwierdzonymi. */
+function CareChatVisual() {
+  const bubble: React.CSSProperties = {
+    fontFamily: "var(--font-body)",
+    fontSize: "0.98rem",
+    lineHeight: 1.5,
+    padding: "13px 18px",
+    maxWidth: "34ch",
+  };
   return (
-    <div className="relative">
-      <Parallax speed={18}>
-        <img
-          src="/realizacje/grabowski-showcase.webp"
-          srcSet="/realizacje/grabowski-showcase-640.webp 640w, /realizacje/grabowski-showcase.webp 1680w"
-          sizes="(max-width: 767px) 92vw, 44vw"
-          alt="Strona pracowni Grabowski — jedna z realizacji pod stałą opieką KODA"
-          width={1680}
-          height={1050}
-          loading="lazy"
-          decoding="async"
-          className="block h-auto w-full"
-          style={{
-            border: "1px solid var(--color-line)",
-            borderRadius: 16,
-            boxShadow: "var(--shadow-card-hover)",
-          }}
-        />
-      </Parallax>
-      {/* Badge jak „Nagranie na żywo" z VideoShowcase — spójny wzorzec */}
-      <span
-        className="absolute top-0 left-0 z-[2] m-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-heading text-[10px] font-bold tracking-[0.16em] uppercase"
-        style={{ background: "rgba(0,0,0,0.55)", color: "#fff", backdropFilter: "blur(6px)" }}
-      >
-        <span className="koda-pulse inline-block h-1.5 w-1.5 rounded-full bg-[#4ade80]" />
-        Pod stałą opieką
-      </span>
-    </div>
+    <Parallax speed={14}>
+      <div aria-hidden="true" className="flex flex-col gap-3.5 md:px-6">
+        {/* Status */}
+        <FadeUp inView delay={0.02} y={10}>
+          <div
+            className="mb-1 inline-flex items-center gap-2 rounded-full font-heading font-bold uppercase"
+            style={{
+              border: "1px solid var(--color-line-strong)",
+              padding: "7px 13px",
+              fontSize: "10px",
+              letterSpacing: "0.16em",
+              color: "var(--color-ink-muted)",
+            }}
+          >
+            <span className="koda-pulse inline-block h-1.5 w-1.5 rounded-full bg-[#22a35c]" />
+            Opieka KODA · odpowiedź w 24 h
+          </div>
+        </FadeUp>
+
+        {/* Klient */}
+        <FadeUp inView delay={0.12} y={14}>
+          <div className="flex justify-start">
+            <div
+              style={{
+                ...bubble,
+                backgroundColor: "var(--color-surface-1)",
+                border: "1px solid var(--color-line)",
+                borderRadius: "18px 18px 18px 6px",
+                color: "var(--color-ink)",
+                boxShadow: "var(--shadow-card)",
+              }}
+            >
+              Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?
+            </div>
+          </div>
+        </FadeUp>
+
+        {/* KODA */}
+        <FadeUp inView delay={0.28} y={14}>
+          <div className="flex justify-end">
+            <div
+              style={{
+                ...bubble,
+                backgroundColor: "#b32a9d",
+                borderRadius: "18px 18px 6px 18px",
+                color: "#ffffff",
+                boxShadow: "0 14px 34px -14px rgba(179,42,157,0.55)",
+              }}
+            >
+              Jasne, już się robi. Podeślemy podgląd do akceptacji.
+            </div>
+          </div>
+        </FadeUp>
+
+        {/* Klient — domknięcie */}
+        <FadeUp inView delay={0.44} y={14}>
+          <div className="flex justify-start">
+            <div
+              style={{
+                ...bubble,
+                backgroundColor: "var(--color-surface-1)",
+                border: "1px solid var(--color-line)",
+                borderRadius: "18px 18px 18px 6px",
+                color: "var(--color-ink)",
+                boxShadow: "var(--shadow-card)",
+              }}
+            >
+              Ekstra, dzięki! 🙌
+            </div>
+          </div>
+        </FadeUp>
+
+        {/* Meta-linia gwarancji (zatwierdzone warunki) */}
+        <FadeUp inView delay={0.56} y={10}>
+          <p
+            className="mt-1 font-body"
+            style={{ fontSize: "0.88rem", color: "var(--color-ink-faint)" }}
+          >
+            Gwarancja techniczna 14 dni po starcie · aktualizacje, kopie, monitoring w umowie
+          </p>
+        </FadeUp>
+      </div>
+    </Parallax>
   );
 }
 
@@ -229,7 +394,7 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
   const reversed = index % 2 === 1;
   const visual =
     s.id === "projektowanie" ? (
-      <FloatStack />
+      <WireframeVisual />
     ) : s.id === "strony" ? (
       <VideoShowcase
         src="/realizacje/rikoszet.mp4"
@@ -240,7 +405,7 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
     ) : s.id === "optymalizacja" ? (
       <ScoreStrip />
     ) : (
-      <CareVisual />
+      <CareChatVisual />
     );
 
   return (
@@ -305,7 +470,7 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
                   style={{ fontSize: "1.02rem", lineHeight: 1.5, color: "var(--color-ink-muted)" }}
                 >
                   <CheckBadge delay={idx * 0.08} />
-                  <span className="pt-[2px]">
+                  <span className="pt-[1px]" style={{ fontSize: "1.05rem" }}>
                     <Emph text={p} />
                   </span>
                 </li>
