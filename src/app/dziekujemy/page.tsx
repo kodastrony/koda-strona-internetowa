@@ -4,6 +4,7 @@ import { FadeUp } from "@/components/motion";
 import { PillLink } from "@/components/ui/pill-link";
 import { SuccessCheck } from "@/components/ui/success-check";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 
 // Strona-podziękowanie — cel `_next` po wysłaniu formularza (FormSubmit).
 // noindex: nie chcemy jej w wynikach wyszukiwania.
@@ -104,7 +105,9 @@ export default function DziekujemyPage() {
             className="mb-9 text-[var(--color-ink-faint)]"
             style={{ fontSize: "0.9rem", lineHeight: 1.6 }}
           >
-            Pilne? Napisz wprost:{" "}
+            Pilne? Zadzwoń:{" "}
+            <PhoneLink className="font-heading font-bold text-[var(--color-ink)] transition-colors duration-300 hover:text-pink" />{" "}
+            albo napisz:{" "}
             <EmailLink className="text-[var(--color-ink-muted)] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:text-pink hover:decoration-pink" />
           </p>
         </FadeUp>

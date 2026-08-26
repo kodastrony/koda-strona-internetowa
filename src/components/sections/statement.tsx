@@ -9,6 +9,7 @@ import { Magnetic } from "@/components/motion/magnetic";
 import { HorizonBackdropLazy } from "@/components/scene3d/scenes/horizon-lazy";
 import { CONTACT } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 
 /* ── Final CTA "moment" — the conversion climax before the footer ──────────
    NOT a full-bleed pink slab (that was the old flashbang). Instead the brand
@@ -452,6 +453,10 @@ export function Statement() {
               <QuoteButton href="/kontakt" label="Zacznijmy projekt" />
             </Magnetic>
             {/* Pełna biel — white/85 spadał pod 4.5:1 na jasnym końcu gradientu. */}
+            <PhoneLink
+              className="inline-flex min-h-[44px] items-center font-heading text-[19px] font-bold text-white transition-opacity hover:opacity-80"
+              label={`Zadzwoń: ${CONTACT.phone}`}
+            />
             <EmailLink
               className="text-[14px] text-white underline-offset-4 transition-[text-decoration-color] hover:underline"
               label={`Napisz: ${CONTACT.email}`}

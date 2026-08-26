@@ -6,6 +6,7 @@ import Link from "next/link";
 import { EASE } from "@/lib/motion";
 import { NAV_LINKS, CONTACT, SITE_CONFIG } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 
 /* ════════════════════════════════════════════════════════════════════
    KODA — full-screen menu overlay (baunfire-style)
@@ -301,6 +302,18 @@ export function MenuOverlay({
             variants={fadeSide}
             className="flex flex-col gap-3 lg:items-end lg:text-right"
           >
+            {/* DUŻY numer telefonu (życzenie Natana 2026-08-26): telefon > formularz,
+                zwłaszcza na mobile — jeden tap i dzwonisz. Font logo/heading w dużej
+                skali, ink na bieli (AA), hover różowieje jak reszta menu. */}
+            <PhoneLink
+              className="font-heading font-extrabold transition-colors duration-300 hover:text-pink"
+              style={{
+                fontSize: "clamp(1.7rem, 4.5vw, 2.6rem)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+                color: "#0f0f0f",
+              }}
+            />
             {/* Ciemny ink (AA na bieli) + RÓŻOWE podkreślenie jako akcent marki —
                 pink-jako-tekst na bieli dawał 4.08:1 (<AA). */}
             <EmailLink

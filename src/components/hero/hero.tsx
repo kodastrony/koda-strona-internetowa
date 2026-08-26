@@ -6,6 +6,8 @@ import { EASE } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { PillLink } from "@/components/ui/pill-link";
+import { PhoneLink } from "@/components/ui/phone-link";
+import { CONTACT } from "@/lib/constants";
 import { introHasPlayed, markIntroPlayed } from "@/lib/intro-state";
 import { useThemeValue } from "@/lib/theme";
 import { KODA_FILL, KODA_FILL_LIGHT } from "./hero-config";
@@ -36,6 +38,26 @@ import { KodaColumnLetters, KODA_LEFT } from "./koda-letters";
    Hero ADAPTUJE się do motywu (☾ ciemna aurora / ☀ świetlista porcelana) — tło,
    litery KODA, intro i tokeny mają warianty jasne (useThemeValue).
    ══════════════════════════════════════════════════════════════════════════ */
+
+/* Słuchawka przy numerze w hero — dekoracyjna (aria-hidden), dziedziczy kolor. */
+function PhoneGlyph() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={{ color: "var(--color-accent)" }}
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
 
 /* ── Treść hero (H1/opis/CTA — tekst bez zmian). Wjeżdża, gdy `play` = true. ── */
 function HeroCopy({ play }: { play: boolean }) {
@@ -114,18 +136,33 @@ function HeroCopy({ play }: { play: boolean }) {
         scale={0.9}
         className="mt-10"
       >
-        <Magnetic strength={0.4}>
-          {/* #b32a9d (nie #cf43b8): biały tekst 11–13px bold na #cf43b8 = 4,08:1
-              (<AA 4,5). Na #b32a9d = 5,62:1 — AA w obu motywach, róż zostaje. */}
-          <PillLink
-            href="/kontakt"
-            bg="#b32a9d"
-            border="#b32a9d"
-            className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
-          >
-            Bezpłatna wycena
-          </PillLink>
-        </Magnetic>
+        {/* CTA + telefon obok siebie (mobile: łamią się w kolumnę). Telefon dobrze
+            widoczny na home (życzenie Natana 2026-08-26) — jeden tap i połączenie,
+            prościej niż formularz, zwłaszcza na telefonie. */}
+        <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
+          <Magnetic strength={0.4}>
+            {/* #b32a9d (nie #cf43b8): biały tekst 11–13px bold na #cf43b8 = 4,08:1
+                (<AA 4,5). Na #b32a9d = 5,62:1 — AA w obu motywach, róż zostaje. */}
+            <PillLink
+              href="/kontakt"
+              bg="#b32a9d"
+              border="#b32a9d"
+              className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
+            >
+              Bezpłatna wycena
+            </PillLink>
+          </Magnetic>
+          <PhoneLink
+            className="inline-flex min-h-[44px] items-center gap-2.5 font-heading font-bold transition-colors duration-300 hover:text-pink"
+            style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.25rem)", color: "var(--color-ink)" }}
+            label={
+              <>
+                <PhoneGlyph />
+                {CONTACT.phone}
+              </>
+            }
+          />
+        </div>
       </FadeUp>
 
       <FadeUp play={play} delay={0.36} duration={0.6} ease={EASE.expo} y={10} className="mt-5">

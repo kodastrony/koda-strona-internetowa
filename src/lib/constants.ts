@@ -17,6 +17,13 @@ export const NAV_LINKS = [
 
 export const CONTACT = {
   email: "kontakt@kodastrony.pl",
+  // Wyświetlany format numeru (spacje jak podał Natan) + href tel: w E.164.
+  // JEDNO źródło dla: hero, menu, /kontakt, stopki, CTABand, Statement,
+  // /dziekujemy, JSON-LD (telephone) i llms.txt — NAP identyczny wszędzie.
+  phone: "511 107 468",
+  phoneHref: "tel:+48511107468",
+  /** E.164 do danych strukturalnych (schema.org telephone). */
+  phoneE164: "+48 511 107 468",
   domain: "kodastrony.pl",
   city: "Bielsko-Biała",
   // ⬇️ Opcjonalnie — po wpisaniu NIP renderuje się sam w stopce („NIP: …"). Puste = nie pokazuje się.

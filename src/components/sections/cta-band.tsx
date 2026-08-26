@@ -4,6 +4,7 @@ import { FadeUp, Parallax } from "@/components/motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACT } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 import { PillLink } from "@/components/ui/pill-link";
 
 /* ── CTABand — shared closing call-to-action ───────────────────────────────
@@ -129,6 +130,13 @@ export function CTABand({
               Bezpłatna wycena
             </PillLink>
           </Magnetic>
+          {/* Telefon tuż pod głównym CTA — widoczny na każdej podstronie z bandem;
+              na mobile jeden tap = połączenie (prościej niż formularz). */}
+          <PhoneLink
+            className="inline-flex min-h-[44px] items-center font-heading text-[17px] font-bold transition-colors duration-300 hover:text-pink"
+            style={{ color: "var(--color-ink)" }}
+            label={`Zadzwoń: ${CONTACT.phone}`}
+          />
           <EmailLink
             className="text-[14px] text-ink-muted underline-offset-4 transition-colors duration-300 hover:text-pink hover:underline"
             label={`lub napisz: ${CONTACT.email}`}

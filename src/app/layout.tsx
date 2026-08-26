@@ -29,6 +29,7 @@ const ORG_JSON_LD = {
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
       email: CONTACT.email,
+      telephone: CONTACT.phoneE164,
       logo: {
         "@type": "ImageObject",
         url: `${SITE_CONFIG.url}/icon.svg`,
@@ -41,6 +42,7 @@ const ORG_JSON_LD = {
       contactPoint: {
         "@type": "ContactPoint",
         email: CONTACT.email,
+        telephone: CONTACT.phoneE164,
         contactType: "customer service",
         areaServed: "PL",
         availableLanguage: ["pl"],
@@ -57,6 +59,9 @@ const ORG_JSON_LD = {
       "@id": `${SITE_CONFIG.url}/#business`,
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
+      // telephone: REALNY numer (dodany 2026-08-26 na życzenie Natana) — domyka
+      // NAP (nazwa+adres+telefon) i odblokowuje spójność z przyszłym GBP.
+      telephone: CONTACT.phoneE164,
       image: [`${SITE_CONFIG.url}/icon.svg`, `${SITE_CONFIG.url}/opengraph-image`],
       parentOrganization: { "@id": `${SITE_CONFIG.url}/#organization` },
       description: SITE_CONFIG.tagline,
@@ -80,8 +85,9 @@ const ORG_JSON_LD = {
       // knowsAbout (wyżej) + węzły Service i OfferCatalog na /uslugi/.
       // Geo na poziomie MIASTA (centroid Bielska-Białej) — wzmacnia encję lokalną
       // pod local pack / lokalne odpowiedzi AI, bez podawania precyzyjnego adresu
-      // (firma usługowa bez lokalu z obsługą klienta). openingHours / telephone /
-      // NIP / aggregateRating dodajemy DOPIERO, gdy będą realne (zależne od Natana).
+      // (firma usługowa bez lokalu z obsługą klienta). openingHours / NIP /
+      // aggregateRating dodajemy DOPIERO, gdy będą realne (zależne od Natana);
+      // telephone jest już realny (2026-08-26).
       geo: {
         "@type": "GeoCoordinates",
         latitude: 49.8224,

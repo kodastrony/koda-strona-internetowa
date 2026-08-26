@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_CONFIG, NAV_LINKS, CONTACT } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, cssBezier } from "@/lib/motion";
 
@@ -97,6 +98,9 @@ export function Footer() {
             <p className="label-koda" style={{ color: "var(--color-pink-bright)" }}>
               Kontakt
             </p>
+            {/* Telefon nad e-mailem, wyraźniejszy (biały + bold) — najprostsza
+                droga kontaktu, jeden tap na mobile. */}
+            <PhoneLink className="font-heading text-[17px] font-bold text-white transition-colors duration-300 hover:text-pink" />
             <EmailLink className="text-sm text-ink-muted transition-colors duration-300 hover:text-pink" />
             <p className="text-sm text-ink-muted">{CONTACT.city}, Polska</p>
             <p className="text-sm text-ink-muted">Odpowiadamy w 24 h</p>

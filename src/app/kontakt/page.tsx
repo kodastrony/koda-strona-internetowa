@@ -6,7 +6,7 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Kontakt — bezpłatna wycena strony w 24 h",
   description:
-    "Opowiedz nam o projekcie strony internetowej — wrócimy z pomysłem i wyceną w 24 h. Studio z Bielska-Białej, bezpośredni kontakt, bez zobowiązań.",
+    "Zadzwoń: 511 107 468 albo opisz projekt w formularzu — wrócimy z pomysłem i wyceną w 24 h. Studio z Bielska-Białej, bezpośredni kontakt, bez zobowiązań.",
   path: "/kontakt/",
   ogTitle: "Kontakt — KODA Studio",
 });
@@ -20,7 +20,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   path: "/kontakt/",
   name: "Kontakt — bezpłatna wycena strony w 24 h",
   description:
-    "Opowiedz nam o projekcie strony internetowej — wrócimy z pomysłem i wyceną w 24 h. Studio z Bielska-Białej, bezpośredni kontakt, bez zobowiązań.",
+    "Zadzwoń: 511 107 468 albo opisz projekt w formularzu — wrócimy z pomysłem i wyceną w 24 h. Studio z Bielska-Białej, bezpośredni kontakt, bez zobowiązań.",
   dateModified: LASTMOD["/kontakt/"],
 });
 

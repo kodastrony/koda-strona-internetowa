@@ -7,6 +7,7 @@ import { EASE, cssBezier } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
 import { CONTACT, SITE_CONFIG } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 
 /* ════════════════════════════════════════════════════════════════════
    KONTAKT — minimal na BIAŁYM tle. Formularz po LEWEJ, po prawej wielka
@@ -597,6 +598,30 @@ export function Contact() {
               <EmailLink className="text-[#0f0f0f] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:decoration-pink" />
             </p>
           </div>
+          {/* DUŻY telefon (życzenie Natana 2026-08-26): najprostsza droga kontaktu,
+              zwłaszcza na mobile — jeden tap zamiast formularza. Nad formularzem,
+              żeby dzwoniący nie musiał w ogóle scrollować. */}
+          <div className="ph-lead-in" style={{ animationDelay: "0.16s" }}>
+            <PhoneLink
+              className="mt-6 inline-flex min-h-[48px] items-center gap-3 font-heading font-extrabold text-[#0f0f0f] transition-colors duration-300 hover:text-pink"
+              style={{ fontSize: "clamp(1.55rem, 3.4vw, 2.3rem)", letterSpacing: "-0.02em" }}
+              label={
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink/10 text-pink"
+                  >
+                    <PhoneCallIcon />
+                  </span>
+                  {CONTACT.phone}
+                </>
+              }
+            />
+            {/* Bez godzin dostępności — nie obiecujemy niczego, czego nie ma w umowie. */}
+            <p className="mt-1 font-body text-[13px] text-black/55">
+              Najszybsza droga kontaktu — a formularz działa o każdej porze.
+            </p>
+          </div>
 
           {/* ── Formularz (kaskada per-pole) ── */}
           <form
@@ -827,6 +852,24 @@ function Spinner() {
       className="inline-block"
       style={ringStyle}
     />
+  );
+}
+
+function PhoneCallIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
   );
 }
 

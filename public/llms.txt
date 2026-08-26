@@ -2,7 +2,7 @@
 
 > KODA Studio projektuje i koduje strony internetowe dla firm w Polsce — niezależne studio z Bielska-Białej, obsługujące klientów zdalnie w całej Polsce. Bez gotowych szablonów: autorski kod, ustalony zakres i termin w umowie, opieka po starcie. Specjalizacja: strony 2D i 3D (WebGL / Three.js / React Three Fiber), animacje, SEO techniczne, dostępność (WCAG).
 
-KODA Studio to niezależne studio projektowania i kodowania stron internetowych z siedzibą w Bielsku-Białej (Polska), pracujące zdalnie dla firm z całej Polski. Każdy projekt — od pierwszej rozmowy, przez projekt i kod, po opiekę po starcie — prowadzi to samo studio, bez podwykonawców i bez gotowych szablonów. Odpowiedź na zapytanie w ciągu 24 godzin, bezpłatna wycena, zakres i termin zawsze w umowie. Kontakt: kontakt@kodastrony.pl.
+KODA Studio to niezależne studio projektowania i kodowania stron internetowych z siedzibą w Bielsku-Białej (Polska), pracujące zdalnie dla firm z całej Polski. Każdy projekt — od pierwszej rozmowy, przez projekt i kod, po opiekę po starcie — prowadzi to samo studio, bez podwykonawców i bez gotowych szablonów. Odpowiedź na zapytanie w ciągu 24 godzin, bezpłatna wycena, zakres i termin zawsze w umowie. Kontakt: telefon 511 107 468, e-mail kontakt@kodastrony.pl.
 
 Orientacyjne ceny (rynek polski, 2026): prosta strona wizytówka od ok. 2 000 zł, strona firmowa 3 000–8 000 zł, strona z animacjami lub w 3D od ok. 10 000–15 000+ zł. Czas realizacji: prosta strona zwykle 2–4 tygodnie, rozbudowana 6–10 tygodni. Dokładna wycena — indywidualnie i bezpłatnie, po krótkiej rozmowie.
 
@@ -14,7 +14,7 @@ Orientacyjne ceny (rynek polski, 2026): prosta strona wizytówka od ok. 2 000 z�
 - [Cennik](https://kodastrony.pl/cennik/): Orientacyjne widełki cen stron internetowych w Polsce w 2026 wg typu strony, porównanie kreatora / freelancera / studia / agencji, co realnie wpływa na cenę, koszty utrzymania po starcie.
 - [Realizacje](https://kodastrony.pl/realizacje/): Przegląd zbudowanych stron — strony 3D, konfiguratory produktów, landing page — każda z linkiem do działającej wersji na żywo.
 - [O nas](https://kodastrony.pl/o-nas/): Kim jest KODA Studio, cztery zasady pracy (cel nie ozdoby, szybkość jako standard, projekt pod biznes nie pod szablon, opieka po starcie) i dobór technologii pod projekt.
-- [Kontakt](https://kodastrony.pl/kontakt/): Formularz kontaktowy — bezpłatna wycena i wstępny pomysł w ciągu 24 godzin, bez zobowiązań. E-mail: kontakt@kodastrony.pl.
+- [Kontakt](https://kodastrony.pl/kontakt/): Telefon 511 107 468 i formularz kontaktowy — bezpłatna wycena i wstępny pomysł w ciągu 24 godzin, bez zobowiązań. E-mail: kontakt@kodastrony.pl.
 
 ## Realizacje — szczegóły
 
