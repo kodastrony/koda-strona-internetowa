@@ -369,22 +369,22 @@ html[data-koda-light] .cta-footer-wash {
   0%,
   60%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 0.45;
   }
   30% {
-    transform: translateY(-4px);
+    transform: translateY(-5px) scale(1.15);
     opacity: 1;
   }
 }
 .koda-typing-dot {
-  animation: koda-typing 1.1s ease-in-out infinite;
+  animation: koda-typing 0.7s ease-in-out infinite;
 }
 .koda-typing-dot:nth-child(2) {
-  animation-delay: 0.15s;
+  animation-delay: 0.09s;
 }
 .koda-typing-dot:nth-child(3) {
-  animation-delay: 0.3s;
+  animation-delay: 0.18s;
 }
 @media (prefers-reduced-motion: reduce) {
   .koda-typing-dot {

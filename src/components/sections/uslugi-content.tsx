@@ -293,22 +293,23 @@ function ScoreStrip() {
 
 /* ── Wizual 4 (Opieka): czat „jak z reklamy" — ZAPĘTLONA scenka ────────────
    Klient pisze (kropki) → wiadomość wskakuje → KODA pisze → odpowiedź →
-   „Ekstra, dzięki!" → pauza → płynny reset i od nowa. Sterowane maszynką
+   „Ekstra, dzięki!" → ❤️ reakcja → pauza → płynny reset i od nowa. Sterowane maszynką
    kroków (setTimeout) startującą po wejściu w widok; reduced-motion →
    statyczna pełna rozmowa, bez pętli. Tylko bąbelki — zero dodatkowych
    tekstów (życzenie Natana). */
 // delay = czas spędzony W danym stanie, zanim przejdziemy do kolejnego.
-// Stan 7 = „hold" (cała rozmowa widoczna), stan 0 = pusto (krótki oddech
-// przed kolejną pętlą; to też stan startowy — dlatego krótki).
+// Stan 7 = ❤️ reakcja KODY + „hold" całej rozmowy, stan 0 = pusto (oddech
+// przed kolejną pętlą; to też stan startowy — dlatego krótki). Tempo celowo
+// reklamowe: cała scenka ~6 s (korekta Natana — wolniejsza wersja „pusta").
 const CHAT_FLOW: Record<number, { next: number; delay: number }> = {
-  0: { next: 1, delay: 600 }, // pusto → klient zaczyna pisać
-  1: { next: 2, delay: 1000 }, // klient pisze…
-  2: { next: 3, delay: 1200 }, // bąbel 1 na ekranie
-  3: { next: 4, delay: 1400 }, // KODA pisze…
-  4: { next: 5, delay: 1300 }, // odpowiedź na ekranie
-  5: { next: 6, delay: 800 }, // klient pisze…
-  6: { next: 7, delay: 400 }, // „dzięki" wskoczyło
-  7: { next: 0, delay: 3200 }, // hold całości → reset
+  0: { next: 1, delay: 350 }, // pusto → klient zaczyna pisać
+  1: { next: 2, delay: 600 }, // klient pisze…
+  2: { next: 3, delay: 550 }, // pytanie na ekranie
+  3: { next: 4, delay: 700 }, // KODA pisze…
+  4: { next: 5, delay: 650 }, // odpowiedź na ekranie
+  5: { next: 6, delay: 500 }, // klient pisze…
+  6: { next: 7, delay: 450 }, // „dzięki" wskoczyło
+  7: { next: 0, delay: 2300 }, // ❤️ pop + hold całości → reset
 };
 
 function TypingDots({ onPink = false }: { onPink?: boolean }) {
@@ -329,26 +330,48 @@ function ChatBubble({
   side,
   visible,
   typing,
+  reaction,
   children,
 }: {
   side: "left" | "right";
   visible: boolean;
   typing?: boolean;
+  /** ❤️ reakcja KODY doczepiona do rogu bąbla (pop, gdy true). */
+  reaction?: boolean;
   children?: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
   const pink = side === "right";
+  // Stan „schowany": spory zsuw + skala + lekki przechył od rogu nadawcy
+  // + blur — wejście sprężyną z odbiciem daje „eksplozywny" pop jak
+  // w reklamach komunikatorów. Wyjście (reset pętli) = szybki zjazd bez
+  // sprężyny, żeby nie ciągnąć resetu.
+  const hidden = reduce
+    ? { opacity: 0, y: 0, scale: 1, rotate: 0, filter: "blur(0px)" }
+    : { opacity: 0, y: 22, scale: 0.7, rotate: pink ? 5 : -5, filter: "blur(6px)" };
+  const shown = { opacity: 1, y: 0, scale: 1, rotate: 0, filter: "blur(0px)" };
   return (
     <div className={pink ? "flex justify-end" : "flex justify-start"}>
       <motion.div
-        initial={false}
-        animate={
-          visible
-            ? { opacity: 1, y: 0, scale: 1 }
-            : { opacity: 0, y: reduce ? 0 : 12, scale: reduce ? 1 : 0.96 }
+        // Kropki „pisze…" montują się w trakcie pętli — initial=hidden,
+        // żeby też strzelały sprężyną, nie pojawiały się „na sucho".
+        initial={reduce ? false : hidden}
+        animate={visible ? shown : hidden}
+        transition={
+          reduce
+            ? { duration: 0 }
+            : visible
+              ? {
+                  type: "spring",
+                  duration: 0.44,
+                  bounce: 0.44,
+                  // opacity/blur bez sprężyny (odbicie na nich = artefakty).
+                  opacity: { duration: 0.14, ease: "easeOut" },
+                  filter: { duration: 0.2, ease: "easeOut" },
+                }
+              : { duration: 0.16, ease: EASE.out }
         }
-        transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE.back }}
-        className="font-body"
+        className="font-body relative"
         style={{
           fontSize: "1.02rem",
           lineHeight: 1.5,
@@ -365,6 +388,37 @@ function ChatBubble({
         }}
       >
         {children}
+        {reaction !== undefined && (
+          <motion.span
+            initial={false}
+            animate={
+              reaction
+                ? { opacity: 1, scale: 1, rotate: 0 }
+                : { opacity: 0, scale: reduce ? 1 : 0.3, rotate: reduce ? 0 : -30 }
+            }
+            transition={
+              reduce
+                ? { duration: 0 }
+                : reaction
+                  ? { type: "spring", duration: 0.5, bounce: 0.6, opacity: { duration: 0.1 } }
+                  : { duration: 0.12, ease: EASE.out }
+            }
+            className="absolute flex items-center justify-center"
+            style={{
+              right: -12,
+              bottom: -14,
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              backgroundColor: "var(--color-surface-1)",
+              border: "1px solid var(--color-line)",
+              boxShadow: "var(--shadow-card-hover)",
+              fontSize: 15,
+            }}
+          >
+            ❤️
+          </motion.span>
+        )}
       </motion.div>
     </div>
   );
@@ -415,13 +469,13 @@ function CareChatVisual() {
           </ChatBubble>
         )}
 
-        {/* 3: klient pisze… / domknięcie */}
+        {/* 3: klient pisze… / domknięcie (+ ❤️ reakcja KODY w holdzie) */}
         {typingLeft2 ? (
           <ChatBubble side="left" visible typing>
             <TypingDots />
           </ChatBubble>
         ) : (
-          <ChatBubble side="left" visible={show(6)}>
+          <ChatBubble side="left" visible={show(6)} reaction={show(7)}>
             Ekstra, dzięki! 🙌
           </ChatBubble>
         )}
