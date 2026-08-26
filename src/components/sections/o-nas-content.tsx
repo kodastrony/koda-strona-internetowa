@@ -39,9 +39,11 @@ export function ONasContent() {
           className="container-koda grid grid-cols-1 gap-x-12 gap-y-9 md:grid-cols-12"
           style={{ paddingTop: "clamp(24px,3vw,52px)", paddingBottom: "clamp(60px,8vw,120px)" }}
         >
-          {/* Statement — the focal point, alone in its column */}
+          {/* Statement — the focal point, alone in its column.
+              Wejścia manifestu w CZYSTYM CSS (.ph-lead-in): drugi akapit to LCP
+              strony — na FadeUp inView czekał na hydrację (LCP 5,7 s mobile). */}
           <div className="md:col-span-5">
-            <FadeUp inView>
+            <div className="ph-lead-in">
               <h2
                 className="font-heading font-semibold md:sticky md:top-32"
                 style={{
@@ -56,12 +58,12 @@ export function ONasContent() {
                 <span style={{ color: "var(--color-pink-bright)" }}>produkt, nie jak zlecenie</span>
                 .
               </h2>
-            </FadeUp>
+            </div>
           </div>
 
           {/* Supporting paragraphs — the read, set apart from the statement */}
           <div className="flex max-w-[58ch] flex-col gap-6 md:col-span-7">
-            <FadeUp inView delay={0.08}>
+            <div className="ph-lead-in" style={{ animationDelay: "0.08s" }}>
               {/* Zdanie definicyjne (wzorzec encyklopedyczny) — samodzielny, cytowalny
                   pasaż z podmiotem „KODA Studio" + lokalizacją: odpowiada wprost na
                   „co to KODA Studio / kto robi strony w Bielsku-Białej" (AEO). */}
@@ -77,8 +79,8 @@ export function ONasContent() {
                 internetowe dla firm z całej Polski — od projektu, przez autorski kod, po opiekę po
                 starcie.
               </p>
-            </FadeUp>
-            <FadeUp inView delay={0.1}>
+            </div>
+            <div className="ph-lead-in" style={{ animationDelay: "0.12s" }}>
               <p
                 style={{
                   fontFamily: "var(--font-body)",
@@ -91,8 +93,8 @@ export function ONasContent() {
                 wyniki jak szablon. KODA powstała z prostego przekonania: da się inaczej — i
                 pokazujemy to w każdym projekcie.
               </p>
-            </FadeUp>
-            <FadeUp inView delay={0.12}>
+            </div>
+            <div className="ph-lead-in" style={{ animationDelay: "0.16s" }}>
               <p
                 style={{
                   fontFamily: "var(--font-body)",
@@ -105,8 +107,8 @@ export function ONasContent() {
                 Każdy projekt prowadzimy sami — od pierwszej rozmowy, przez projekt i kod, po opiekę
                 po starcie. Piszesz do KODA — rozmawiasz z KODA, nie z account managerem.
               </p>
-            </FadeUp>
-            <FadeUp inView delay={0.16}>
+            </div>
+            <div className="ph-lead-in" style={{ animationDelay: "0.2s" }}>
               <p
                 style={{
                   fontFamily: "var(--font-body)",
@@ -118,7 +120,7 @@ export function ONasContent() {
                 Mamy jasne zasady i pełną odpowiedzialność za każdy projekt, który podejmujemy.
                 Jeśli szukasz strony, która ma realnie pracować na Twoją firmę — porozmawiajmy.
               </p>
-            </FadeUp>
+            </div>
           </div>
         </div>
       </section>

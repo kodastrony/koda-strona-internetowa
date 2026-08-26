@@ -141,8 +141,10 @@ export function CennikContent() {
   return (
     <section data-header-theme="dark" data-canvas="base" className="relative">
       <div className="container-koda" style={{ paddingBottom: "clamp(40px, 6vw, 96px)" }}>
-        {/* ── Answer-first (BLUF) — bezpośrednia odpowiedź dla Google i AI ── */}
-        <FadeUp inView>
+        {/* ── Answer-first (BLUF) — bezpośrednia odpowiedź dla Google i AI.
+            Wejście w CZYSTYM CSS (.ph-lead-in): ten akapit to LCP strony —
+            na FadeUp inView czekał na hydrację (LCP 5,4 s mobile). ── */}
+        <div className="ph-lead-in" style={{ animationDelay: "0.1s" }}>
           <div
             style={{
               borderLeft: "3px solid var(--color-pink-bright)",
@@ -180,7 +182,7 @@ export function CennikContent() {
               .
             </p>
           </div>
-        </FadeUp>
+        </div>
       </div>
 
       {/* ── Tabela 1 — widełki wg typu strony ── */}

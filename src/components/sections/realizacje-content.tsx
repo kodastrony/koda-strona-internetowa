@@ -9,8 +9,9 @@ export function RealizacjeContent() {
     <section data-header-theme="dark" data-canvas="base" className="relative">
       <div className="container-koda" style={{ paddingBottom: "clamp(40px, 6vw, 90px)" }}>
         {/* Akapit wprowadzający — samodzielny, cytowalny pasaż (AEO): kto, co,
-            fakt weryfikowalny (żywe strony) i uczciwy podział klient/koncept. */}
-        <FadeUp inView>
+            fakt weryfikowalny (żywe strony) i uczciwy podział klient/koncept.
+            Wejście w CZYSTYM CSS — to LCP strony (FadeUp inView = LCP 7,2 s mobile). */}
+        <div className="ph-lead-in" style={{ animationDelay: "0.1s" }}>
           <p
             className="mb-[clamp(36px,4.5vw,64px)] max-w-[62ch]"
             style={{
@@ -25,7 +26,7 @@ export function RealizacjeContent() {
             (JR Modular Systems, DrBlocks), pozostałe to jasno oznaczone projekty koncepcyjne, które
             pokazują nasz standard pracy — od konfiguratorów 3D po animowane strony produktowe.
           </p>
-        </FadeUp>
+        </div>
         <h2 className="sr-only">Wszystkie realizacje</h2>
         <div
           className="grid grid-cols-1 md:grid-cols-2"

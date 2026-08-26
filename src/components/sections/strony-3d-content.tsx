@@ -109,9 +109,10 @@ const DEMOS = DEMO_ORDER.map((id) => getProject(id)).filter((p): p is NonNullabl
 export function Strony3DContent() {
   return (
     <section data-header-theme="dark" data-canvas="base" className="relative">
-      {/* ── Answer-first (BLUF) ── */}
+      {/* ── Answer-first (BLUF) — wejście w CZYSTYM CSS: ten akapit to LCP
+          strony (FadeUp inView czekał na hydrację → LCP 6,1 s mobile). ── */}
       <div className="container-koda" style={{ paddingBottom: "clamp(40px, 6vw, 96px)" }}>
-        <FadeUp inView>
+        <div className="ph-lead-in" style={{ animationDelay: "0.1s" }}>
           <div
             style={{
               borderLeft: "3px solid var(--color-pink-bright)",
@@ -138,7 +139,7 @@ export function Strony3DContent() {
               realnie się opłaca.
             </p>
           </div>
-        </FadeUp>
+        </div>
       </div>
 
       {/* ── Live dema (dowód) ── */}
