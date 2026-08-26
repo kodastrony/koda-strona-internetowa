@@ -24,7 +24,7 @@ const SERVICE_JSON_LD = {
   description:
     "Interaktywne strony 3D (WebGL / Three.js / React Three Fiber) oraz strony z animacjami (GSAP), budowane na autorskim kodzie — szybkie, dostępne (WCAG) i responsywne.",
   url: `${SITE_CONFIG.url}/uslugi/strony-3d/`,
-  inLanguage: "pl-PL",
+  // Bez inLanguage — własność CreativeWork, nie Service (walidator: UNKNOWN_FIELD).
   provider: { "@id": `${SITE_CONFIG.url}/#organization` },
   areaServed: { "@type": "Country", name: "Polska" },
 };

@@ -34,6 +34,8 @@ const SERVICES_JSON_LD = {
         })),
       },
     },
+    // Bez inLanguage: to własność CreativeWork, nie Service (walidator Google:
+    // UNKNOWN_FIELD). Język strony niesie WebPage/WebSite.
     ...SERVICES.map((s) => ({
       "@type": "Service",
       "@id": `${SITE_CONFIG.url}/uslugi/#${s.id}`,
@@ -43,7 +45,6 @@ const SERVICES_JSON_LD = {
       url: `${SITE_CONFIG.url}/uslugi/#${s.id}`,
       provider: { "@id": `${SITE_CONFIG.url}/#organization` },
       areaServed: { "@type": "Country", name: "Polska" },
-      inLanguage: "pl-PL",
     })),
   ],
 };

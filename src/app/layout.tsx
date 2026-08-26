@@ -77,12 +77,9 @@ const ORG_JSON_LD = {
         { "@type": "AdministrativeArea", name: "województwo śląskie" },
         { "@type": "City", name: CONTACT.city },
       ],
-      serviceType: [
-        "Projektowanie stron internetowych",
-        "Strony internetowe 2D i 3D",
-        "SEO i optymalizacja",
-        "Opieka i rozwój stron",
-      ],
+      // Bez serviceType: to własność typu Service, NIE ProfessionalService/LocalBusiness
+      // (walidator Google: UNKNOWN_FIELD ×4 na każdej stronie). Zakres usług niosą
+      // knowsAbout (wyżej) + węzły Service i OfferCatalog na /uslugi/.
       // Geo na poziomie MIASTA (centroid Bielska-Białej) — wzmacnia encję lokalną
       // pod local pack / lokalne odpowiedzi AI, bez podawania precyzyjnego adresu
       // (firma usługowa bez lokalu z obsługą klienta). openingHours / telephone /
