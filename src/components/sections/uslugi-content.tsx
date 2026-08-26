@@ -107,81 +107,112 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
   );
 }
 
-/* ── Wizual 1 (Projektowanie): „BAŁAGAN → PORZĄDEK" ─────────────────────────
-   Meta-dowód kompetencji UX/UI: TA SAMA makieta w dwóch stanach. Start =
-   chaos (bloki krzywe, porozrzucane, nakładają się, CTA szary i zgubiony
-   w rogu), po chwili wszystko składa się kaskadą sprężyn w czysty layout
-   na siatce, z różowym CTA na ścieżce wzroku. Przełącznik PRZED/PO pozwala
-   klientowi samemu „posprzątać" projekt. Czysty DOM, tokeny marki.
-   Wybrane spośród kilku konceptów (kursor-ścieżka, slider porównawczy,
-   morf tokenów) — patrz commit. */
-type MorphPhase = "before" | "after";
+/* ── Wizual 1 (Projektowanie): „ZŁA STRONA → KODA" — scenka z kursorem ──────
+   Live-przykład na WŁASNYM brandzie (życzenie Natana): w kadrze stoi
+   amatorski prototyp strony KODY (serif, wyśrodkowany, niebieskie
+   podkreślone linki, beveled „Kliknij tutaj!" — internet 2009). Wjeżdża
+   kursor projektanta i naprawia stronę TRZEMA klikami:
+   1) typografia nagłówka (serif środek → Geologica 800 do lewej),
+   2) CTA (szary bevel → różowy pill),
+   3) brand (białe tło → porcelanowa aurora, czysty nav, pionowe KODA
+      kaskadą liter — jak w prawdziwym hero).
+   Kursor wyjeżdża, CTA oddycha halo — strona zostaje „naprawiona".
+   PRZED wraca do prototypu, PO odgrywa naprawę od nowa. */
 
-interface MorphState {
-  x: number; // left, % szerokości kadru
-  y: number; // top, % wysokości kadru
-  w: number; // width, %
-  h: number; // height, %
-  rot: number;
-  r: number; // border-radius, px
-  bg: string;
-  op?: number;
-}
+// Maszynka kroków: 0 = prototyp (hold), 1–4 = przejazdy kursora (klik na
+// KOŃCU przejazdu ⇒ region naprawia się przy WEJŚCIU w kolejny krok),
+// 5 = finał (kursor za kadrem, halo CTA).
+const FIX_FLOW: Record<number, { next: number; delay: number }> = {
+  0: { next: 1, delay: 700 }, // prototyp w całej okazałości
+  1: { next: 2, delay: 800 }, // dojazd do nagłówka
+  2: { next: 3, delay: 750 }, // klik → typografia; dojazd do CTA
+  3: { next: 4, delay: 850 }, // klik → pill; dojazd na prawą flankę
+  4: { next: 5, delay: 650 }, // klik → brand/aurora/litery; wyjazd
+};
+const FIX_DONE = 5;
 
-const BONE = "rgba(36,27,43,0.07)";
-const BONE_DARK = "rgba(36,27,43,0.13)";
-const GRAY_CTA = "rgba(36,27,43,0.18)";
-const PINK_SOFT = "rgba(179,42,157,0.10)";
-const PINK_NAV = "rgba(179,42,157,0.25)";
+// Punkty trasy kursora (% kadru): nagłówek → CTA → prawa flanka → wyjazd.
+const CURSOR_AT: Record<number, { x: number; y: number }> = {
+  0: { x: 108, y: 112 },
+  1: { x: 34, y: 40 },
+  2: { x: 20, y: 69 },
+  3: { x: 86, y: 46 },
+  4: { x: 108, y: 112 },
+  5: { x: 108, y: 112 },
+};
 
-/* before = chaos (krzywo, nakładki, niespójne radiusy — celowo „spartaczone"),
-   after = ład (siatka, oddechy, spójne radiusy, CTA różowy przy H1). */
-const MORPH_BLOCKS: { id: string; before: MorphState; after: MorphState; cta?: boolean }[] = [
-  { id: "logo", before: { x: 36, y: 8, w: 26, h: 7, rot: -7, r: 2, bg: BONE_DARK }, after: { x: 4, y: 5, w: 14, h: 5, rot: 0, r: 8, bg: BONE } },
-  { id: "nav1", before: { x: 6, y: 30, w: 12, h: 4, rot: 10, r: 2, bg: BONE_DARK }, after: { x: 60, y: 6, w: 8, h: 3.5, rot: 0, r: 6, bg: BONE } },
-  { id: "nav2", before: { x: 22, y: 7, w: 9, h: 4, rot: -12, r: 10, bg: BONE_DARK }, after: { x: 70, y: 6, w: 8, h: 3.5, rot: 0, r: 6, bg: BONE } },
-  { id: "navCta", before: { x: 84, y: 44, w: 12, h: 4, rot: 6, r: 3, bg: GRAY_CTA }, after: { x: 81, y: 5.2, w: 15, h: 5, rot: 0, r: 999, bg: PINK_NAV } },
-  { id: "h1a", before: { x: 18, y: 36, w: 58, h: 9, rot: -4, r: 3, bg: BONE_DARK }, after: { x: 4, y: 17, w: 50, h: 8, rot: 0, r: 8, bg: BONE } },
-  { id: "h1b", before: { x: 8, y: 48, w: 46, h: 9, rot: 3, r: 14, bg: BONE_DARK }, after: { x: 4, y: 27.5, w: 36, h: 8, rot: 0, r: 8, bg: BONE } },
-  { id: "sub1", before: { x: 48, y: 61, w: 44, h: 4.5, rot: -3, r: 2, bg: BONE_DARK, op: 0.85 }, after: { x: 4, y: 40, w: 42, h: 3.8, rot: 0, r: 6, bg: BONE, op: 0.7 } },
-  { id: "sub2", before: { x: 10, y: 57, w: 30, h: 4.5, rot: 6, r: 2, bg: BONE_DARK, op: 0.85 }, after: { x: 4, y: 46, w: 32, h: 3.8, rot: 0, r: 6, bg: BONE, op: 0.7 } },
-  { id: "cta", before: { x: 78, y: 90, w: 17, h: 7, rot: -9, r: 4, bg: GRAY_CTA }, after: { x: 4, y: 55, w: 20, h: 9, rot: 0, r: 999, bg: "var(--color-accent)", op: 0.9 }, cta: true },
-  { id: "img", before: { x: 1, y: 66, w: 30, h: 30, rot: 7, r: 4, bg: "rgba(36,27,43,0.10)" }, after: { x: 60, y: 17, w: 36, h: 47, rot: 0, r: 12, bg: PINK_SOFT } },
-  { id: "card1", before: { x: 38, y: 74, w: 34, h: 20, rot: -5, r: 18, bg: BONE_DARK }, after: { x: 4, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
-  { id: "card2", before: { x: 64, y: 68, w: 30, h: 18, rot: 8, r: 4, bg: BONE_DARK }, after: { x: 36, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
-  { id: "card3", before: { x: 30, y: 90, w: 28, h: 12, rot: -3, r: 6, bg: BONE_DARK }, after: { x: 68, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
-];
+const SERIF = "Georgia, 'Times New Roman', serif";
+
+/* Propsy animacji regionów: prototyp zdmuchuje się (blur w górę),
+   naprawiona wersja wskakuje sprężyną. Nakładki absolutne — zero reflow. */
+const beforeAnim = (fixed: boolean, reduce: boolean) => ({
+  initial: false as const,
+  animate: fixed
+    ? { opacity: 0, y: -12, filter: "blur(5px)" }
+    : { opacity: 1, y: 0, filter: "blur(0px)" },
+  transition: reduce ? { duration: 0 } : { duration: 0.3, ease: "easeOut" as const },
+});
+const afterAnim = (fixed: boolean, reduce: boolean, delay = 0) => ({
+  initial: false as const,
+  animate: fixed ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 16, scale: 0.95 },
+  transition: reduce
+    ? { duration: 0 }
+    : fixed
+      ? {
+          type: "spring" as const,
+          duration: 0.6,
+          bounce: 0.34,
+          delay,
+          opacity: { duration: 0.18, delay },
+        }
+      : { duration: 0.15 },
+});
 
 function WireframeVisual() {
   const reduce = useReducedMotion();
   const wrapRef = useRef<HTMLDivElement>(null);
   const inView = useInView(wrapRef, { once: true, margin: "-15% 0px -15% 0px" });
-  // SSR/no-JS renderuje ŁAD (bezpieczny default); klient bez reduce cofa do
-  // chaosu jeszcze pod foldem i „sprząta" dopiero na oczach usera (inView).
-  const [phase, setPhase] = useState<MorphPhase>("after");
+  // SSR/no-JS renderuje NAPRAWIONĄ stronę (bezpieczny default); klient cofa
+  // do prototypu pod foldem i odgrywa naprawę dopiero przy scrollu (inView).
+  const [step, setStep] = useState(FIX_DONE);
+  const [paused, setPaused] = useState(false);
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     if (reduce || touched) return;
-    // setTimeout(0): flip po hydratacji (SSR musi zostać przy „after" —
-    // pierwszy render klienta musi się z nim zgadzać), poza ciałem efektu
-    // (reguła react-hooks/set-state-in-effect).
-    const t = setTimeout(() => setPhase("before"), 0);
+    // setTimeout(0): flip po hydratacji (pierwszy render klienta musi zgadzać
+    // się z SSR), poza ciałem efektu (reguła react-hooks/set-state-in-effect).
+    const t = setTimeout(() => setStep(0), 0);
     return () => clearTimeout(t);
   }, [reduce, touched]);
 
   useEffect(() => {
-    if (reduce || touched || !inView || phase !== "before") return;
-    const t = setTimeout(() => setPhase("after"), 950);
+    if (reduce || paused || !inView || step >= FIX_DONE) return;
+    const cur = FIX_FLOW[step] ?? FIX_FLOW[0];
+    const t = setTimeout(() => setStep(cur.next), cur.delay);
     return () => clearTimeout(t);
-  }, [reduce, touched, inView, phase]);
+  }, [reduce, paused, inView, step]);
 
-  const pick = (p: MorphPhase) => {
+  const pickBefore = () => {
     setTouched(true);
-    setPhase(p);
+    setPaused(true);
+    setStep(0);
+  };
+  const pickAfter = () => {
+    setTouched(true);
+    setPaused(false);
+    if (step === 0 || step >= FIX_DONE) setStep(1); // powtórka scenki od klika 1
   };
 
-  const n = MORPH_BLOCKS.length;
+  const rm = !!reduce;
+  const typoFixed = rm || step >= 2;
+  const ctaFixed = rm || step >= 3;
+  const brandFixed = rm || step >= 4;
+  const done = rm || step >= FIX_DONE;
+  const cursorOn = !rm && step >= 1 && step < FIX_DONE;
+  const at = CURSOR_AT[Math.min(step, FIX_DONE)] ?? CURSOR_AT[0];
+  const ripple = !rm && step >= 2 && step <= 4 ? CURSOR_AT[step - 1] : null;
+
   const chip = (active: boolean) =>
     `rounded-full border px-5 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
       active
@@ -220,82 +251,306 @@ function WireframeVisual() {
             />
           </div>
 
-          {/* Kadr makiety: bloki % → skalują się z szerokością kolumny */}
-          <div className="relative w-full" style={{ aspectRatio: "16 / 10.5" }}>
-            {/* Siatka projektowa — wyłania się dopiero w PO (dowód „ładu") */}
-            {[25, 50, 75].map((x) => (
-              <motion.span
-                key={x}
-                initial={false}
-                animate={{ opacity: phase === "after" ? 0.6 : 0 }}
-                transition={{ duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.35 }}
-                className="absolute top-0 h-full w-px"
-                style={{ left: `${x}%`, backgroundColor: "var(--color-line)" }}
+          {/* Kadr: cqw = % szerokości kadru → cała mini-strona skaluje się
+              z kolumną (desktop i telefon z jednego kodu). */}
+          <div
+            className="relative w-full"
+            style={{ aspectRatio: "16 / 10.5", containerType: "inline-size" }}
+          >
+            {/* TŁO: gołe białe → porcelanowa aurora (jak PageCanvas/hero) */}
+            <motion.div
+              initial={false}
+              animate={{ opacity: brandFixed ? 0 : 1 }}
+              transition={{ duration: rm ? 0 : 0.45 }}
+              className="absolute inset-0"
+              style={{ backgroundColor: "#ffffff" }}
+            />
+            <motion.div
+              initial={false}
+              animate={{ opacity: brandFixed ? 1 : 0 }}
+              transition={{ duration: rm ? 0 : 0.55 }}
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(180deg, #f7f4f8 0%, #f3edf6 100%)" }}
+            >
+              <span
+                className="absolute"
+                style={{
+                  left: "6%",
+                  bottom: "-20%",
+                  width: "58%",
+                  height: "58%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(255,94,200,0.30) 0%, rgba(255,94,200,0) 70%)",
+                  filter: "blur(18px)",
+                }}
               />
-            ))}
-            {MORPH_BLOCKS.map((b, i) => {
-              const s = phase === "before" ? b.before : b.after;
-              return (
-                <motion.div
-                  key={b.id}
+              <span
+                className="absolute"
+                style={{
+                  right: "-8%",
+                  top: "-16%",
+                  width: "50%",
+                  height: "54%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(139,124,246,0.24) 0%, rgba(139,124,246,0) 70%)",
+                  filter: "blur(20px)",
+                }}
+              />
+            </motion.div>
+
+            {/* NAV — prototyp: serifowy tytuł-link / po: logo KODA. + pill */}
+            <motion.div
+              {...beforeAnim(brandFixed, rm)}
+              className="absolute inset-x-0 text-center"
+              style={{
+                top: "6%",
+                fontFamily: SERIF,
+                color: "#1a0dab",
+                textDecoration: "underline",
+                fontSize: "clamp(9px, 3cqw, 17px)",
+              }}
+            >
+              KODA — Strony Internetowe — Najlepsze Strony WWW
+            </motion.div>
+            <motion.div
+              {...afterAnim(brandFixed, rm)}
+              className="absolute flex items-center justify-between"
+              style={{ left: "6%", right: "6%", top: "5.5%" }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-logo)",
+                  fontWeight: 800,
+                  fontSize: "clamp(11px, 3.4cqw, 22px)",
+                  letterSpacing: "-0.02em",
+                  color: "var(--color-ink)",
+                }}
+              >
+                KODA<span style={{ color: "var(--color-accent)" }}>.</span>
+              </span>
+              <span
+                className="rounded-full"
+                style={{
+                  backgroundColor: "var(--color-accent)",
+                  color: "#ffffff",
+                  fontWeight: 700,
+                  fontSize: "clamp(7px, 1.9cqw, 11px)",
+                  letterSpacing: "0.12em",
+                  padding: "0.9cqw 2.6cqw",
+                }}
+              >
+                KONTAKT
+              </span>
+            </motion.div>
+
+            {/* NAGŁÓWEK — serif na środku → prawdziwy H1 KODY do lewej */}
+            <motion.div
+              {...beforeAnim(typoFixed, rm)}
+              className="absolute inset-x-0 text-center"
+              style={{ top: "27%", fontFamily: SERIF, color: "#161616" }}
+            >
+              <div style={{ fontSize: "clamp(11px, 4.4cqw, 28px)", fontWeight: 700, lineHeight: 1.25 }}>
+                Strona internetowa,
+                <br />
+                która przynosi klientów.
+              </div>
+              <div
+                style={{
+                  marginTop: "1.6cqw",
+                  fontStyle: "italic",
+                  color: "#6b6b6b",
+                  fontSize: "clamp(8px, 2.5cqw, 14px)",
+                }}
+              >
+                Witamy na naszej stronie internetowej!!!
+              </div>
+            </motion.div>
+            <motion.div
+              {...afterAnim(typoFixed, rm)}
+              className="absolute"
+              style={{ left: "6%", top: "24%", width: "70%" }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontWeight: 800,
+                  color: "var(--color-ink)",
+                  fontSize: "clamp(13px, 5.3cqw, 34px)",
+                  lineHeight: 1.06,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Strona internetowa,
+                <br />
+                która przynosi klientów.
+              </div>
+              <div
+                style={{
+                  marginTop: "2.2cqw",
+                  color: "var(--color-ink-muted)",
+                  fontSize: "clamp(8px, 2.5cqw, 15px)",
+                }}
+              >
+                Projekt, kod i opieka.
+              </div>
+            </motion.div>
+
+            {/* CTA — bevel „Kliknij tutaj!" + niebieski link → różowy pill */}
+            <motion.div
+              {...beforeAnim(ctaFixed, rm)}
+              className="absolute inset-x-0 flex flex-col items-center"
+              style={{ top: "63%", gap: "1.6cqw" }}
+            >
+              <span
+                style={{
+                  fontFamily: SERIF,
+                  color: "#0000ee",
+                  textDecoration: "underline",
+                  fontSize: "clamp(8px, 2.7cqw, 15px)",
+                }}
+              >
+                Zobacz więcej &gt;&gt;&gt;
+              </span>
+              <span
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  fontSize: "clamp(8px, 2.4cqw, 13px)",
+                  color: "#333333",
+                  backgroundColor: "#e3e1dc",
+                  border: "2px outset #f7f6f3",
+                  padding: "1.1cqw 3cqw",
+                }}
+              >
+                Kliknij tutaj!
+              </span>
+            </motion.div>
+            <motion.div {...afterAnim(ctaFixed, rm)} className="absolute" style={{ left: "6%", top: "66%" }}>
+              <span
+                className="relative inline-block rounded-full"
+                style={{
+                  backgroundColor: "var(--color-accent)",
+                  color: "#ffffff",
+                  fontWeight: 700,
+                  fontSize: "clamp(7px, 2.1cqw, 12px)",
+                  letterSpacing: "0.14em",
+                  padding: "1.7cqw 3.6cqw",
+                }}
+              >
+                BEZPŁATNA WYCENA
+                {done && (
+                  <span
+                    className="koda-halo pointer-events-none absolute"
+                    style={{
+                      inset: -5,
+                      borderRadius: 999,
+                      boxShadow: "0 0 24px 7px rgba(179,42,157,0.38)",
+                    }}
+                  />
+                )}
+              </span>
+            </motion.div>
+
+            {/* Pionowe KODA — znak hero; litery wjeżdżają kaskadą z prawej */}
+            <div className="absolute flex flex-col items-end" style={{ right: "5%", top: "16%" }}>
+              {["K", "O", "D", "A"].map((l, i) => (
+                <motion.span
+                  key={l}
                   initial={false}
-                  animate={{
-                    left: `${s.x}%`,
-                    top: `${s.y}%`,
-                    width: `${s.w}%`,
-                    height: `${s.h}%`,
-                    rotate: s.rot,
-                    borderRadius: s.r,
-                    backgroundColor: s.bg,
-                    opacity: s.op ?? 1,
-                  }}
+                  animate={brandFixed ? { opacity: 1, x: 0 } : { opacity: 0, x: 26 }}
                   transition={
-                    reduce
+                    rm
                       ? { duration: 0 }
-                      : {
-                          type: "spring",
-                          duration: 0.8,
-                          bounce: 0.26,
-                          // Sprzątanie = kaskada od góry; bałagan wraca szybciej.
-                          delay: phase === "after" ? i * 0.045 : (n - 1 - i) * 0.015,
-                        }
+                      : brandFixed
+                        ? {
+                            type: "spring",
+                            duration: 0.55,
+                            bounce: 0.3,
+                            delay: 0.12 + i * 0.08,
+                            opacity: { duration: 0.2, delay: 0.12 + i * 0.08 },
+                          }
+                        : { duration: 0.15 }
                   }
-                  className="absolute"
+                  style={{
+                    fontFamily: "var(--font-logo)",
+                    fontWeight: 800,
+                    fontSize: "clamp(26px, 10.5cqw, 74px)",
+                    lineHeight: 0.92,
+                    letterSpacing: "-0.04em",
+                    color: "var(--color-ink)",
+                  }}
                 >
-                  {/* Różowe halo CTA — oddycha dopiero, gdy jest PORZĄDEK. */}
-                  {b.cta && phase === "after" && (
-                    <span
-                      className="koda-halo pointer-events-none absolute"
-                      style={{
-                        inset: -4,
-                        borderRadius: 999,
-                        boxShadow: "0 0 26px 8px rgba(179,42,157,0.4)",
-                      }}
-                    />
-                  )}
-                </motion.div>
-              );
-            })}
+                  {l}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Fala kliknięcia (nowy ripple na każdy klik — key={step}) */}
+            {ripple && (
+              <span
+                key={step}
+                className="koda-ripple pointer-events-none absolute"
+                style={{
+                  left: `${ripple.x}%`,
+                  top: `${ripple.y}%`,
+                  width: 34,
+                  height: 34,
+                  marginLeft: -17,
+                  marginTop: -17,
+                  borderRadius: "50%",
+                  border: "2px solid var(--color-accent)",
+                  zIndex: 9,
+                }}
+              />
+            )}
+
+            {/* Kursor projektanta */}
+            <motion.div
+              initial={false}
+              animate={{ left: `${at.x}%`, top: `${at.y}%`, opacity: cursorOn ? 1 : 0 }}
+              transition={
+                rm
+                  ? { duration: 0 }
+                  : {
+                      left: { duration: 0.62, ease: [0.45, 0.05, 0.2, 1] },
+                      top: { duration: 0.62, ease: [0.45, 0.05, 0.2, 1] },
+                      opacity: { duration: 0.2 },
+                    }
+              }
+              className="absolute"
+              style={{ zIndex: 10 }}
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
+              >
+                <path
+                  d="M5.5 2.5l13 11.2-6.8 0.9 3.9 7.2-3.2 1.6-3.7-7.4-3.2 4.6z"
+                  fill="#151217"
+                  stroke="#ffffff"
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
           </div>
         </div>
 
-        {/* Przełącznik: klient sam „sprząta" projekt */}
+        {/* Przełącznik: PRZED = prototyp, PO = powtórka naprawy */}
         <div
           role="group"
-          aria-label="Makieta: przed i po uporządkowaniu"
+          aria-label="Strona: prototyp i wersja naprawiona"
           className="mt-5 flex justify-center gap-2"
         >
-          {(["before", "after"] as const).map((p) => (
-            <button
-              key={p}
-              type="button"
-              aria-pressed={phase === p}
-              onClick={() => pick(p)}
-              className={chip(phase === p)}
-            >
-              {p === "before" ? "Przed" : "Po"}
-            </button>
-          ))}
+          <button type="button" aria-pressed={step === 0} onClick={pickBefore} className={chip(step === 0)}>
+            Przed
+          </button>
+          <button type="button" aria-pressed={done} onClick={pickAfter} className={chip(done)}>
+            Po
+          </button>
         </div>
       </div>
     </Parallax>
