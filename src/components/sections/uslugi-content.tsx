@@ -133,9 +133,9 @@ const FIX_DONE = 5;
 // Punkty trasy kursora (% kadru): nagłówek → guzik → prawa flanka → wyjazd.
 const CURSOR_AT: Record<number, { x: number; y: number }> = {
   0: { x: 108, y: 112 },
-  1: { x: 42, y: 33 },
+  1: { x: 40, y: 32 },
   2: { x: 50, y: 69 },
-  3: { x: 88, y: 44 },
+  3: { x: 76, y: 38 },
   4: { x: 108, y: 112 },
   5: { x: 108, y: 112 },
 };
@@ -162,10 +162,14 @@ interface FixState {
 }
 
 /* Bloki-cienie. before = amatorski układ (wyśrodkowane, krzywe, „niebieski
-   link", szary guzik); after = WIERNY szkielet OBECNEGO hero KODY: logo,
-   pill KONTAKT + hamburger, H1 ×2, opis ×2, różowy pill CTA + „lub zadzwoń"
-   (proporcje z prawdziwej strony głównej). Blok tylko-before znika przy
-   naprawie regionu, tylko-after wjeżdża; oba stany ⇒ morf sprężyną. */
+   link", szary guzik); after = szkielet OBECNEGO hero KODY odrysowany 1:1
+   ze zrzutu strony głównej (Natan, 26.08): logo x3.8 / pill KONTAKT x86 +
+   burger x93.9; H1 = PIĘĆ linii o realnych szerokościach („Strona" 15.5,
+   „internetowa," 29.5, „która" 12.5, RÓŻOWE „przynosi" 19.5 i „klientów."
+   21), opis ×2, pill CTA + numer telefonu, caption „Odpowiadamy w 24 h".
+   Blok tylko-before znika przy naprawie regionu, tylko-after wjeżdża;
+   oba stany ⇒ morf sprężyną. */
+const PINK_BAR = "rgba(179,42,157,0.5)";
 const FIX_BLOCKS: {
   id: string;
   region: "typo" | "cta" | "brand";
@@ -175,18 +179,22 @@ const FIX_BLOCKS: {
 }[] = [
   // brand: wyśrodkowany „tytuł-link" → header jak w KODA
   { id: "titleBar", region: "brand", before: { x: 25, y: 6.5, w: 50, h: 4, rot: -2, r: 3, bg: BONE_DARK } },
-  { id: "logo", region: "brand", after: { x: 6, y: 5.5, w: 11, h: 4.5, rot: 0, r: 6, bg: BONE_DARK } },
-  { id: "kontakt", region: "brand", after: { x: 72, y: 5.2, w: 13, h: 5, rot: 0, r: 999, bg: PINK_NAV } },
-  { id: "burger", region: "brand", after: { x: 87.5, y: 4.6, w: 4, h: 6.1, rot: 0, r: 999, bg: "rgba(21,18,23,0.85)" } },
-  // typo: krzywe wyśrodkowane bary → H1 ×2 + opis ×2 do lewej
-  { id: "h1a", region: "typo", before: { x: 22, y: 26, w: 56, h: 7, rot: -3, r: 3, bg: BONE_DARK }, after: { x: 6, y: 19, w: 47, h: 8, rot: 0, r: 8, bg: BONE_DARK } },
-  { id: "h1b", region: "typo", before: { x: 28, y: 36, w: 44, h: 7, rot: 2, r: 12, bg: BONE_DARK }, after: { x: 6, y: 29.5, w: 38, h: 8, rot: 0, r: 8, bg: BONE_DARK } },
-  { id: "sub1", region: "typo", before: { x: 33, y: 46.5, w: 34, h: 3, rot: -1, r: 2, bg: BONE, op: 0.9 }, after: { x: 6, y: 42.5, w: 33, h: 3, rot: 0, r: 4, bg: BONE, op: 0.85 } },
-  { id: "sub2", region: "typo", after: { x: 6, y: 47.5, w: 26, h: 3, rot: 0, r: 4, bg: BONE, op: 0.85 } },
-  // cta: „niebieski link" + szary guzik → różowy pill + bar „lub zadzwoń"
+  { id: "logo", region: "brand", after: { x: 3.8, y: 5.5, w: 7, h: 3.4, rot: 0, r: 5, bg: BONE_DARK } },
+  { id: "kontakt", region: "brand", after: { x: 86, y: 5, w: 6.6, h: 4.4, rot: 0, r: 999, bg: PINK_NAV } },
+  { id: "burger", region: "brand", after: { x: 93.9, y: 4.9, w: 3, h: 4.6, rot: 0, r: 999, bg: "rgba(21,18,23,0.85)" } },
+  // typo: krzywe wyśrodkowane bary → 5 linii H1 (3 ink + 2 różowe) + opis ×2
+  { id: "h1a", region: "typo", before: { x: 22, y: 26, w: 56, h: 7, rot: -3, r: 3, bg: BONE_DARK }, after: { x: 13.7, y: 19, w: 15.5, h: 6, rot: 0, r: 7, bg: BONE_DARK } },
+  { id: "h1b", region: "typo", before: { x: 28, y: 36, w: 44, h: 7, rot: 2, r: 12, bg: BONE_DARK }, after: { x: 13.7, y: 27.5, w: 29.5, h: 6, rot: 0, r: 7, bg: BONE_DARK } },
+  { id: "h1c", region: "typo", after: { x: 13.7, y: 36, w: 12.5, h: 6, rot: 0, r: 7, bg: BONE_DARK } },
+  { id: "h1d", region: "typo", after: { x: 13.7, y: 44.5, w: 19.5, h: 6, rot: 0, r: 7, bg: PINK_BAR } },
+  { id: "h1e", region: "typo", after: { x: 13.7, y: 53, w: 21, h: 6, rot: 0, r: 7, bg: PINK_BAR } },
+  { id: "sub1", region: "typo", before: { x: 33, y: 46.5, w: 34, h: 3, rot: -1, r: 2, bg: BONE, op: 0.9 }, after: { x: 13.7, y: 64.5, w: 30, h: 2.6, rot: 0, r: 4, bg: BONE, op: 0.9 } },
+  { id: "sub2", region: "typo", after: { x: 13.7, y: 69, w: 29, h: 2.6, rot: 0, r: 4, bg: BONE, op: 0.9 } },
+  // cta: „niebieski link" + szary guzik → pill + telefon + caption (1:1 z hero)
   { id: "link", region: "cta", before: { x: 38, y: 58, w: 24, h: 3, rot: 0, r: 2, bg: "rgba(0,0,238,0.32)" } },
-  { id: "cta", region: "cta", before: { x: 40, y: 65, w: 20, h: 6.5, rot: 1, r: 3, bg: "#d9d5cd" }, after: { x: 6, y: 56, w: 19, h: 8, rot: 0, r: 999, bg: "var(--color-accent)" }, cta: true },
-  { id: "phone", region: "cta", after: { x: 27.5, y: 58.5, w: 15, h: 3, rot: 0, r: 4, bg: BONE_DARK, op: 0.8 } },
+  { id: "cta", region: "cta", before: { x: 40, y: 65, w: 20, h: 6.5, rot: 1, r: 3, bg: "#d9d5cd" }, after: { x: 13.7, y: 76, w: 14.5, h: 6.8, rot: 0, r: 999, bg: "var(--color-accent)" }, cta: true },
+  { id: "phone", region: "cta", after: { x: 30.5, y: 77.9, w: 8.5, h: 3, rot: 0, r: 4, bg: BONE_DARK, op: 0.85 } },
+  { id: "caption", region: "cta", after: { x: 13.7, y: 85.5, w: 14, h: 2, rot: 0, r: 3, bg: BONE, op: 0.75 } },
 ];
 
 function WireframeVisual() {
@@ -321,6 +329,50 @@ function WireframeVisual() {
               />
             </motion.div>
 
+            {/* Pionowy napis KODA — 1:1 ze zrzutu hero: OGROMNE szklane
+                litery (Syne 800, -0.04em, lh 0.9, gradient KODA_FILL_LIGHT
+                przez background-clip:text), K tuż pod górą kadru, D ścięte
+                dolną krawędzią, A poza kadrem (overflow) — jak w realnym
+                viewporcie. POD headerem (pill KONTAKT nachodzi na K). */}
+            <div
+              className="absolute flex flex-col items-center"
+              style={{ right: "13%", top: "3.5%", zIndex: 0 }}
+            >
+              {["K", "O", "D", "A"].map((l, i) => (
+                <motion.span
+                  key={l}
+                  initial={false}
+                  animate={brandFixed ? { opacity: 1, x: 0 } : { opacity: 0, x: 34 }}
+                  transition={
+                    rm
+                      ? { duration: 0 }
+                      : brandFixed
+                        ? {
+                            type: "spring",
+                            duration: 0.6,
+                            bounce: 0.28,
+                            delay: 0.12 + i * 0.09,
+                            opacity: { duration: 0.22, delay: 0.12 + i * 0.09 },
+                          }
+                        : { duration: 0.15 }
+                  }
+                  style={{
+                    fontFamily: "var(--font-logo)",
+                    fontWeight: 800,
+                    fontSize: "clamp(64px, 22cqw, 170px)",
+                    lineHeight: 0.9,
+                    letterSpacing: "-0.04em",
+                    backgroundImage: KODA_GLASS,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  {l}
+                </motion.span>
+              ))}
+            </div>
+
             {/* Bloki-cienie: każdy morfuje/znika/wjeżdża przy naprawie
                 SWOJEGO regionu (klik kursora) */}
             {FIX_BLOCKS.map((b, i) => {
@@ -347,10 +399,11 @@ function WireframeVisual() {
                     rm
                       ? { duration: 0 }
                       : shown
-                        ? { type: "spring", duration: 0.65, bounce: 0.3, delay: (i % 4) * 0.06 }
+                        ? { type: "spring", duration: 0.65, bounce: 0.3, delay: (i % 5) * 0.06 }
                         : { duration: 0.25, ease: "easeOut" }
                   }
                   className="absolute"
+                  style={{ zIndex: 1 }}
                 >
                   {b.cta && done && (
                     <span
@@ -365,46 +418,6 @@ function WireframeVisual() {
                 </motion.div>
               );
             })}
-
-            {/* Pionowy napis KODA — JEDYNY prawdziwy element cienia, 1:1
-                z hero: Syne 800, -0.04em, lh 0.9, szklany gradient
-                różowo-fioletowo-indygowy przez background-clip:text
-                (KODA_FILL_LIGHT z hero-config). Kaskada liter z prawej. */}
-            <div className="absolute flex flex-col items-center" style={{ right: "4.5%", top: "13%" }}>
-              {["K", "O", "D", "A"].map((l, i) => (
-                <motion.span
-                  key={l}
-                  initial={false}
-                  animate={brandFixed ? { opacity: 1, x: 0 } : { opacity: 0, x: 26 }}
-                  transition={
-                    rm
-                      ? { duration: 0 }
-                      : brandFixed
-                        ? {
-                            type: "spring",
-                            duration: 0.55,
-                            bounce: 0.3,
-                            delay: 0.12 + i * 0.08,
-                            opacity: { duration: 0.2, delay: 0.12 + i * 0.08 },
-                          }
-                        : { duration: 0.15 }
-                  }
-                  style={{
-                    fontFamily: "var(--font-logo)",
-                    fontWeight: 800,
-                    fontSize: "clamp(30px, 12cqw, 86px)",
-                    lineHeight: 0.9,
-                    letterSpacing: "-0.04em",
-                    backgroundImage: KODA_GLASS,
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  {l}
-                </motion.span>
-              ))}
-            </div>
 
             {/* Fala kliknięcia (nowy ripple na każdy klik — key={step}) */}
             {ripple && (
