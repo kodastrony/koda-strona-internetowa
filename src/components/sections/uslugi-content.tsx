@@ -107,109 +107,194 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
   );
 }
 
-/* ── Wizual 1 (Projektowanie): makieta-wireframe, która SIĘ SKŁADA ──────────
-   Stylizowane okno przeglądarki z szkieletem projektu: bloki wjeżdżają
-   kaskadą przy scrollu (jak makieta nabierająca kształtu), CTA pulsuje różem.
-   Czysty CSS/DOM — zero zdjęć, w tokenach marki. */
-function WireBlock({
-  delay,
-  className,
-  style,
-  children,
-}: {
-  delay: number;
-  className?: string;
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
-}) {
-  return (
-    <FadeUp inView delay={delay} y={14} duration={0.5} className={className}>
-      <div className="h-full w-full" style={style}>
-        {children}
-      </div>
-    </FadeUp>
-  );
+/* ── Wizual 1 (Projektowanie): „BAŁAGAN → PORZĄDEK" ─────────────────────────
+   Meta-dowód kompetencji UX/UI: TA SAMA makieta w dwóch stanach. Start =
+   chaos (bloki krzywe, porozrzucane, nakładają się, CTA szary i zgubiony
+   w rogu), po chwili wszystko składa się kaskadą sprężyn w czysty layout
+   na siatce, z różowym CTA na ścieżce wzroku. Przełącznik PRZED/PO pozwala
+   klientowi samemu „posprzątać" projekt. Czysty DOM, tokeny marki.
+   Wybrane spośród kilku konceptów (kursor-ścieżka, slider porównawczy,
+   morf tokenów) — patrz commit. */
+type MorphPhase = "before" | "after";
+
+interface MorphState {
+  x: number; // left, % szerokości kadru
+  y: number; // top, % wysokości kadru
+  w: number; // width, %
+  h: number; // height, %
+  rot: number;
+  r: number; // border-radius, px
+  bg: string;
+  op?: number;
 }
 
+const BONE = "rgba(36,27,43,0.07)";
+const BONE_DARK = "rgba(36,27,43,0.13)";
+const GRAY_CTA = "rgba(36,27,43,0.18)";
+const PINK_SOFT = "rgba(179,42,157,0.10)";
+const PINK_NAV = "rgba(179,42,157,0.25)";
+
+/* before = chaos (krzywo, nakładki, niespójne radiusy — celowo „spartaczone"),
+   after = ład (siatka, oddechy, spójne radiusy, CTA różowy przy H1). */
+const MORPH_BLOCKS: { id: string; before: MorphState; after: MorphState; cta?: boolean }[] = [
+  { id: "logo", before: { x: 36, y: 8, w: 26, h: 7, rot: -7, r: 2, bg: BONE_DARK }, after: { x: 4, y: 5, w: 14, h: 5, rot: 0, r: 8, bg: BONE } },
+  { id: "nav1", before: { x: 6, y: 30, w: 12, h: 4, rot: 10, r: 2, bg: BONE_DARK }, after: { x: 60, y: 6, w: 8, h: 3.5, rot: 0, r: 6, bg: BONE } },
+  { id: "nav2", before: { x: 22, y: 7, w: 9, h: 4, rot: -12, r: 10, bg: BONE_DARK }, after: { x: 70, y: 6, w: 8, h: 3.5, rot: 0, r: 6, bg: BONE } },
+  { id: "navCta", before: { x: 84, y: 44, w: 12, h: 4, rot: 6, r: 3, bg: GRAY_CTA }, after: { x: 81, y: 5.2, w: 15, h: 5, rot: 0, r: 999, bg: PINK_NAV } },
+  { id: "h1a", before: { x: 18, y: 36, w: 58, h: 9, rot: -4, r: 3, bg: BONE_DARK }, after: { x: 4, y: 17, w: 50, h: 8, rot: 0, r: 8, bg: BONE } },
+  { id: "h1b", before: { x: 8, y: 48, w: 46, h: 9, rot: 3, r: 14, bg: BONE_DARK }, after: { x: 4, y: 27.5, w: 36, h: 8, rot: 0, r: 8, bg: BONE } },
+  { id: "sub1", before: { x: 48, y: 61, w: 44, h: 4.5, rot: -3, r: 2, bg: BONE_DARK, op: 0.85 }, after: { x: 4, y: 40, w: 42, h: 3.8, rot: 0, r: 6, bg: BONE, op: 0.7 } },
+  { id: "sub2", before: { x: 10, y: 57, w: 30, h: 4.5, rot: 6, r: 2, bg: BONE_DARK, op: 0.85 }, after: { x: 4, y: 46, w: 32, h: 3.8, rot: 0, r: 6, bg: BONE, op: 0.7 } },
+  { id: "cta", before: { x: 78, y: 90, w: 17, h: 7, rot: -9, r: 4, bg: GRAY_CTA }, after: { x: 4, y: 55, w: 20, h: 9, rot: 0, r: 999, bg: "var(--color-accent)", op: 0.9 }, cta: true },
+  { id: "img", before: { x: 1, y: 66, w: 30, h: 30, rot: 7, r: 4, bg: "rgba(36,27,43,0.10)" }, after: { x: 60, y: 17, w: 36, h: 47, rot: 0, r: 12, bg: PINK_SOFT } },
+  { id: "card1", before: { x: 38, y: 74, w: 34, h: 20, rot: -5, r: 18, bg: BONE_DARK }, after: { x: 4, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
+  { id: "card2", before: { x: 64, y: 68, w: 30, h: 18, rot: 8, r: 4, bg: BONE_DARK }, after: { x: 36, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
+  { id: "card3", before: { x: 30, y: 90, w: 28, h: 12, rot: -3, r: 6, bg: BONE_DARK }, after: { x: 68, y: 72, w: 28, h: 21, rot: 0, r: 10, bg: BONE } },
+];
+
 function WireframeVisual() {
-  const bone: React.CSSProperties = {
-    backgroundColor: "rgba(36, 27, 43, 0.07)",
-    borderRadius: 8,
+  const reduce = useReducedMotion();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(wrapRef, { once: true, margin: "-15% 0px -15% 0px" });
+  // SSR/no-JS renderuje ŁAD (bezpieczny default); klient bez reduce cofa do
+  // chaosu jeszcze pod foldem i „sprząta" dopiero na oczach usera (inView).
+  const [phase, setPhase] = useState<MorphPhase>("after");
+  const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    if (reduce || touched) return;
+    // setTimeout(0): flip po hydratacji (SSR musi zostać przy „after" —
+    // pierwszy render klienta musi się z nim zgadzać), poza ciałem efektu
+    // (reguła react-hooks/set-state-in-effect).
+    const t = setTimeout(() => setPhase("before"), 0);
+    return () => clearTimeout(t);
+  }, [reduce, touched]);
+
+  useEffect(() => {
+    if (reduce || touched || !inView || phase !== "before") return;
+    const t = setTimeout(() => setPhase("after"), 950);
+    return () => clearTimeout(t);
+  }, [reduce, touched, inView, phase]);
+
+  const pick = (p: MorphPhase) => {
+    setTouched(true);
+    setPhase(p);
   };
+
+  const n = MORPH_BLOCKS.length;
+  const chip = (active: boolean) =>
+    `rounded-full border px-5 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
+      active
+        ? "border-[#b32a9d] bg-[#b32a9d] text-white"
+        : "border-[var(--color-line)] text-[var(--color-ink-muted)] hover:border-[#b32a9d] hover:text-[#9a2487]"
+    }`;
+
   return (
     <Parallax speed={14}>
-      <div
-        aria-hidden="true"
-        className="relative overflow-hidden"
-        style={{
-          border: "1px solid var(--color-line)",
-          borderRadius: 18,
-          background: "var(--color-surface-1)",
-          boxShadow: "var(--shadow-card-hover)",
-        }}
-      >
-        {/* Pasek przeglądarki */}
+      <div ref={wrapRef}>
         <div
-          className="flex items-center gap-2 px-5"
-          style={{ height: 44, borderBottom: "1px solid var(--color-line)" }}
+          aria-hidden="true"
+          className="relative overflow-hidden"
+          style={{
+            border: "1px solid var(--color-line)",
+            borderRadius: 18,
+            background: "var(--color-surface-1)",
+            boxShadow: "var(--shadow-card-hover)",
+          }}
         >
-          {[0, 1, 2].map((i) => (
+          {/* Pasek przeglądarki */}
+          <div
+            className="flex items-center gap-2 px-5"
+            style={{ height: 44, borderBottom: "1px solid var(--color-line)" }}
+          >
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: "rgba(36,27,43,0.12)" }}
+              />
+            ))}
             <span
-              key={i}
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: "rgba(36,27,43,0.12)" }}
+              className="ml-3 hidden h-5 flex-1 rounded-full sm:block"
+              style={{ backgroundColor: "rgba(36,27,43,0.05)", maxWidth: 280 }}
             />
-          ))}
-          <span
-            className="ml-3 hidden h-5 flex-1 rounded-full sm:block"
-            style={{ backgroundColor: "rgba(36,27,43,0.05)", maxWidth: 280 }}
-          />
+          </div>
+
+          {/* Kadr makiety: bloki % → skalują się z szerokością kolumny */}
+          <div className="relative w-full" style={{ aspectRatio: "16 / 10.5" }}>
+            {/* Siatka projektowa — wyłania się dopiero w PO (dowód „ładu") */}
+            {[25, 50, 75].map((x) => (
+              <motion.span
+                key={x}
+                initial={false}
+                animate={{ opacity: phase === "after" ? 0.6 : 0 }}
+                transition={{ duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.35 }}
+                className="absolute top-0 h-full w-px"
+                style={{ left: `${x}%`, backgroundColor: "var(--color-line)" }}
+              />
+            ))}
+            {MORPH_BLOCKS.map((b, i) => {
+              const s = phase === "before" ? b.before : b.after;
+              return (
+                <motion.div
+                  key={b.id}
+                  initial={false}
+                  animate={{
+                    left: `${s.x}%`,
+                    top: `${s.y}%`,
+                    width: `${s.w}%`,
+                    height: `${s.h}%`,
+                    rotate: s.rot,
+                    borderRadius: s.r,
+                    backgroundColor: s.bg,
+                    opacity: s.op ?? 1,
+                  }}
+                  transition={
+                    reduce
+                      ? { duration: 0 }
+                      : {
+                          type: "spring",
+                          duration: 0.8,
+                          bounce: 0.26,
+                          // Sprzątanie = kaskada od góry; bałagan wraca szybciej.
+                          delay: phase === "after" ? i * 0.045 : (n - 1 - i) * 0.015,
+                        }
+                  }
+                  className="absolute"
+                >
+                  {/* Różowe halo CTA — oddycha dopiero, gdy jest PORZĄDEK. */}
+                  {b.cta && phase === "after" && (
+                    <span
+                      className="koda-halo pointer-events-none absolute"
+                      style={{
+                        inset: -4,
+                        borderRadius: 999,
+                        boxShadow: "0 0 26px 8px rgba(179,42,157,0.4)",
+                      }}
+                    />
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Szkielet projektu — składa się kaskadą */}
-        <div className="grid grid-cols-6 gap-3 p-5 sm:gap-4 sm:p-7">
-          {/* nav */}
-          <WireBlock delay={0.05} className="col-span-2">
-            <div style={{ ...bone, height: 14, width: "70%" }} />
-          </WireBlock>
-          <WireBlock delay={0.1} className="col-span-4">
-            <div className="flex justify-end gap-2.5">
-              {[44, 52, 40].map((w, i) => (
-                <div key={i} style={{ ...bone, height: 12, width: w }} />
-              ))}
-              <div
-                style={{ height: 12, width: 62, borderRadius: 999, backgroundColor: "rgba(179,42,157,0.25)" }}
-              />
-            </div>
-          </WireBlock>
-          {/* hero */}
-          <WireBlock delay={0.18} className="col-span-6 sm:col-span-4">
-            <div style={{ ...bone, height: 26, width: "88%" }} />
-            <div className="mt-2.5" style={{ ...bone, height: 26, width: "62%" }} />
-            <div className="mt-4" style={{ ...bone, height: 11, width: "78%", opacity: 0.7 }} />
-            <div className="mt-2" style={{ ...bone, height: 11, width: "64%", opacity: 0.7 }} />
-            {/* CTA — pulsuje różem (highlight ścieżki do kontaktu) */}
-            <div
-              className="koda-pulse mt-5"
-              style={{
-                height: 34,
-                width: 132,
-                borderRadius: 999,
-                backgroundColor: "var(--color-accent)",
-                opacity: 0.9,
-              }}
-            />
-          </WireBlock>
-          <WireBlock delay={0.26} className="col-span-6 sm:col-span-2">
-            <div style={{ ...bone, height: "100%", minHeight: 120, borderRadius: 12 }} />
-          </WireBlock>
-          {/* trzy kafle */}
-          {[0.34, 0.4, 0.46].map((d, i) => (
-            <WireBlock key={i} delay={d} className="col-span-2">
-              <div style={{ ...bone, height: 54, borderRadius: 10 }} />
-              <div className="mt-2" style={{ ...bone, height: 9, width: "80%", opacity: 0.7 }} />
-              <div className="mt-1.5" style={{ ...bone, height: 9, width: "55%", opacity: 0.7 }} />
-            </WireBlock>
+        {/* Przełącznik: klient sam „sprząta" projekt */}
+        <div
+          role="group"
+          aria-label="Makieta: przed i po uporządkowaniu"
+          className="mt-5 flex justify-center gap-2"
+        >
+          {(["before", "after"] as const).map((p) => (
+            <button
+              key={p}
+              type="button"
+              aria-pressed={phase === p}
+              onClick={() => pick(p)}
+              className={chip(phase === p)}
+            >
+              {p === "before" ? "Przed" : "Po"}
+            </button>
           ))}
         </div>
       </div>
