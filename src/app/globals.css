@@ -345,9 +345,11 @@ html[data-koda-light] .cta-footer-wash {
   animation: ph-fade-left 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.05s backwards;
 }
 .ph-title-in {
-  /* Spoczynkowy clip -40% pion — nie ucina descenderów/diakrytyków (jak Reveal). */
-  clip-path: inset(-40% 0% -40% 0);
-  animation: ph-wipe 0.85s cubic-bezier(0.23, 1, 0.32, 1) 0.12s backwards;
+  /* Slide bez clip-wipe'a: Chromium stempluje LCP tekstu pod clip-path dopiero
+     przy pełnej odsłonie (jak przy opacity) — H1 podstron to największy element
+     viewportu, więc wipe trzymał LCP na ~5 s w symulacji. Slide (precedens: H1
+     na /kontakt/) = malowanie od pierwszej klatki. Wipe zostaje w hero home. */
+  animation: ph-fade-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.08s backwards;
 }
 .ph-lead-in {
   animation: ph-fade-up 0.5s cubic-bezier(0.19, 1, 0.22, 1) 0.1s backwards;
