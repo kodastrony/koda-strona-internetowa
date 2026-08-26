@@ -291,16 +291,15 @@ function ScoreStrip() {
   );
 }
 
-/* ── Wizual 4 (Opieka): czat „jak z reklamy" — ZAPĘTLONA scenka ────────────
+/* ── Wizual 4 (Opieka): czat „jak z reklamy" — scenka grana RAZ ────────────
    Klient pisze (kropki) → wiadomość wskakuje → KODA pisze → odpowiedź →
-   „Ekstra, dzięki!" → ❤️ reakcja → pauza → płynny reset i od nowa. Sterowane maszynką
-   kroków (setTimeout) startującą po wejściu w widok; reduced-motion →
-   statyczna pełna rozmowa, bez pętli. Tylko bąbelki — zero dodatkowych
-   tekstów (życzenie Natana). */
+   „Ekstra, dzięki!" → ❤️ reakcja → rozmowa ZOSTAJE (bez replaya — korekta
+   Natana). Po wejściu bąble spokojnie unoszą się w górę/dół (.koda-bob).
+   Sterowane maszynką kroków (setTimeout) startującą po wejściu w widok;
+   reduced-motion → statyczna pełna rozmowa. Tylko bąbelki — zero
+   dodatkowych tekstów (życzenie Natana). */
 // delay = czas spędzony W danym stanie, zanim przejdziemy do kolejnego.
-// Stan 7 = ❤️ reakcja KODY + „hold" całej rozmowy, stan 0 = pusto (oddech
-// przed kolejną pętlą; to też stan startowy — dlatego krótki). Tempo celowo
-// reklamowe: cała scenka ~6 s (korekta Natana — wolniejsza wersja „pusta").
+// Stan 7 = finał (❤️ pop) — maszynka się zatrzymuje, nic nie planujemy.
 const CHAT_FLOW: Record<number, { next: number; delay: number }> = {
   0: { next: 1, delay: 350 }, // pusto → klient zaczyna pisać
   1: { next: 2, delay: 600 }, // klient pisze…
@@ -308,9 +307,9 @@ const CHAT_FLOW: Record<number, { next: number; delay: number }> = {
   3: { next: 4, delay: 700 }, // KODA pisze…
   4: { next: 5, delay: 750 }, // odpowiedź na ekranie (jw.)
   5: { next: 6, delay: 500 }, // klient pisze…
-  6: { next: 7, delay: 500 }, // „dzięki" wskoczyło
-  7: { next: 0, delay: 2300 }, // ❤️ pop + hold całości → reset
+  6: { next: 7, delay: 500 }, // „dzięki" wskoczyło → ❤️ i koniec
 };
+const CHAT_DONE = 7;
 
 const EMOJI_RE = /\p{Extended_Pictographic}/u;
 
@@ -389,6 +388,7 @@ function ChatBubble({
   visible,
   typing,
   reaction,
+  bob,
   children,
 }: {
   side: "left" | "right";
@@ -396,27 +396,31 @@ function ChatBubble({
   typing?: boolean;
   /** ❤️ reakcja KODY doczepiona do rogu bąbla (pop, gdy true). */
   reaction?: boolean;
+  /** Faza spokojnego unoszenia się chmurki (1–3, rozstrojone, by nie falowały synchronicznie). */
+  bob?: 1 | 2 | 3;
   children?: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
   const pink = side === "right";
-  // Wejście = kreskówkowy „boing" (squash & stretch): bąbel wyskakuje NAD
-  // cel rozciągnięty w pionie, spłaszcza się przy lądowaniu i dopina.
-  // Do tego przechył od rogu nadawcy i blur-in. Wyjście (reset pętli)
-  // = szybki zjazd bez fajerwerków, żeby nie ciągnąć resetu.
+  // Wejście = PODSKOK do góry (korekta Natana: pion, nie „pozioma linia"):
+  // bąbel wystrzeliwuje z dołu NAD cel, lekko się rozciąga w pionie,
+  // spłaszcza przy lądowaniu i dopina. Do tego mały przechył od rogu
+  // nadawcy i blur-in. Potem wrapper (.koda-bob) unosi go spokojnie
+  // w górę i w dół jak chmurkę.
   const hidden = reduce
     ? { opacity: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, filter: "blur(0px)" }
-    : { opacity: 0, y: 30, scaleX: 0.5, scaleY: 0.5, rotate: pink ? 7 : -7, filter: "blur(7px)" };
+    : { opacity: 0, y: 38, scaleX: 0.72, scaleY: 0.72, rotate: pink ? 5 : -5, filter: "blur(7px)" };
   const boing = {
     opacity: 1,
-    y: [30, -8, 2, 0],
-    scaleX: [0.5, 1.06, 0.97, 1],
-    scaleY: [0.5, 1.15, 0.9, 1],
-    rotate: [pink ? 7 : -7, pink ? -2 : 2, pink ? 0.6 : -0.6, 0],
+    y: [38, -12, 3, 0],
+    scaleX: [0.72, 1.02, 0.99, 1],
+    scaleY: [0.72, 1.1, 0.94, 1],
+    rotate: [pink ? 5 : -5, pink ? -1.5 : 1.5, pink ? 0.5 : -0.5, 0],
     filter: "blur(0px)",
   };
+  const bobClass = bob ? ` koda-bob koda-bob-${bob}` : "";
   return (
-    <div className={pink ? "flex justify-end" : "flex justify-start"}>
+    <div className={(pink ? "flex justify-end" : "flex justify-start") + bobClass}>
       <motion.div
         // Kropki „pisze…" montują się w trakcie pętli — initial=hidden,
         // żeby też strzelały popem, nie pojawiały się „na sucho".
@@ -498,6 +502,7 @@ function CareChatVisual() {
   useEffect(() => {
     if (reduce) return; // statyczna pełna rozmowa
     if (!inView) return; // pauza poza ekranem (oszczędza baterię)
+    if (step >= CHAT_DONE) return; // scenka odegrana — zostaje, bez replaya
     const cur = CHAT_FLOW[step] ?? CHAT_FLOW[0];
     const t = setTimeout(() => setStep(cur.next), cur.delay);
     return () => clearTimeout(t);
@@ -514,33 +519,33 @@ function CareChatVisual() {
       <div ref={wrapRef} aria-hidden="true" className="flex flex-col gap-4 md:px-8">
         {/* 1: klient pisze… / wiadomość */}
         {typingLeft1 ? (
-          <ChatBubble side="left" visible typing>
+          <ChatBubble side="left" visible typing bob={1}>
             <TypingDots />
           </ChatBubble>
         ) : (
-          <ChatBubble side="left" visible={show(2)}>
+          <ChatBubble side="left" visible={show(2)} bob={1}>
             <PopWords text="Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?" visible={show(2)} />
           </ChatBubble>
         )}
 
         {/* 2: KODA pisze… / odpowiedź */}
         {typingRight ? (
-          <ChatBubble side="right" visible typing>
+          <ChatBubble side="right" visible typing bob={2}>
             <TypingDots onPink />
           </ChatBubble>
         ) : (
-          <ChatBubble side="right" visible={show(4)}>
+          <ChatBubble side="right" visible={show(4)} bob={2}>
             <PopWords text="Jasne, już się robi. Podeślemy podgląd do akceptacji. 👍" visible={show(4)} />
           </ChatBubble>
         )}
 
         {/* 3: klient pisze… / domknięcie (+ ❤️ reakcja KODY w holdzie) */}
         {typingLeft2 ? (
-          <ChatBubble side="left" visible typing>
+          <ChatBubble side="left" visible typing bob={3}>
             <TypingDots />
           </ChatBubble>
         ) : (
-          <ChatBubble side="left" visible={show(6)} reaction={show(7)}>
+          <ChatBubble side="left" visible={show(6)} reaction={show(7)} bob={3}>
             <PopWords text="Ekstra, dzięki! 🙌" visible={show(6)} />
           </ChatBubble>
         )}

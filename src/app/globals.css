@@ -393,6 +393,33 @@ html[data-koda-light] .cta-footer-wash {
   }
 }
 
+/* ── Spokojne unoszenie bąbli czatu („chmurki") na /uslugi ──
+   Na WRAPPERZE bąbla (motion trzyma transform samego bąbla — nie mogą
+   walczyć o jeden element). Fazy 1–3 rozstrojone ujemnym delayem. */
+@keyframes koda-bob {
+  0%,
+  100% {
+    transform: translateY(3px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.koda-bob {
+  animation: koda-bob 3.4s ease-in-out infinite;
+}
+.koda-bob-2 {
+  animation-delay: -1.15s;
+}
+.koda-bob-3 {
+  animation-delay: -2.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .koda-bob {
+    animation: none;
+  }
+}
+
 /* ── Puls kropki statusu (badge „Pod stałą opieką" na /uslugi) ── */
 @keyframes koda-pulse {
   0%,
