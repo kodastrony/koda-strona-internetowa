@@ -7,8 +7,8 @@ import { getProject } from "@/lib/projects";
    /uslugi/strony-3d — strona-filar wokół największego wyróżnika KODA: strony 3D
    i animowane. Cel SEO/AEO: wygrać niszę „strony 3D / strony z animacjami" (niska
    konkurencja, on-trend 2026), której ŻADNA polska agencja nie obsadza z LIVE
-   demami. Dowód = 6 działających dem: 3D (rikoszet, jr-modular, drblocks) +
-   animacje (slice, wycisk, grabowski). Część to koncepty (fikcyjne marki —
+   demami. Dowód = 4 działające dema: 3D (rikoszet, jr-modular, drblocks) +
+   animacje (grabowski). Część to koncepty (fikcyjne marki —
    badge „Koncept"), część realne marki (DrBlocks, JR Modular) — patrz projects.ts.
    Answer-first BLUF + nazwany stack + mini-FAQ pod ekstrakcję AI (cytowania
    zdaniowe po przebudowie AI Mode z 6 maja 2026).
@@ -103,7 +103,7 @@ const bodyStyle: React.CSSProperties = {
 
 // Dema w kolejności pod 3D/animacje: prawdziwe 3D na czele (scena, konfigurator,
 // model), potem mocne animacje.
-const DEMO_ORDER = ["rikoszet", "jr-modular", "drblocks", "slice", "wycisk", "grabowski"];
+const DEMO_ORDER = ["rikoszet", "jr-modular", "drblocks", "grabowski"];
 const DEMOS = DEMO_ORDER.map((id) => getProject(id)).filter((p): p is NonNullable<typeof p> => !!p);
 
 export function Strony3DContent() {
@@ -135,7 +135,7 @@ export function Strony3DContent() {
             </p>
             <p className="mt-4" style={{ ...bodyStyle, maxWidth: "64ch" }}>
               Budujemy je na autorskim kodzie, z dbałością o szybkość i dostępność — działają
-              płynnie też na telefonie. Poniżej zobaczysz sześć działających dem oraz to, kiedy 3D
+              płynnie też na telefonie. Poniżej zobaczysz cztery działające dema oraz to, kiedy 3D
               realnie się opłaca.
             </p>
           </div>
@@ -151,7 +151,7 @@ export function Strony3DContent() {
         </FadeUp>
         <FadeUp inView delay={0.08}>
           <p className="mt-4" style={{ ...bodyStyle, maxWidth: "60ch" }}>
-            Sześć działających dem, które zaprojektowaliśmy i zakodowaliśmy od zera. Kliknij kartę,
+            Cztery działające dema, które zaprojektowaliśmy i zakodowaliśmy od zera. Kliknij kartę,
             żeby zobaczyć pełne case study i otworzyć wersję na żywo.
           </p>
         </FadeUp>

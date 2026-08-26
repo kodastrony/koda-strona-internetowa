@@ -20,8 +20,8 @@ import { getProject } from "@/lib/projects";
 // dokładnie w te rogi. GÓRNY rząd = REALNI klienci (audyt treści 2026-08-26:
 // pierwsze wrażenie portfolio nie powinno zaczynać się dwiema etykietami
 // „Koncept" przed prawdziwymi wdrożeniami — E-E-A-T). Karty to wspólny
-// <ProjectCard> (ten sam komponent co na /realizacje). Slice + Wycisk żyją
-// na /realizacje.
+// <ProjectCard> (ten sam komponent co na /realizacje). Siatka pokrywa dziś
+// CAŁE portfolio (4 projekty), więc /realizacje pokazuje ten sam zestaw.
 const GRID = ["jr-modular", "drblocks", "rikoszet", "grabowski"].map((id) => getProject(id)!);
 
 export function Work() {

@@ -9,7 +9,7 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Strony internetowe 3D i animowane",
   description:
-    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 6 działających dem. Szybkie i na każdym ekranie.",
+    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 4 działające dema. Szybkie i na każdym ekranie.",
   path: "/uslugi/strony-3d/",
 });
 
@@ -56,7 +56,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   path: "/uslugi/strony-3d/",
   name: "Strony internetowe 3D i animowane",
   description:
-    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 6 działających dem. Szybkie i na każdym ekranie.",
+    "Strony internetowe 3D i z animacjami (WebGL/Three.js) — interaktywne sceny, które wyróżniają markę. Zobacz 4 działające dema. Szybkie i na każdym ekranie.",
   dateModified: LASTMOD["/uslugi/strony-3d/"],
   mainEntityId: `${SITE_CONFIG.url}/uslugi/strony-3d/#service`,
 });
@@ -83,7 +83,7 @@ export default function Strony3DPage() {
       <PageHero
         label="Usługi · 3D i animacje"
         title="Strony internetowe 3D i animowane"
-        lead="Interaktywne sceny w przeglądarce i animacje, które wyróżniają markę — z sześcioma działającymi demami. Szybkie, dostępne i na każdym ekranie."
+        lead="Interaktywne sceny w przeglądarce i animacje, które wyróżniają markę — z czterema działającymi demami. Szybkie, dostępne i na każdym ekranie."
         hue={324}
       />
       <Strony3DContent />
