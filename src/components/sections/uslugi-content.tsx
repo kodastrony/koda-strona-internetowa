@@ -291,99 +291,140 @@ function ScoreStrip() {
   );
 }
 
-/* ── Wizual 4 (Opieka): mini-czat wsparcia — bąbelki wskakują kaskadą ──────
-   Przykładowa (stylizowana) wymiana z opieki: pokazuje responsywność lepiej
-   niż zdjęcie. Bez konkretnych godzin/obietnic poza zatwierdzonymi. */
+/* ── Wizual 4 (Opieka): czat „jak z reklamy" — ZAPĘTLONA scenka ────────────
+   Klient pisze (kropki) → wiadomość wskakuje → KODA pisze → odpowiedź →
+   „Ekstra, dzięki!" → pauza → płynny reset i od nowa. Sterowane maszynką
+   kroków (setTimeout) startującą po wejściu w widok; reduced-motion →
+   statyczna pełna rozmowa, bez pętli. Tylko bąbelki — zero dodatkowych
+   tekstów (życzenie Natana). */
+// delay = czas spędzony W danym stanie, zanim przejdziemy do kolejnego.
+// Stan 7 = „hold" (cała rozmowa widoczna), stan 0 = pusto (krótki oddech
+// przed kolejną pętlą; to też stan startowy — dlatego krótki).
+const CHAT_FLOW: Record<number, { next: number; delay: number }> = {
+  0: { next: 1, delay: 600 }, // pusto → klient zaczyna pisać
+  1: { next: 2, delay: 1000 }, // klient pisze…
+  2: { next: 3, delay: 1200 }, // bąbel 1 na ekranie
+  3: { next: 4, delay: 1400 }, // KODA pisze…
+  4: { next: 5, delay: 1300 }, // odpowiedź na ekranie
+  5: { next: 6, delay: 800 }, // klient pisze…
+  6: { next: 7, delay: 400 }, // „dzięki" wskoczyło
+  7: { next: 0, delay: 3200 }, // hold całości → reset
+};
+
+function TypingDots({ onPink = false }: { onPink?: boolean }) {
+  return (
+    <span className="flex items-center gap-1" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="koda-typing-dot inline-block h-1.5 w-1.5 rounded-full"
+          style={{ backgroundColor: onPink ? "rgba(255,255,255,0.9)" : "rgba(36,27,43,0.45)" }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ChatBubble({
+  side,
+  visible,
+  typing,
+  children,
+}: {
+  side: "left" | "right";
+  visible: boolean;
+  typing?: boolean;
+  children?: React.ReactNode;
+}) {
+  const reduce = useReducedMotion();
+  const pink = side === "right";
+  return (
+    <div className={pink ? "flex justify-end" : "flex justify-start"}>
+      <motion.div
+        initial={false}
+        animate={
+          visible
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: reduce ? 0 : 12, scale: reduce ? 1 : 0.96 }
+        }
+        transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE.back }}
+        className="font-body"
+        style={{
+          fontSize: "1.02rem",
+          lineHeight: 1.5,
+          padding: typing ? "15px 18px" : "14px 19px",
+          maxWidth: "32ch",
+          backgroundColor: pink ? "#b32a9d" : "var(--color-surface-1)",
+          border: pink ? "none" : "1px solid var(--color-line)",
+          borderRadius: pink ? "20px 20px 6px 20px" : "20px 20px 20px 6px",
+          color: pink ? "#ffffff" : "var(--color-ink)",
+          boxShadow: pink
+            ? "0 18px 40px -16px rgba(179,42,157,0.6)"
+            : "var(--shadow-card-hover)",
+          transformOrigin: pink ? "bottom right" : "bottom left",
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
 function CareChatVisual() {
-  const bubble: React.CSSProperties = {
-    fontFamily: "var(--font-body)",
-    fontSize: "0.98rem",
-    lineHeight: 1.5,
-    padding: "13px 18px",
-    maxWidth: "34ch",
-  };
+  const reduce = useReducedMotion();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(wrapRef, { once: false, margin: "-15% 0px -15% 0px" });
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (reduce) return; // statyczna pełna rozmowa
+    if (!inView) return; // pauza poza ekranem (oszczędza baterię)
+    const cur = CHAT_FLOW[step] ?? CHAT_FLOW[0];
+    const t = setTimeout(() => setStep(cur.next), cur.delay);
+    return () => clearTimeout(t);
+  }, [step, inView, reduce]);
+
+  // reduced-motion: wszystko widoczne, bez kropek i bez pętli.
+  const show = (n: number) => (reduce ? true : step >= n);
+  const typingLeft1 = !reduce && step === 1;
+  const typingRight = !reduce && step === 3;
+  const typingLeft2 = !reduce && step === 5;
+
   return (
     <Parallax speed={14}>
-      <div aria-hidden="true" className="flex flex-col gap-3.5 md:px-6">
-        {/* Status */}
-        <FadeUp inView delay={0.02} y={10}>
-          <div
-            className="mb-1 inline-flex items-center gap-2 rounded-full font-heading font-bold uppercase"
-            style={{
-              border: "1px solid var(--color-line-strong)",
-              padding: "7px 13px",
-              fontSize: "10px",
-              letterSpacing: "0.16em",
-              color: "var(--color-ink-muted)",
-            }}
-          >
-            <span className="koda-pulse inline-block h-1.5 w-1.5 rounded-full bg-[#22a35c]" />
-            Opieka KODA · odpowiedź w 24 h
-          </div>
-        </FadeUp>
+      <div ref={wrapRef} aria-hidden="true" className="flex flex-col gap-4 md:px-8">
+        {/* 1: klient pisze… / wiadomość */}
+        {typingLeft1 ? (
+          <ChatBubble side="left" visible typing>
+            <TypingDots />
+          </ChatBubble>
+        ) : (
+          <ChatBubble side="left" visible={show(2)}>
+            Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?
+          </ChatBubble>
+        )}
 
-        {/* Klient */}
-        <FadeUp inView delay={0.12} y={14}>
-          <div className="flex justify-start">
-            <div
-              style={{
-                ...bubble,
-                backgroundColor: "var(--color-surface-1)",
-                border: "1px solid var(--color-line)",
-                borderRadius: "18px 18px 18px 6px",
-                color: "var(--color-ink)",
-                boxShadow: "var(--shadow-card)",
-              }}
-            >
-              Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?
-            </div>
-          </div>
-        </FadeUp>
+        {/* 2: KODA pisze… / odpowiedź */}
+        {typingRight ? (
+          <ChatBubble side="right" visible typing>
+            <TypingDots onPink />
+          </ChatBubble>
+        ) : (
+          <ChatBubble side="right" visible={show(4)}>
+            Jasne, już się robi. Podeślemy podgląd do akceptacji. 👍
+          </ChatBubble>
+        )}
 
-        {/* KODA */}
-        <FadeUp inView delay={0.28} y={14}>
-          <div className="flex justify-end">
-            <div
-              style={{
-                ...bubble,
-                backgroundColor: "#b32a9d",
-                borderRadius: "18px 18px 6px 18px",
-                color: "#ffffff",
-                boxShadow: "0 14px 34px -14px rgba(179,42,157,0.55)",
-              }}
-            >
-              Jasne, już się robi. Podeślemy podgląd do akceptacji.
-            </div>
-          </div>
-        </FadeUp>
-
-        {/* Klient — domknięcie */}
-        <FadeUp inView delay={0.44} y={14}>
-          <div className="flex justify-start">
-            <div
-              style={{
-                ...bubble,
-                backgroundColor: "var(--color-surface-1)",
-                border: "1px solid var(--color-line)",
-                borderRadius: "18px 18px 18px 6px",
-                color: "var(--color-ink)",
-                boxShadow: "var(--shadow-card)",
-              }}
-            >
-              Ekstra, dzięki! 🙌
-            </div>
-          </div>
-        </FadeUp>
-
-        {/* Meta-linia gwarancji (zatwierdzone warunki) */}
-        <FadeUp inView delay={0.56} y={10}>
-          <p
-            className="mt-1 font-body"
-            style={{ fontSize: "0.88rem", color: "var(--color-ink-faint)" }}
-          >
-            Gwarancja techniczna 14 dni po starcie · aktualizacje, kopie, monitoring w umowie
-          </p>
-        </FadeUp>
+        {/* 3: klient pisze… / domknięcie */}
+        {typingLeft2 ? (
+          <ChatBubble side="left" visible typing>
+            <TypingDots />
+          </ChatBubble>
+        ) : (
+          <ChatBubble side="left" visible={show(6)}>
+            Ekstra, dzięki! 🙌
+          </ChatBubble>
+        )}
       </div>
     </Parallax>
   );
