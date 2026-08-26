@@ -304,13 +304,71 @@ function ScoreStrip() {
 const CHAT_FLOW: Record<number, { next: number; delay: number }> = {
   0: { next: 1, delay: 350 }, // pusto → klient zaczyna pisać
   1: { next: 2, delay: 600 }, // klient pisze…
-  2: { next: 3, delay: 550 }, // pytanie na ekranie
+  2: { next: 3, delay: 700 }, // pytanie na ekranie (kaskada słów potrzebuje chwili)
   3: { next: 4, delay: 700 }, // KODA pisze…
-  4: { next: 5, delay: 650 }, // odpowiedź na ekranie
+  4: { next: 5, delay: 750 }, // odpowiedź na ekranie (jw.)
   5: { next: 6, delay: 500 }, // klient pisze…
-  6: { next: 7, delay: 450 }, // „dzięki" wskoczyło
+  6: { next: 7, delay: 500 }, // „dzięki" wskoczyło
   7: { next: 0, delay: 2300 }, // ❤️ pop + hold całości → reset
 };
+
+const EMOJI_RE = /\p{Extended_Pictographic}/u;
+
+/* Kinetic typography w bąblu: słowa wystrzeliwują kaskadą (mini-sprężyny,
+   40 ms odstępu), emoji wpada na końcu mocniej i z zakrętem — „reklamowo",
+   a nie 1:1 jak w telefonie (korekta Natana). Spany inline-block z „pre"
+   zachowują spacje, a chowanie tylko przez opacity/transform ⇒ bąbel ma
+   finalny rozmiar od razu (zero reflow / skoków layoutu). */
+function PopWords({ text, visible }: { text: string; visible: boolean }) {
+  const reduce = useReducedMotion();
+  const words = text.split(" ");
+  return (
+    <>
+      {words.map((w, i) => {
+        const emoji = EMOJI_RE.test(w);
+        // Start po ~0.16 s (bąbel zdążył „boing-nąć"), potem kaskada.
+        const delay = 0.16 + i * 0.04 + (emoji ? 0.12 : 0);
+        return (
+          <motion.span
+            key={i}
+            // Bąbel wiadomości REMONTUJE się przy podmianie kropek→tekst,
+            // więc initial MUSI być stanem ukrytym — z initial={false} span
+            // montuje się od razu „gotowy" i kaskada w ogóle nie gra.
+            initial={
+              reduce
+                ? false
+                : { opacity: 0, y: 9, scale: emoji ? 0.2 : 0.6, rotate: emoji ? -25 : 0 }
+            }
+            animate={
+              visible
+                ? { opacity: 1, y: 0, scale: 1, rotate: 0 }
+                : reduce
+                  ? { opacity: 0, y: 0, scale: 1, rotate: 0 }
+                  : { opacity: 0, y: 9, scale: emoji ? 0.2 : 0.6, rotate: emoji ? -25 : 0 }
+            }
+            transition={
+              reduce
+                ? { duration: 0 }
+                : visible
+                  ? {
+                      delay,
+                      type: "spring",
+                      duration: emoji ? 0.5 : 0.34,
+                      bounce: emoji ? 0.58 : 0.42,
+                      opacity: { delay, duration: 0.1, ease: "easeOut" },
+                    }
+                  : { duration: 0.1 }
+            }
+            className="inline-block"
+            style={{ whiteSpace: "pre" }}
+          >
+            {i < words.length - 1 ? `${w} ` : w}
+          </motion.span>
+        );
+      })}
+    </>
+  );
+}
 
 function TypingDots({ onPink = false }: { onPink?: boolean }) {
   return (
@@ -342,32 +400,39 @@ function ChatBubble({
 }) {
   const reduce = useReducedMotion();
   const pink = side === "right";
-  // Stan „schowany": spory zsuw + skala + lekki przechył od rogu nadawcy
-  // + blur — wejście sprężyną z odbiciem daje „eksplozywny" pop jak
-  // w reklamach komunikatorów. Wyjście (reset pętli) = szybki zjazd bez
-  // sprężyny, żeby nie ciągnąć resetu.
+  // Wejście = kreskówkowy „boing" (squash & stretch): bąbel wyskakuje NAD
+  // cel rozciągnięty w pionie, spłaszcza się przy lądowaniu i dopina.
+  // Do tego przechył od rogu nadawcy i blur-in. Wyjście (reset pętli)
+  // = szybki zjazd bez fajerwerków, żeby nie ciągnąć resetu.
   const hidden = reduce
-    ? { opacity: 0, y: 0, scale: 1, rotate: 0, filter: "blur(0px)" }
-    : { opacity: 0, y: 22, scale: 0.7, rotate: pink ? 5 : -5, filter: "blur(6px)" };
-  const shown = { opacity: 1, y: 0, scale: 1, rotate: 0, filter: "blur(0px)" };
+    ? { opacity: 0, y: 0, scaleX: 1, scaleY: 1, rotate: 0, filter: "blur(0px)" }
+    : { opacity: 0, y: 30, scaleX: 0.5, scaleY: 0.5, rotate: pink ? 7 : -7, filter: "blur(7px)" };
+  const boing = {
+    opacity: 1,
+    y: [30, -8, 2, 0],
+    scaleX: [0.5, 1.06, 0.97, 1],
+    scaleY: [0.5, 1.15, 0.9, 1],
+    rotate: [pink ? 7 : -7, pink ? -2 : 2, pink ? 0.6 : -0.6, 0],
+    filter: "blur(0px)",
+  };
   return (
     <div className={pink ? "flex justify-end" : "flex justify-start"}>
       <motion.div
         // Kropki „pisze…" montują się w trakcie pętli — initial=hidden,
-        // żeby też strzelały sprężyną, nie pojawiały się „na sucho".
+        // żeby też strzelały popem, nie pojawiały się „na sucho".
         initial={reduce ? false : hidden}
-        animate={visible ? shown : hidden}
+        animate={visible ? boing : hidden}
         transition={
           reduce
             ? { duration: 0 }
             : visible
               ? {
-                  type: "spring",
-                  duration: 0.44,
-                  bounce: 0.44,
-                  // opacity/blur bez sprężyny (odbicie na nich = artefakty).
-                  opacity: { duration: 0.14, ease: "easeOut" },
-                  filter: { duration: 0.2, ease: "easeOut" },
+                  duration: 0.52,
+                  times: [0, 0.4, 0.7, 1],
+                  ease: ["easeOut", "easeInOut", "easeInOut"],
+                  // opacity/blur bez keyframe'ów (mrugałyby przy odbiciu).
+                  opacity: { duration: 0.13, ease: "easeOut" },
+                  filter: { duration: 0.18, ease: "easeOut" },
                 }
               : { duration: 0.16, ease: EASE.out }
         }
@@ -388,6 +453,20 @@ function ChatBubble({
         }}
       >
         {children}
+        {/* „Echo" po lądowaniu: obrys bąbla rozchodzi się jak fala i gaśnie. */}
+        {!typing && !reduce && (
+          <motion.span
+            aria-hidden="true"
+            initial={false}
+            animate={visible ? { scale: [0.88, 1.25], opacity: [0.55, 0] } : { scale: 0.88, opacity: 0 }}
+            transition={visible ? { duration: 0.6, delay: 0.14, ease: "easeOut" } : { duration: 0 }}
+            className="pointer-events-none absolute inset-0"
+            style={{
+              borderRadius: "inherit",
+              border: `2px solid ${pink ? "#ff5ec8" : "#b32a9d"}`,
+            }}
+          />
+        )}
         {reaction !== undefined && (
           <motion.span
             initial={false}
@@ -454,7 +533,7 @@ function CareChatVisual() {
           </ChatBubble>
         ) : (
           <ChatBubble side="left" visible={show(2)}>
-            Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?
+            <PopWords text="Dodacie nam zakładkę z nową usługą i podepniecie cennik PDF?" visible={show(2)} />
           </ChatBubble>
         )}
 
@@ -465,7 +544,7 @@ function CareChatVisual() {
           </ChatBubble>
         ) : (
           <ChatBubble side="right" visible={show(4)}>
-            Jasne, już się robi. Podeślemy podgląd do akceptacji. 👍
+            <PopWords text="Jasne, już się robi. Podeślemy podgląd do akceptacji. 👍" visible={show(4)} />
           </ChatBubble>
         )}
 
@@ -476,7 +555,7 @@ function CareChatVisual() {
           </ChatBubble>
         ) : (
           <ChatBubble side="left" visible={show(6)} reaction={show(7)}>
-            Ekstra, dzięki! 🙌
+            <PopWords text="Ekstra, dzięki! 🙌" visible={show(6)} />
           </ChatBubble>
         )}
       </div>
