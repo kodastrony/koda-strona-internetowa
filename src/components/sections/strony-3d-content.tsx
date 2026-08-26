@@ -30,7 +30,7 @@ export const STRONY3D_FAQ: Strony3DFaq[] = [
   },
   {
     q: "Ile kosztuje strona z animacjami albo w 3D?",
-    a: "Zwykle zaczyna się od kilkunastu tysięcy złotych — animacje i sceny 3D to dodatkowy czas projektu i programowania. Orientacyjne widełki znajdziesz na stronie cennika, a dokładną wycenę KODA przygotuje pod Twój pomysł, bezpłatnie i bez zobowiązań.",
+    a: "Strona premium z animacjami i 3D kosztuje w KODA od 12 900 zł netto, a typowy zakres to 15 000 – 25 000 zł — na rynku podobne projekty kreatywne kosztują 20 000 – 80 000 zł. Sam dodatek do istniejącej strony jest tańszy: sekcja 3D od 2 900 zł, konfigurator produktu od 6 900 zł. Dokładną wycenę KODA przygotuje pod Twój pomysł, bezpłatnie i bez zobowiązań.",
   },
   {
     q: "Czy efekty 3D pomagają w Google i wyszukiwarkach AI?",

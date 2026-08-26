@@ -967,10 +967,10 @@ export function UslugiContent() {
                   maxWidth: "56ch",
                 }}
               >
-                Na polskim rynku strona dla firmy kosztuje najczęściej od 3 000 do 15 000 zł netto
-                — dokładna kwota zależy od zakresu: liczby podstron, treści, integracji i terminu.
-                Dlatego nie podajemy cen z sufitu — opisz nam krótko projekt, a wrócimy z konkretną
-                kwotą. Bezpłatnie i bez zobowiązań.
+                Landing page kosztuje u nas od 2 900 zł netto, wizytówka od 3 900 zł, strona
+                firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Dokładna
+                kwota zależy od zakresu: liczby podstron, treści, integracji i terminu — opisz nam
+                krótko projekt, a wrócimy z konkretem w 24 h. Bezpłatnie i bez zobowiązań.
               </p>
             </FadeUp>
             <FadeUp inView delay={0.16}>
