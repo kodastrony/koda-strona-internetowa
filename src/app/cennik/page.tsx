@@ -7,9 +7,9 @@ import { LASTMOD } from "@/app/sitemap";
 import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Ile kosztuje strona internetowa? Cennik 2026",
+  title: "Cennik stron internetowych 2026 — ceny KODA",
   description:
-    "Ile kosztuje strona internetowa w 2026? Widełki cen wg typu strony, co wpływa na cenę i porównanie: kreator, freelancer, agencja. Bezpłatna wycena w KODA.",
+    "Landing od 2 900 zł, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium 3D od 12 900 zł netto. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
   path: "/cennik/",
 });
 
@@ -20,14 +20,14 @@ const ARTICLE_JSON_LD = {
   "@type": "Article",
   // @id — FAQPage niżej i WebPage referencjonują ten węzeł (spójny graf strony).
   "@id": `${SITE_CONFIG.url}/cennik/#article`,
-  headline: "Ile kosztuje strona internetowa w 2026? Cennik i co wpływa na cenę",
+  headline: "Cennik stron internetowych 2026 — ceny KODA i widełki rynkowe",
   description:
-    "Orientacyjne widełki cen stron internetowych w Polsce w 2026 roku wg typu strony, czynniki wpływające na cenę oraz porównanie kreatora, freelancera i agencji.",
+    "Realny cennik KODA (landing od 2 900 zł, wizytówka od 3 900 zł, firmowa od 6 900 zł, premium 3D od 12 900 zł netto, opieka od 149 zł/mc) oraz orientacyjne widełki rynku PL 2026 wg typu strony.",
   inLanguage: "pl-PL",
   datePublished: "2026-06-17",
-  // dateModified = realna data ostatniej zmiany TREŚCI artykułu (2026-08-26:
-  // nowe FAQ o czasie realizacji + widoczna data „Stan na"). Spójne z sitemap.
-  dateModified: "2026-08-26",
+  // dateModified = realna data ostatniej zmiany TREŚCI artykułu (2026-08-27:
+  // publikacja realnego cennika KODA — pakiety, dodatki, opieka). Spójne z sitemap.
+  dateModified: "2026-08-27",
   author: { "@id": `${SITE_CONFIG.url}/#organization` },
   publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
   isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
@@ -52,6 +52,63 @@ const FAQ_JSON_LD = {
   })),
 };
 
+// OfferCatalog — realny cennik KODA jako dane strukturalne. TYLKO prawdziwe
+// ceny „od" (PriceSpecification.minPrice) i plany opieki (UnitPriceSpecification
+// za miesiąc) — zgodne 1:1 z treścią strony i modelem CENNIK-MODEL-2026.
+const OFERTA_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "OfferCatalog",
+  "@id": `${SITE_CONFIG.url}/cennik/#oferta`,
+  name: "Cennik KODA — strony internetowe",
+  provider: { "@id": `${SITE_CONFIG.url}/#business` },
+  itemListElement: [
+    ...[
+      ["Landing page / one-page", 2900, "Jedna strona sprzedażowa: do 6 sekcji, formularz, animacje."],
+      ["Strona wizytówka", 3900, "Do 5 podstron z mapą dojazdu i rozbudowanym home."],
+      ["Strona firmowa", 6900, "6–10 podstron z treściami i strukturą pod SEO."],
+      ["Strona premium 2D/3D", 12900, "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory."],
+    ].map(([name, minPrice, description]) => ({
+      "@type": "Offer",
+      name,
+      description,
+      priceSpecification: {
+        "@type": "PriceSpecification",
+        minPrice,
+        priceCurrency: "PLN",
+        valueAddedTaxIncluded: false,
+      },
+      itemOffered: {
+        "@type": "Service",
+        name,
+        provider: { "@id": `${SITE_CONFIG.url}/#business` },
+        areaServed: "Polska",
+      },
+    })),
+    ...[
+      ["Opieka techniczna „Czuwanie”", 149, "Monitoring 24/7, aktualizacje, kopie, zmiany do 1 h, hosting w cenie."],
+      ["Opieka techniczna „Opieka+”", 349, "Zmiany do 3 h, miesięczny raport szybkości i widoczności, priorytet."],
+      ["Opieka techniczna „Rozwój”", 799, "Do 6 h rozwoju miesięcznie, konsultacje, kwartalny przegląd."],
+    ].map(([name, price, description]) => ({
+      "@type": "Offer",
+      name,
+      description,
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price,
+        priceCurrency: "PLN",
+        unitText: "miesiąc",
+        valueAddedTaxIncluded: false,
+      },
+      itemOffered: {
+        "@type": "Service",
+        name,
+        provider: { "@id": `${SITE_CONFIG.url}/#business` },
+        areaServed: "Polska",
+      },
+    })),
+  ],
+};
+
 const BREADCRUMB_JSON_LD = breadcrumbLd([
   { name: "Strona główna", path: "/" },
   { name: "Cennik", path: "/cennik/" },
@@ -60,9 +117,9 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 // WebPage — jawny węzeł „ta strona" (mainEntity → Article, breadcrumb po @id).
 const WEBPAGE_JSON_LD = webPageLd({
   path: "/cennik/",
-  name: "Ile kosztuje strona internetowa? Cennik 2026",
+  name: "Cennik stron internetowych 2026 — ceny KODA",
   description:
-    "Ile kosztuje strona internetowa w 2026? Widełki cen wg typu strony, co wpływa na cenę i porównanie: kreator, freelancer, agencja. Bezpłatna wycena w KODA.",
+    "Landing od 2 900 zł, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium 3D od 12 900 zł netto. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
   dateModified: LASTMOD["/cennik/"],
   mainEntityId: `${SITE_CONFIG.url}/cennik/#article`,
 });
@@ -80,6 +137,10 @@ export default function CennikPage() {
       />
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(OFERTA_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(BREADCRUMB_JSON_LD) }}
       />
       <script
@@ -88,8 +149,8 @@ export default function CennikPage() {
       />
       <PageHero
         label="Cennik"
-        title="Ile kosztuje strona internetowa"
-        lead="Orientacyjne widełki rynkowe na 2026 rok i to, co realnie wpływa na cenę. W KODA wyceniamy każdy projekt indywidualnie — bezpłatnie."
+        title="Ile kosztuje strona w KODA"
+        lead="Konkretne ceny „od” dla każdego typu strony, dodatków i opieki — plus widełki rynkowe 2026 do porównania. Wycena zawsze bezpłatna, w 24 h."
         hue={300}
       />
       <CennikContent />

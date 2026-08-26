@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PROJECTS } from "@/lib/projects";
 
@@ -18,10 +18,10 @@ export const dynamic = "force-static";
 // export: te same daty zasilają WebPage.dateModified w JSON-LD (lib/seo.ts →
 // webPageLd) — jedno źródło prawdy, zero rozjazdu sitemap↔schema.
 export const LASTMOD: Record<string, string> = {
-  "/": "2026-08-26",
+  "/": "2026-08-27",
   "/uslugi/": "2026-08-26",
   "/uslugi/strony-3d/": "2026-08-26",
-  "/cennik/": "2026-08-26",
+  "/cennik/": "2026-08-27",
   "/realizacje/": "2026-08-26",
   "/o-nas/": "2026-08-26",
   "/kontakt/": "2026-08-26",

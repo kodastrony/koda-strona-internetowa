@@ -18,10 +18,10 @@ export interface Faq {
 
 export const FAQS: Faq[] = [
   {
-    // Answer-first: liczba w PIERWSZYM zdaniu (widełki rynkowe — te same, które
+    // Answer-first: NASZE ceny „od" w PIERWSZYM zdaniu (te same, które
     // publikujemy na /cennik/; spójność = wiarygodność + cytowalność przez AI).
     q: "Ile kosztuje strona?",
-    a: "Strona internetowa dla firmy kosztuje w Polsce najczęściej od 3 000 do 15 000 zł netto — dokładna kwota zależy od zakresu: liczby podstron, treści i funkcji. W KODA konkretną wycenę dla Twojego projektu podajemy po krótkiej rozmowie, bezpłatnie i bez zobowiązań, a wszystko zapisujemy w umowie — bez ukrytych kosztów później.",
+    a: "W KODA landing page kosztuje od 2 900 zł netto, strona wizytówka od 3 900 zł, strona firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Cena „od” to minimalny zakres pakietu; konkret dla Twojego projektu podajemy bezpłatnie w 24 godziny i zapisujemy w umowie — bez ukrytych kosztów później. Pełny cennik znajdziesz na podstronie Cennik.",
   },
   {
     // Answer-first: ramy czasowe w PIERWSZYM zdaniu (orientacyjne, rynkowe —
