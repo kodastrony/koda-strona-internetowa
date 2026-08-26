@@ -107,17 +107,16 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
   );
 }
 
-/* ── Wizual 1 (Projektowanie): „ZŁA STRONA → KODA" — scenka z kursorem ──────
-   Live-przykład na WŁASNYM brandzie (życzenie Natana): w kadrze stoi
-   amatorski prototyp strony KODY (serif, wyśrodkowany, niebieskie
-   podkreślone linki, beveled „Kliknij tutaj!" — internet 2009). Wjeżdża
-   kursor projektanta i naprawia stronę TRZEMA klikami:
-   1) typografia nagłówka (serif środek → Geologica 800 do lewej),
-   2) CTA (szary bevel → różowy pill),
-   3) brand (białe tło → porcelanowa aurora, czysty nav, pionowe KODA
-      kaskadą liter — jak w prawdziwym hero).
-   Kursor wyjeżdża, CTA oddycha halo — strona zostaje „naprawiona".
-   PRZED wraca do prototypu, PO odgrywa naprawę od nowa. */
+/* ── Wizual 1 (Projektowanie): „ZŁA STRONA → KODA" — cień z kursorem ────────
+   Scenka na WŁASNYM brandzie w estetyce CIENIA (bloki-szkielet, nie
+   realistyczna treść — korekta Natana): amatorski układ (wyśrodkowane,
+   krzywe bary, „niebieski link", szary guzik) naprawiany kursorem
+   projektanta TRZEMA klikami:
+   1) typografia (krzywe bary środkiem → H1 ×2 + opis jak w hero KODY),
+   2) CTA (szary guzik → różowy pill + bar „lub zadzwoń"),
+   3) brand (białe tło → porcelanowa aurora, header logo+KONTAKT+burger,
+      pionowy napis KODA 1:1 z hero — szklane litery kaskadą).
+   Kursor wyjeżdża, CTA oddycha halo. PRZED = prototyp, PO = powtórka. */
 
 // Maszynka kroków: 0 = prototyp (hold), 1–4 = przejazdy kursora (klik na
 // KOŃCU przejazdu ⇒ region naprawia się przy WEJŚCIU w kolejny krok),
@@ -131,42 +130,64 @@ const FIX_FLOW: Record<number, { next: number; delay: number }> = {
 };
 const FIX_DONE = 5;
 
-// Punkty trasy kursora (% kadru): nagłówek → CTA → prawa flanka → wyjazd.
+// Punkty trasy kursora (% kadru): nagłówek → guzik → prawa flanka → wyjazd.
 const CURSOR_AT: Record<number, { x: number; y: number }> = {
   0: { x: 108, y: 112 },
-  1: { x: 34, y: 40 },
-  2: { x: 20, y: 69 },
-  3: { x: 86, y: 46 },
+  1: { x: 42, y: 33 },
+  2: { x: 50, y: 69 },
+  3: { x: 88, y: 44 },
   4: { x: 108, y: 112 },
   5: { x: 108, y: 112 },
 };
 
-const SERIF = "Georgia, 'Times New Roman', serif";
+/* Estetyka „CIEŃ" (korekta Natana): makieta = szare bloki-szkielet, NIE
+   realistyczna treść. Jedyny prawdziwy element = pionowy napis KODA 1:1
+   z hero (Syne 800, -0.04em, lh 0.9, szklany gradient KODA_FILL_LIGHT). */
+const BONE = "rgba(36,27,43,0.07)";
+const BONE_DARK = "rgba(36,27,43,0.13)";
+const PINK_NAV = "rgba(179,42,157,0.25)";
+/** 1:1 wypełnienie liter KODA z hero-config (KODA_FILL_LIGHT, background-clip). */
+const KODA_GLASS =
+  "linear-gradient(180deg, rgba(179,42,157,0.16) 0%, rgba(124,76,222,0.15) 52%, rgba(77,98,224,0.15) 100%)";
 
-/* Propsy animacji regionów: prototyp zdmuchuje się (blur w górę),
-   naprawiona wersja wskakuje sprężyną. Nakładki absolutne — zero reflow. */
-const beforeAnim = (fixed: boolean, reduce: boolean) => ({
-  initial: false as const,
-  animate: fixed
-    ? { opacity: 0, y: -12, filter: "blur(5px)" }
-    : { opacity: 1, y: 0, filter: "blur(0px)" },
-  transition: reduce ? { duration: 0 } : { duration: 0.3, ease: "easeOut" as const },
-});
-const afterAnim = (fixed: boolean, reduce: boolean, delay = 0) => ({
-  initial: false as const,
-  animate: fixed ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 16, scale: 0.95 },
-  transition: reduce
-    ? { duration: 0 }
-    : fixed
-      ? {
-          type: "spring" as const,
-          duration: 0.6,
-          bounce: 0.34,
-          delay,
-          opacity: { duration: 0.18, delay },
-        }
-      : { duration: 0.15 },
-});
+interface FixState {
+  x: number; // left, % szerokości kadru
+  y: number; // top, % wysokości kadru
+  w: number; // width, %
+  h: number; // height, %
+  rot: number;
+  r: number; // border-radius, px
+  bg: string;
+  op?: number;
+}
+
+/* Bloki-cienie. before = amatorski układ (wyśrodkowane, krzywe, „niebieski
+   link", szary guzik); after = WIERNY szkielet OBECNEGO hero KODY: logo,
+   pill KONTAKT + hamburger, H1 ×2, opis ×2, różowy pill CTA + „lub zadzwoń"
+   (proporcje z prawdziwej strony głównej). Blok tylko-before znika przy
+   naprawie regionu, tylko-after wjeżdża; oba stany ⇒ morf sprężyną. */
+const FIX_BLOCKS: {
+  id: string;
+  region: "typo" | "cta" | "brand";
+  before?: FixState;
+  after?: FixState;
+  cta?: boolean;
+}[] = [
+  // brand: wyśrodkowany „tytuł-link" → header jak w KODA
+  { id: "titleBar", region: "brand", before: { x: 25, y: 6.5, w: 50, h: 4, rot: -2, r: 3, bg: BONE_DARK } },
+  { id: "logo", region: "brand", after: { x: 6, y: 5.5, w: 11, h: 4.5, rot: 0, r: 6, bg: BONE_DARK } },
+  { id: "kontakt", region: "brand", after: { x: 72, y: 5.2, w: 13, h: 5, rot: 0, r: 999, bg: PINK_NAV } },
+  { id: "burger", region: "brand", after: { x: 87.5, y: 4.6, w: 4, h: 6.1, rot: 0, r: 999, bg: "rgba(21,18,23,0.85)" } },
+  // typo: krzywe wyśrodkowane bary → H1 ×2 + opis ×2 do lewej
+  { id: "h1a", region: "typo", before: { x: 22, y: 26, w: 56, h: 7, rot: -3, r: 3, bg: BONE_DARK }, after: { x: 6, y: 19, w: 47, h: 8, rot: 0, r: 8, bg: BONE_DARK } },
+  { id: "h1b", region: "typo", before: { x: 28, y: 36, w: 44, h: 7, rot: 2, r: 12, bg: BONE_DARK }, after: { x: 6, y: 29.5, w: 38, h: 8, rot: 0, r: 8, bg: BONE_DARK } },
+  { id: "sub1", region: "typo", before: { x: 33, y: 46.5, w: 34, h: 3, rot: -1, r: 2, bg: BONE, op: 0.9 }, after: { x: 6, y: 42.5, w: 33, h: 3, rot: 0, r: 4, bg: BONE, op: 0.85 } },
+  { id: "sub2", region: "typo", after: { x: 6, y: 47.5, w: 26, h: 3, rot: 0, r: 4, bg: BONE, op: 0.85 } },
+  // cta: „niebieski link" + szary guzik → różowy pill + bar „lub zadzwoń"
+  { id: "link", region: "cta", before: { x: 38, y: 58, w: 24, h: 3, rot: 0, r: 2, bg: "rgba(0,0,238,0.32)" } },
+  { id: "cta", region: "cta", before: { x: 40, y: 65, w: 20, h: 6.5, rot: 1, r: 3, bg: "#d9d5cd" }, after: { x: 6, y: 56, w: 19, h: 8, rot: 0, r: 999, bg: "var(--color-accent)" }, cta: true },
+  { id: "phone", region: "cta", after: { x: 27.5, y: 58.5, w: 15, h: 3, rot: 0, r: 4, bg: BONE_DARK, op: 0.8 } },
+];
 
 function WireframeVisual() {
   const reduce = useReducedMotion();
@@ -300,160 +321,56 @@ function WireframeVisual() {
               />
             </motion.div>
 
-            {/* NAV — prototyp: serifowy tytuł-link / po: logo KODA. + pill */}
-            <motion.div
-              {...beforeAnim(brandFixed, rm)}
-              className="absolute inset-x-0 text-center"
-              style={{
-                top: "6%",
-                fontFamily: SERIF,
-                color: "#1a0dab",
-                textDecoration: "underline",
-                fontSize: "clamp(9px, 3cqw, 17px)",
-              }}
-            >
-              KODA — Strony Internetowe — Najlepsze Strony WWW
-            </motion.div>
-            <motion.div
-              {...afterAnim(brandFixed, rm)}
-              className="absolute flex items-center justify-between"
-              style={{ left: "6%", right: "6%", top: "5.5%" }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-logo)",
-                  fontWeight: 800,
-                  fontSize: "clamp(11px, 3.4cqw, 22px)",
-                  letterSpacing: "-0.02em",
-                  color: "var(--color-ink)",
-                }}
-              >
-                KODA<span style={{ color: "var(--color-accent)" }}>.</span>
-              </span>
-              <span
-                className="rounded-full"
-                style={{
-                  backgroundColor: "var(--color-accent)",
-                  color: "#ffffff",
-                  fontWeight: 700,
-                  fontSize: "clamp(7px, 1.9cqw, 11px)",
-                  letterSpacing: "0.12em",
-                  padding: "0.9cqw 2.6cqw",
-                }}
-              >
-                KONTAKT
-              </span>
-            </motion.div>
+            {/* Bloki-cienie: każdy morfuje/znika/wjeżdża przy naprawie
+                SWOJEGO regionu (klik kursora) */}
+            {FIX_BLOCKS.map((b, i) => {
+              const fixed = b.region === "typo" ? typoFixed : b.region === "cta" ? ctaFixed : brandFixed;
+              const shown = fixed ? b.after : b.before;
+              const other = (fixed ? b.before : b.after)!;
+              // Blok bez stanu w danej fazie = wygaszony w miejscu drugiego stanu.
+              const s = shown ?? { ...other, op: 0, y: other.y + 5 };
+              return (
+                <motion.div
+                  key={b.id}
+                  initial={false}
+                  animate={{
+                    left: `${s.x}%`,
+                    top: `${s.y}%`,
+                    width: `${s.w}%`,
+                    height: `${s.h}%`,
+                    rotate: s.rot,
+                    borderRadius: s.r,
+                    backgroundColor: s.bg,
+                    opacity: s.op ?? 1,
+                  }}
+                  transition={
+                    rm
+                      ? { duration: 0 }
+                      : shown
+                        ? { type: "spring", duration: 0.65, bounce: 0.3, delay: (i % 4) * 0.06 }
+                        : { duration: 0.25, ease: "easeOut" }
+                  }
+                  className="absolute"
+                >
+                  {b.cta && done && (
+                    <span
+                      className="koda-halo pointer-events-none absolute"
+                      style={{
+                        inset: -5,
+                        borderRadius: 999,
+                        boxShadow: "0 0 24px 7px rgba(179,42,157,0.38)",
+                      }}
+                    />
+                  )}
+                </motion.div>
+              );
+            })}
 
-            {/* NAGŁÓWEK — serif na środku → prawdziwy H1 KODY do lewej */}
-            <motion.div
-              {...beforeAnim(typoFixed, rm)}
-              className="absolute inset-x-0 text-center"
-              style={{ top: "27%", fontFamily: SERIF, color: "#161616" }}
-            >
-              <div style={{ fontSize: "clamp(11px, 4.4cqw, 28px)", fontWeight: 700, lineHeight: 1.25 }}>
-                Strona internetowa,
-                <br />
-                która przynosi klientów.
-              </div>
-              <div
-                style={{
-                  marginTop: "1.6cqw",
-                  fontStyle: "italic",
-                  color: "#6b6b6b",
-                  fontSize: "clamp(8px, 2.5cqw, 14px)",
-                }}
-              >
-                Witamy na naszej stronie internetowej!!!
-              </div>
-            </motion.div>
-            <motion.div
-              {...afterAnim(typoFixed, rm)}
-              className="absolute"
-              style={{ left: "6%", top: "24%", width: "70%" }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 800,
-                  color: "var(--color-ink)",
-                  fontSize: "clamp(13px, 5.3cqw, 34px)",
-                  lineHeight: 1.06,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Strona internetowa,
-                <br />
-                która przynosi klientów.
-              </div>
-              <div
-                style={{
-                  marginTop: "2.2cqw",
-                  color: "var(--color-ink-muted)",
-                  fontSize: "clamp(8px, 2.5cqw, 15px)",
-                }}
-              >
-                Projekt, kod i opieka.
-              </div>
-            </motion.div>
-
-            {/* CTA — bevel „Kliknij tutaj!" + niebieski link → różowy pill */}
-            <motion.div
-              {...beforeAnim(ctaFixed, rm)}
-              className="absolute inset-x-0 flex flex-col items-center"
-              style={{ top: "63%", gap: "1.6cqw" }}
-            >
-              <span
-                style={{
-                  fontFamily: SERIF,
-                  color: "#0000ee",
-                  textDecoration: "underline",
-                  fontSize: "clamp(8px, 2.7cqw, 15px)",
-                }}
-              >
-                Zobacz więcej &gt;&gt;&gt;
-              </span>
-              <span
-                style={{
-                  fontFamily: "Verdana, sans-serif",
-                  fontSize: "clamp(8px, 2.4cqw, 13px)",
-                  color: "#333333",
-                  backgroundColor: "#e3e1dc",
-                  border: "2px outset #f7f6f3",
-                  padding: "1.1cqw 3cqw",
-                }}
-              >
-                Kliknij tutaj!
-              </span>
-            </motion.div>
-            <motion.div {...afterAnim(ctaFixed, rm)} className="absolute" style={{ left: "6%", top: "66%" }}>
-              <span
-                className="relative inline-block rounded-full"
-                style={{
-                  backgroundColor: "var(--color-accent)",
-                  color: "#ffffff",
-                  fontWeight: 700,
-                  fontSize: "clamp(7px, 2.1cqw, 12px)",
-                  letterSpacing: "0.14em",
-                  padding: "1.7cqw 3.6cqw",
-                }}
-              >
-                BEZPŁATNA WYCENA
-                {done && (
-                  <span
-                    className="koda-halo pointer-events-none absolute"
-                    style={{
-                      inset: -5,
-                      borderRadius: 999,
-                      boxShadow: "0 0 24px 7px rgba(179,42,157,0.38)",
-                    }}
-                  />
-                )}
-              </span>
-            </motion.div>
-
-            {/* Pionowe KODA — znak hero; litery wjeżdżają kaskadą z prawej */}
-            <div className="absolute flex flex-col items-end" style={{ right: "5%", top: "16%" }}>
+            {/* Pionowy napis KODA — JEDYNY prawdziwy element cienia, 1:1
+                z hero: Syne 800, -0.04em, lh 0.9, szklany gradient
+                różowo-fioletowo-indygowy przez background-clip:text
+                (KODA_FILL_LIGHT z hero-config). Kaskada liter z prawej. */}
+            <div className="absolute flex flex-col items-center" style={{ right: "4.5%", top: "13%" }}>
               {["K", "O", "D", "A"].map((l, i) => (
                 <motion.span
                   key={l}
@@ -475,10 +392,13 @@ function WireframeVisual() {
                   style={{
                     fontFamily: "var(--font-logo)",
                     fontWeight: 800,
-                    fontSize: "clamp(26px, 10.5cqw, 74px)",
-                    lineHeight: 0.92,
+                    fontSize: "clamp(30px, 12cqw, 86px)",
+                    lineHeight: 0.9,
                     letterSpacing: "-0.04em",
-                    color: "var(--color-ink)",
+                    backgroundImage: KODA_GLASS,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
                   }}
                 >
                   {l}
