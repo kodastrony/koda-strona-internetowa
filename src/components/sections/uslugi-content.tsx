@@ -1,154 +1,288 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useId, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { FadeUp } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
 import { ProcessSteps } from "@/components/sections/process-steps";
+import { Magnetic } from "@/components/motion/magnetic";
+import { PillLink } from "@/components/ui/pill-link";
+import { PhoneLink } from "@/components/ui/phone-link";
 import { EASE } from "@/lib/motion";
-import { useThemeValue } from "@/lib/theme";
-import { SERVICES } from "@/lib/services-data";
+import { CONTACT } from "@/lib/constants";
+import { SERVICES, type Service } from "@/lib/services-data";
 
-const PINK = "var(--color-pink-bright)";
+/* ════════════════════════════════════════════════════════════════════════════
+   /uslugi — „WIELKI INDEKS" (redesign 2026-08-26, po korekcie Natana).
 
-/* Duża cyfra 01–04: stonowana, a gdy wjedzie na środek ekranu (czyli gdy
-   odwiedzający ją czyta) — płynnie ZAPALA SIĘ na różowo. Theme-aware: w ciemnym
-   biel→żywy róż, w jasnym atrament→głębszy róż (AA na porcelanie; biel→jasny
-   róż byłby niewidoczny). Reduced-motion → od razu w kolorze docelowym. */
-function StepNumber({ n }: { n: string }) {
+   Zasada: ZERO kontenerów-kart i ścian tekstu. Usługi to cztery GIGANTYCZNE
+   typograficzne wiersze leżące wprost na kanwie (DNA menu-overlay), dzielone
+   hairline'ami. Interakcja:
+   • hover / otwarcie → gigant ZALEWA SIĘ różem clip-wipe'em (globals: .svc-wipe,
+     technika „tabs" — duplikat przycięty inset) + na kanwie rozkwita poświata
+     w hue usługi;
+   • klik → akordeon (mechanika 1:1 z FAQ: height auto/0, jeden otwarty,
+     „+" → „×") odsłania JEDNĄ linijkę, chipy 2–4 słowa i link-dowód;
+   • deep-link /uslugi#strony (home, stopka) otwiera właściwy wiersz.
+   Budżet copy wiersza: gigant + ≤12 słów + chipy. Wycena/Proces bez zmian.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const GIANT: React.CSSProperties = {
+  fontSize: "clamp(2.1rem, 5.4vw, 4.6rem)",
+  lineHeight: 1.02,
+  letterSpacing: "-0.035em",
+};
+
+function ServiceRow({
+  s,
+  open,
+  onToggle,
+}: {
+  s: Service;
+  open: boolean;
+  onToggle: () => void;
+}) {
   const reduce = useReducedMotion();
-  const light = useThemeValue() === "light";
-  const from = light ? "#cdbfd6" : "#f5f5f7";
-  const to = light ? "#b32a9d" : "#ff5ec8";
-  return (
-    <motion.div
-      aria-hidden="true"
-      className="mb-4 font-heading font-bold"
-      style={{ fontSize: "clamp(2.6rem,4.4vw,4rem)", lineHeight: 1, letterSpacing: "-0.04em" }}
-      // initial NIE rozgałęzia po reduce (useReducedMotion różni się SSR↔klient →
-      // mismatch hydracji). Ten sam DOM/initial zawsze; reduced steruje tylko
-      // transition (duration:0 → po wejściu w widok kolor wskakuje od razu).
-      initial={{ color: from }}
-      whileInView={{ color: to }}
-      viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
-      transition={reduce ? { duration: 0 } : { duration: 0.55, ease: EASE.out }}
-    >
-      {n}
-    </motion.div>
-  );
-}
+  const uid = useId();
+  const btnId = `${uid}-btn`;
+  const panelId = `${uid}-panel`;
 
-/* Ptaszek, który RYSUJE SIĘ (pathLength) po wjeździe w widok — z opóźnieniem,
-   więc w obrębie usługi zapalają się po kolei („beng, beng"). Różowy. */
-function AnimatedCheck({ delay }: { delay: number }) {
-  const reduce = useReducedMotion();
   return (
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      className="mt-1 shrink-0"
-    >
-      <motion.path
-        d="M3 8.5L6.5 12L13 4.5"
-        stroke={PINK}
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
-        transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}
+    <div id={s.id} data-open={open} className="svc-row group relative scroll-mt-28">
+      {/* Poświata usługi — rozkwita na hover/otwarciu (radial bez blura = tanio). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          inset: "-12% -6%",
+          background: `radial-gradient(52% 78% at 22% 55%, oklch(0.62 0.17 ${s.hue} / 0.13) 0%, oklch(0.62 0.17 ${s.hue} / 0) 70%)`,
+          ...(open ? { opacity: 1 } : {}),
+        }}
       />
-    </svg>
+
+      <h2 className="relative m-0">
+        <button
+          id={btnId}
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="grid w-full grid-cols-[1fr_auto] items-center gap-5 text-left outline-offset-4 transition-transform duration-150 active:scale-[0.995]"
+          style={{
+            paddingTop: "clamp(26px, 4vw, 46px)",
+            paddingBottom: "clamp(24px, 3.6vw, 40px)",
+          }}
+        >
+          <span className="block">
+            {/* Znacznik usługi — mikro (nazwa z oferty; spójna z JSON-LD i home) */}
+            <span
+              className="mb-3 flex items-center gap-2 font-heading font-bold uppercase"
+              style={{
+                fontSize: "10.5px",
+                letterSpacing: "0.16em",
+                color: "var(--color-ink-faint)",
+              }}
+            >
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full transition-transform duration-300 group-hover:scale-150"
+                style={{ backgroundColor: `oklch(0.55 0.19 ${s.hue})` }}
+              />
+              {s.title}
+            </span>
+
+            {/* GIGANT + różowy clip-wipe (duplikat aria-hidden, .svc-wipe w globals) */}
+            <span className="relative inline-block" style={{ textWrap: "balance" }}>
+              <span
+                className="font-heading font-extrabold"
+                style={{ ...GIANT, color: "var(--color-ink)" }}
+              >
+                {s.outcome}
+              </span>
+              <span
+                aria-hidden="true"
+                className="svc-wipe absolute inset-0 font-heading font-extrabold"
+                style={{ ...GIANT, color: "var(--color-accent)" }}
+              >
+                {s.outcome}
+              </span>
+            </span>
+          </span>
+
+          {/* „+" → „×" (DNA FAQ) */}
+          <motion.span
+            aria-hidden="true"
+            className="shrink-0 font-heading leading-none"
+            style={{
+              fontSize: "clamp(1.9rem, 2.8vw, 2.6rem)",
+              fontWeight: 300,
+              color: "var(--color-accent)",
+            }}
+            animate={{ rotate: open ? 45 : 0 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.35, ease: EASE.out }}
+          >
+            +
+          </motion.span>
+        </button>
+      </h2>
+
+      {/* Panel — mechanika FAQ (height auto/0, przerywalna) */}
+      <motion.div
+        id={panelId}
+        role="region"
+        aria-labelledby={btnId}
+        initial={false}
+        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+        transition={reduce ? { duration: 0 } : { duration: 0.42, ease: EASE.out }}
+        style={{ overflow: "hidden" }}
+      >
+        <div style={{ paddingBottom: "clamp(30px, 4vw, 50px)", maxWidth: "72ch" }}>
+          <p
+            className="font-body"
+            style={{
+              fontSize: "clamp(1.05rem, 1.35vw, 1.25rem)",
+              lineHeight: 1.55,
+              color: "var(--color-ink-muted)",
+              maxWidth: "46ch",
+            }}
+          >
+            {s.tagline}
+          </p>
+
+          {/* Chipy 2–4 słowa — stagger przy otwarciu */}
+          <ul className="mt-5 flex flex-wrap gap-2.5" role="list">
+            {s.points.map((p, idx) => (
+              <motion.li
+                key={p}
+                initial={false}
+                animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: reduce ? 0 : 8 }}
+                transition={
+                  reduce
+                    ? { duration: 0 }
+                    : { duration: 0.3, ease: EASE.out, delay: open ? 0.08 + idx * 0.05 : 0 }
+                }
+                className="flex items-center gap-2 rounded-full font-body"
+                style={{
+                  border: "1px solid var(--color-line-strong)",
+                  padding: "9px 15px",
+                  fontSize: "0.92rem",
+                  color: "var(--color-ink)",
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-1 w-1 rounded-full"
+                  style={{ backgroundColor: `oklch(0.55 0.19 ${s.hue})` }}
+                />
+                {p}
+              </motion.li>
+            ))}
+          </ul>
+
+          {/* Dowód + ewentualne pogłębienie */}
+          <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2">
+            {s.proof.href ? (
+              s.proof.external ? (
+                <a
+                  href={s.proof.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${s.proof.label} (otwiera się w nowej karcie)`}
+                  className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                  style={{ color: "var(--color-ink)" }}
+                >
+                  {s.proof.label} ↗
+                </a>
+              ) : (
+                <Link
+                  href={s.proof.href}
+                  className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                  style={{ color: "var(--color-ink)" }}
+                >
+                  {s.proof.label} →
+                </Link>
+              )
+            ) : (
+              <span
+                className="font-heading text-[0.95rem] font-semibold"
+                style={{ color: "var(--color-ink-muted)" }}
+              >
+                {s.proof.label}
+              </span>
+            )}
+            {s.id === "strony" && (
+              <Link
+                href="/uslugi/strony-3d"
+                className="font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+                style={{ color: "var(--color-ink)" }}
+              >
+                Strony 3D i animowane →
+              </Link>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      <div aria-hidden="true" style={{ borderBottom: "1px solid var(--color-line)" }} />
+    </div>
   );
 }
 
 export function UslugiContent() {
+  // Jeden otwarty wiersz (DNA FAQ); pierwszy otwarty domyślnie — sekcja czyta
+  // się jako treść, nie rząd zamkniętych przycisków.
+  const [openIndex, setOpenIndex] = useState(0);
+
+  // Deep-link: /uslugi#strony (home, stopka) otwiera właściwy wiersz.
+  useEffect(() => {
+    const openFromHash = () => {
+      const idx = SERVICES.findIndex((s) => s.id === window.location.hash.slice(1));
+      if (idx >= 0) setOpenIndex(idx);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, []);
+
   return (
     <>
-      {/* ── Detailed services ── */}
+      {/* ── WIELKI INDEKS usług — typografia wprost na kanwie ── */}
       <section data-header-theme="dark" data-canvas="base" className="relative">
-        <div className="container-koda" style={{ paddingBottom: "clamp(60px, 8vw, 120px)" }}>
-          {SERVICES.map((s) => (
-            <article
-              key={s.id}
-              id={s.id}
-              className="grid scroll-mt-28 grid-cols-1 gap-y-6 md:grid-cols-12 md:gap-x-12"
-              style={{
-                borderTop: "1px solid var(--color-line)",
-                paddingTop: "clamp(48px,6vw,96px)",
-                paddingBottom: "clamp(48px,6vw,96px)",
-              }}
-            >
-              <div className="md:col-span-5">
-                <FadeUp inView>
-                  <StepNumber n={s.n} />
-                </FadeUp>
-                <FadeUp inView delay={0.06}>
-                  <h2
-                    className="font-heading font-semibold"
-                    style={{
-                      fontSize: "clamp(1.7rem,3vw,2.6rem)",
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1.08,
-                      color: "var(--color-ink)",
-                    }}
-                  >
-                    {s.title}
-                  </h2>
-                </FadeUp>
-              </div>
+        <div className="container-koda" style={{ paddingBottom: "clamp(56px, 7vw, 100px)" }}>
+          <FadeUp inView y={20} duration={0.6}>
+            <div style={{ borderTop: "1px solid var(--color-line)" }}>
+              {SERVICES.map((s, i) => (
+                <ServiceRow
+                  key={s.id}
+                  s={s}
+                  open={openIndex === i}
+                  onToggle={() => setOpenIndex((cur) => (cur === i ? -1 : i))}
+                />
+              ))}
+            </div>
+          </FadeUp>
 
-              <div className="md:col-span-7">
-                <FadeUp inView delay={0.1}>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "clamp(1.02rem,1.25vw,1.18rem)",
-                      lineHeight: 1.6,
-                      color: "var(--color-ink-muted)",
-                      maxWidth: "52ch",
-                    }}
-                  >
-                    {s.lead}
-                  </p>
-                </FadeUp>
-                <FadeUp inView delay={0.16}>
-                  <ul className="mt-7 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2" role="list">
-                    {s.points.map((p, idx) => (
-                      <li
-                        key={p}
-                        className="flex items-start gap-3"
-                        style={{
-                          fontFamily: "var(--font-body)",
-                          fontSize: "0.97rem",
-                          lineHeight: 1.5,
-                          color: "var(--color-ink)",
-                        }}
-                      >
-                        <AnimatedCheck delay={idx * 0.12} />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </FadeUp>
-                {s.id === "strony" && (
-                  <FadeUp inView delay={0.22}>
-                    <Link
-                      href="/uslugi/strony-3d"
-                      className="mt-7 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-                      style={{ color: "var(--color-ink)" }}
-                    >
-                      Zobacz: strony 3D i animowane →
-                    </Link>
-                  </FadeUp>
-                )}
-              </div>
-            </article>
-          ))}
+          {/* Jedna cicha linia akcji pod indeksem */}
+          <FadeUp inView y={16} delay={0.05}>
+            <div className="mt-12 flex flex-wrap items-center gap-x-7 gap-y-4">
+              <Magnetic strength={0.35}>
+                <PillLink
+                  href="/kontakt"
+                  bg="#b32a9d"
+                  border="#b32a9d"
+                  className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
+                >
+                  Bezpłatna wycena
+                </PillLink>
+              </Magnetic>
+              <PhoneLink
+                className="inline-flex min-h-[44px] items-center font-heading text-[1.02rem] font-bold transition-colors duration-300 hover:text-pink"
+                style={{ color: "var(--color-ink)" }}
+                label={`lub zadzwoń: ${CONTACT.phone}`}
+              />
+            </div>
+          </FadeUp>
         </div>
       </section>
 

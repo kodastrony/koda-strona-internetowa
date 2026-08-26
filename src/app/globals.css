@@ -364,6 +364,30 @@ html[data-koda-light] .cta-footer-wash {
   }
 }
 
+/* ── /uslugi „Wielki indeks": różowy clip-wipe giganta (technika „tabs") ────
+   Duplikat nagłówka w akcencie, przycięty z prawej; hover (tylko mysz) i stan
+   otwarty odsłaniają go płynnie L→P. GPU-only (clip-path), wejście wolniejsze
+   niż wyjście (Emil: decyzja wolna, reakcja szybka). */
+.svc-wipe {
+  clip-path: inset(-10% 100% -10% 0);
+  transition: clip-path 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .svc-row:hover .svc-wipe {
+    clip-path: inset(-10% 0% -10% 0);
+    transition-duration: 480ms;
+  }
+}
+.svc-row[data-open="true"] .svc-wipe {
+  clip-path: inset(-10% 0% -10% 0);
+  transition-duration: 480ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .svc-wipe {
+    transition: none;
+  }
+}
+
 /* ── Poster hero (tier „static"): powolny „oddech" świetlnej bloomy ────
    GPU-only (transform+opacity), tani nawet na słabym sprzęcie. Dwie warstwy
    z różnym tempem/fazą → światło żyje organicznie, nie pulsuje mechanicznie. */
