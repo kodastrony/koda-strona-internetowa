@@ -116,7 +116,8 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
    2) CTA (szary guzik → różowy pill + bar „lub zadzwoń"),
    3) brand (białe tło → porcelanowa aurora, header logo+KONTAKT+burger,
       pionowy napis KODA 1:1 z hero — szklane litery kaskadą).
-   Kursor wyjeżdża, CTA oddycha halo. PRZED = prototyp, PO = powtórka. */
+   Kursor wyjeżdża, CTA oddycha halo — scenka gra RAZ i zostaje
+   (przełącznik PRZED/PO usunięty na życzenie Natana, 27.08). */
 
 // Maszynka kroków: 0 = prototyp (hold), 1–4 = przejazdy kursora (klik na
 // KOŃCU przejazdu ⇒ region naprawia się przy WEJŚCIU w kolejny krok),
@@ -204,34 +205,21 @@ function WireframeVisual() {
   // SSR/no-JS renderuje NAPRAWIONĄ stronę (bezpieczny default); klient cofa
   // do prototypu pod foldem i odgrywa naprawę dopiero przy scrollu (inView).
   const [step, setStep] = useState(FIX_DONE);
-  const [paused, setPaused] = useState(false);
-  const [touched, setTouched] = useState(false);
 
   useEffect(() => {
-    if (reduce || touched) return;
+    if (reduce) return;
     // setTimeout(0): flip po hydratacji (pierwszy render klienta musi zgadzać
     // się z SSR), poza ciałem efektu (reguła react-hooks/set-state-in-effect).
     const t = setTimeout(() => setStep(0), 0);
     return () => clearTimeout(t);
-  }, [reduce, touched]);
+  }, [reduce]);
 
   useEffect(() => {
-    if (reduce || paused || !inView || step >= FIX_DONE) return;
+    if (reduce || !inView || step >= FIX_DONE) return;
     const cur = FIX_FLOW[step] ?? FIX_FLOW[0];
     const t = setTimeout(() => setStep(cur.next), cur.delay);
     return () => clearTimeout(t);
-  }, [reduce, paused, inView, step]);
-
-  const pickBefore = () => {
-    setTouched(true);
-    setPaused(true);
-    setStep(0);
-  };
-  const pickAfter = () => {
-    setTouched(true);
-    setPaused(false);
-    if (step === 0 || step >= FIX_DONE) setStep(1); // powtórka scenki od klika 1
-  };
+  }, [reduce, inView, step]);
 
   const rm = !!reduce;
   const typoFixed = rm || step >= 2;
@@ -242,16 +230,11 @@ function WireframeVisual() {
   const at = CURSOR_AT[Math.min(step, FIX_DONE)] ?? CURSOR_AT[0];
   const ripple = !rm && step >= 2 && step <= 4 ? CURSOR_AT[step - 1] : null;
 
-  const chip = (active: boolean) =>
-    `rounded-full border px-5 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
-      active
-        ? "border-[#b32a9d] bg-[#b32a9d] text-white"
-        : "border-[var(--color-line)] text-[var(--color-ink-muted)] hover:border-[#b32a9d] hover:text-[#9a2487]"
-    }`;
-
   return (
     <Parallax speed={14}>
-      <div ref={wrapRef}>
+      {/* max-w: makieta ma być AKCENTEM sekcji, nie gigantem (korekta
+          Natana) — mniejszy kadr, wyśrodkowany w swojej kolumnie. */}
+      <div ref={wrapRef} className="mx-auto w-full max-w-[540px]">
         <div
           aria-hidden="true"
           className="relative overflow-hidden"
@@ -470,20 +453,6 @@ function WireframeVisual() {
               </svg>
             </motion.div>
           </div>
-        </div>
-
-        {/* Przełącznik: PRZED = prototyp, PO = powtórka naprawy */}
-        <div
-          role="group"
-          aria-label="Strona: prototyp i wersja naprawiona"
-          className="mt-5 flex justify-center gap-2"
-        >
-          <button type="button" aria-pressed={step === 0} onClick={pickBefore} className={chip(step === 0)}>
-            Przed
-          </button>
-          <button type="button" aria-pressed={done} onClick={pickAfter} className={chip(done)}>
-            Po
-          </button>
         </div>
       </div>
     </Parallax>
