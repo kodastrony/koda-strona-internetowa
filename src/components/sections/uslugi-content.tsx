@@ -453,20 +453,6 @@ function ChatBubble({
         }}
       >
         {children}
-        {/* „Echo" po lądowaniu: obrys bąbla rozchodzi się jak fala i gaśnie. */}
-        {!typing && !reduce && (
-          <motion.span
-            aria-hidden="true"
-            initial={false}
-            animate={visible ? { scale: [0.88, 1.25], opacity: [0.55, 0] } : { scale: 0.88, opacity: 0 }}
-            transition={visible ? { duration: 0.6, delay: 0.14, ease: "easeOut" } : { duration: 0 }}
-            className="pointer-events-none absolute inset-0"
-            style={{
-              borderRadius: "inherit",
-              border: `2px solid ${pink ? "#ff5ec8" : "#b32a9d"}`,
-            }}
-          />
-        )}
         {reaction !== undefined && (
           <motion.span
             initial={false}
