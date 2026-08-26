@@ -18,7 +18,10 @@ const nextConfig: NextConfig = isStaticExport
       output: "export", // build → statyczny folder out/ (czysty HTML/CSS/JS)
       trailingSlash: true, // /kontakt/ → out/kontakt/index.html (Apache-friendly na OVH)
       images: { unoptimized: true }, // brak serwera Next = brak optymalizacji obrazów w locie
-      experimental: { optimizePackageImports: ["motion"] },
+      // inlineCss: CSS (~12,7 KB; brotli ~3 KB) w <style> zamiast render-blocking
+      // <link> → FCP/LCP bez rundy sieciowej (audyt CWV 2026-08-26). Koszt: brak
+      // cache'owania CSS między stronami — pomijalny przy tej skali arkusza.
+      experimental: { optimizePackageImports: ["motion"], inlineCss: true },
     }
   : {
       images: {
