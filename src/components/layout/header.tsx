@@ -9,7 +9,6 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { useHeaderTheme } from "@/hooks/use-header-theme";
 import { useLogoHidden } from "@/hooks/use-logo-hide";
 import { KodaLogo } from "@/components/ui/koda-logo";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { EASE, INTRO_DURATION, cssBezier } from "@/lib/motion";
 import { introHasPlayed } from "@/lib/intro-state";
 import { MenuOverlay, type Origin } from "@/components/layout/menu-overlay";
@@ -75,12 +74,8 @@ export function Header() {
   // górze strony albo przy fokusie (Tab, a11y).
   const hideLogo = logoHidden && !logoFocused && !open;
 
-  // ── Przełącznik motywu chowa się TAK SAMO jak logo ────────────────────────
-  // (życzenie usera: ikonka ☀/☾ znika przy zjeździe i wraca na górze, dokładnie
-  // jak wordmark KODA). Burger i pill „Kontakt" ZOSTAJĄ (menu zawsze dostępne).
-  // Osobny stan focusu, by Tab na przełącznik wymuszał jego widoczność (a11y).
-  const [toggleFocused, setToggleFocused] = useState(false);
-  const hideToggle = logoHidden && !toggleFocused && !open;
+  // (Przełącznik motywu ☀/☾ i jego logika chowania usunięte 2026-08-26 —
+  // motyw przypięty na stałe do jasnego.)
 
   // ── Magnetyczny przycisk ──────────────────────────────────────────
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -215,20 +210,8 @@ export function Header() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE.primary, delay: base - 0.02 }}
             >
-              {/* ── Przełącznik motywu (jasny/ciemny) — dostępny też na mobile.
-                  CHOWA SIĘ jak logo (fade + lekki lift) przy zjeździe, wraca na
-                  górze. pointer-events:none gdy schowany = nieklikalny myszą, a
-                  focus (Tab) wymusza powrót do widoku. */}
-              <motion.div
-                onFocus={() => setToggleFocused(true)}
-                onBlur={() => setToggleFocused(false)}
-                animate={{ opacity: hideToggle ? 0 : 1, y: hideToggle ? -10 : 0 }}
-                transition={{ duration: 0.6, ease: EASE.smooth }}
-                style={{ pointerEvents: hideToggle ? "none" : "auto" }}
-              >
-                <ThemeToggle />
-              </motion.div>
-
+              {/* (Przełącznik motywu ☀/☾ usunięty 2026-08-26 — strona ma na
+                  stałe tylko jasny motyw, patrz lib/theme.ts.) */}
               {/* ── KONTAKT pill (główne CTA do kontaktu) ── */}
               <Link
                 href="/kontakt"

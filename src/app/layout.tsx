@@ -11,8 +11,6 @@ import { CustomCursor } from "@/components/ui/custom-cursor";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
 import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
 import { jsonLd } from "@/lib/seo";
-import { THEME_INIT_SCRIPT } from "@/lib/theme-init";
-import { ThemeAutoSync } from "@/components/layout/theme-auto-sync";
 import "./globals.css";
 
 // Organization + WebSite structured data (JSON-LD) — helps search engines build
@@ -207,15 +205,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // ★ LIGHT-FIRST SSR: renderujemy <html data-koda-light style=color-scheme:light>
-    // JUŻ w statycznym HTML. Dzięki temu PIERWSZA KLATKA (przed jakimkolwiek skryptem,
-    // przed/po CSS, także na zimnym cache) jest JASNA = porcelana — bez czarnego/szarego
-    // błysku domyślnego ciemnego stanu. Inline-skrypt motywu (niżej) USUWA atrybut +
-    // ustawia color-scheme:dark TYLKO dla ciemnego motywu (auto-noc / ręczny). Light-first
-    // pasuje do marki (porcelana, auto-jasny 07–20) i życzenia „otwiera się od razu biała".
-    // suppressHydrationWarning: skrypt mutuje te atrybuty <html> przed hydracją (zamierzone,
-    // wzorzec next-themes). useThemeValue (useSyncExternalStore) bezpiecznie godzi
-    // getServerSnapshot="dark" z klienckim odczytem atrybutu (bez ostrzeżeń hydracji).
+    // ★ MOTYW: TYLKO JASNY, NA STAŁE (decyzja Natana 2026-08-26 — „zostawiamy
+    // tylko biały motyw zawsze"). SSR renderuje <html data-koda-light
+    // style=color-scheme:light> i NIC tego nigdy nie zdejmuje: dawny automat
+    // pory dnia (jasny 07–20 / ciemny nocą), inline-skrypt theme-init,
+    // ThemeAutoSync i toggle ☀/☾ w headerze zostały USUNIĘTE (git: stan sprzed
+    // 2026-08-26). Pierwsza klatka zawsze porcelanowa, zero skryptu przed
+    // malowaniem, zero FOUC. Ciemne WYSPY (stopka, Statement) są niezależne od
+    // motywu — lokalne tokeny w globals.css. Ciemne tokeny :root w globals.css
+    // zostają jako martwa gałąź (html bez atrybutu nie występuje) + zasilają wyspy.
     <html
       lang="pl"
       data-koda-light=""
@@ -224,41 +222,18 @@ export default function RootLayout({
       // PageCanvas maluje NAD nim. Tło na <html> łamało ten inwariant → PageCanvas
       // przestawał zasłaniać → jasne tło body prześwitywało przez przezroczyste
       // sekcje (np. ciemna wyspa Statement robiła się jasna na górze). Tu zostaje
-      // tylko colorScheme:light (spójny chrom/scrollbar od startu, light-first).
+      // tylko colorScheme:light (spójny chrom/scrollbar od startu).
       style={{ colorScheme: "light" }}
-      suppressHydrationWarning
       className={`${display.variable} ${inter.variable} ${syne.variable}`}
     >
       {/* Tło porcelana INLINE na <body> (NIE na <html> — to łamało PageCanvas).
           Body to „canvas dokumentu", nad którym PageCanvas (-z-10) maluje, więc
           tło body jest BEZPIECZNE i wypełnia lukę „przed wczytaniem globals.css"
-          porcelaną zamiast szarego domyślnego tła przeglądarki (light-first).
-          Ciemny motyw nadpisuje to z powrotem regułą html:not([data-koda-light]) body
-          w globals.css. */}
+          porcelaną zamiast szarego domyślnego tła przeglądarki. */}
       <body
         style={{ backgroundColor: "#f7f4f8" }}
         className="flex min-h-svh flex-col bg-dark font-body text-off-white antialiased"
       >
-        {/* Motyw PRZED malowaniem (zero FOUC): ustala motyw AUTOMATYCZNIE wg pory
-            dnia (jasny 07:00–20:00, poza tym ciemny) — a jeśli jest WAŻNE ręczne
-            nadpisanie (do najbliższego progu), bierze je. Ustawia html[data-koda-light]
-            + color-scheme, ZANIM cokolwiek się namaluje.
-            ⚠️ SUROWY inline <script>, NIE next/script. next/script
-            strategy="beforeInteractive" w App Routerze NIE jest synchronicznym
-            inline-skryptem — serializuje się do kolejki `__next_s` przetwarzanej
-            przez bootstrap frameworka, więc odpala się DOPIERO po załadowaniu
-            bundla JS (czyli PO pierwszym malowaniu). Skutek: atrybut
-            html[data-koda-light] nie był ustawiony na 1. klatce → kurtyna intro
-            (var(--intro-cover)) i kanwa (var(--canvas-fallback)) brały tokeny
-            :root = CIEMNE → ułamek sekundy ciemnego błysku przy wejściu (jasny
-            motyw). Surowy inline <script> jako PIERWSZE dziecko <body> wykonuje
-            się SYNCHRONICZNIE podczas parsowania HTML, przed treścią → motyw
-            ustalony zanim cokolwiek widoczne się pokaże. Logika i godziny progu
-            żyją w lib/theme-init.ts (jedno źródło, wspólne z theme.ts). */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        {/* Automat na żywo: przełącza motyw na progu 07:00/20:00 i po powrocie do
-            karty (gdy zakładka była w tle/uśpiona). Nic nie renderuje. */}
-        <ThemeAutoSync />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(ORG_JSON_LD) }}
