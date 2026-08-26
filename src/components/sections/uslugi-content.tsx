@@ -30,31 +30,48 @@ import { SERVICES, type Service } from "@/lib/services-data";
    Naprzemienne strony, hue-poświata per usługa. Wycena/Proces bez zmian.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* Ptaszek rysujący się pathLength po wejściu w widok — ticki oferty zapalają
-   się kaskadą (wzorzec z pierwotnej wersji strony). */
-function AnimatedCheck({ delay }: { delay: number }) {
+/* „Pełny" tick: rysujący się ptaszek w wypełnionym różowym kółku (wzór Natana
+   2026-08-26). Kaskada zapala się po wejściu w widok. */
+function CheckBadge({ delay }: { delay: number }) {
   const reduce = useReducedMotion();
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
+    <span
       aria-hidden="true"
-      className="mt-1 shrink-0"
+      className="mt-[1px] flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full"
+      style={{ backgroundColor: "rgba(207, 67, 184, 0.11)" }}
     >
-      <motion.path
-        d="M3 8.5L6.5 12L13 4.5"
-        stroke="var(--color-pink-bright)"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
-        transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}
-      />
-    </svg>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <motion.path
+          d="M3 8.5L6.5 12L13 4.5"
+          stroke="var(--color-accent)"
+          strokeWidth="2.1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0 }}
+          whileInView={{ pathLength: 1 }}
+          viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
+          transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE.out, delay }}
+        />
+      </svg>
+    </span>
+  );
+}
+
+/* Renderer pogrubień w tickach: „**fraza**" → <strong> (dane w services-data). */
+function Emph({ text }: { text: string }) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return (
+    <>
+      {parts.map((p, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold" style={{ color: "var(--color-ink)" }}>
+            {p}
+          </strong>
+        ) : (
+          p
+        )
+      )}
+    </>
   );
 }
 
@@ -280,18 +297,17 @@ function ServiceSection({ s, index }: { s: Service; index: number }) {
             </h2>
           </FadeUp>
           <FadeUp inView delay={0.12}>
-            <ul
-              className="mt-7 grid grid-cols-1 gap-x-7 gap-y-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
-              role="list"
-            >
+            <ul className="mt-8 flex flex-col gap-[18px]" role="list">
               {s.points.map((p, idx) => (
                 <li
                   key={p}
-                  className="flex items-start gap-3 font-body"
-                  style={{ fontSize: "0.97rem", lineHeight: 1.45, color: "var(--color-ink)" }}
+                  className="flex items-start gap-3.5 font-body"
+                  style={{ fontSize: "1.02rem", lineHeight: 1.5, color: "var(--color-ink-muted)" }}
                 >
-                  <AnimatedCheck delay={idx * 0.09} />
-                  <span>{p}</span>
+                  <CheckBadge delay={idx * 0.08} />
+                  <span className="pt-[2px]">
+                    <Emph text={p} />
+                  </span>
                 </li>
               ))}
             </ul>
