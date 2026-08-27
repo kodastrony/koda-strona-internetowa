@@ -194,13 +194,15 @@ export function ProjectCard({
   // ~950px fizycznych) brały pełne 1200w — Lighthouse liczył ~334 KB nadmiaru
   // na /realizacje/ (audyt CWV 2026-08-26).
   const src960 = project.image.replace(/\.webp$/, "-960.webp");
+  // 384w: gęsta siatka 2×2 na telefonie wyświetla kartę ~170px CSS (≈340px @2×) —
+  // 640w był ~2× za duży (PSI 2026-08-27: „Ulepsz dostarczanie obrazów −50 KiB").
+  const src384 = project.image.replace(/\.webp$/, "-384.webp");
   const srcSet = has640
-    ? `${src640} 640w, ${src960} 960w, ${project.image} 1200w`
+    ? `${src384} 384w, ${src640} 640w, ${src960} 960w, ${project.image} 1200w`
     : imageSrcSet;
-  // AVIF siblings (te same 3 szerokości, sharp q55) — PSI mobile 2026-08-27:
-  // „Ulepsz dostarczanie obrazów −84 KiB". Tylko dla standardowego kadru karty.
+  // AVIF siblings (te same szerokości, sharp q55) — tylko dla standardowego kadru karty.
   const srcSetAvif = has640
-    ? `${src640.replace(/\.webp$/, ".avif")} 640w, ${src960.replace(/\.webp$/, ".avif")} 960w, ${project.image.replace(/\.webp$/, ".avif")} 1200w`
+    ? `${src384.replace(/\.webp$/, ".avif")} 384w, ${src640.replace(/\.webp$/, ".avif")} 640w, ${src960.replace(/\.webp$/, ".avif")} 960w, ${project.image.replace(/\.webp$/, ".avif")} 1200w`
     : undefined;
 
   return (

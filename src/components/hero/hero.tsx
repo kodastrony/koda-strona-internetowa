@@ -120,7 +120,8 @@ function HeroCopy({ play }: { play: boolean }) {
           }}
         >
           Projektujemy i kodujemy strony internetowe premium dla firm — z Bielska-Białej, dla
-          całej Polski. Każda strona internetowa powstaje od zera, pod konkretny cel.
+          całej Polski. Każda strona internetowa powstaje od zera, pod konkretny cel — i
+          realnie przynosi klientów.
         </p>
       </FadeUp>
 
@@ -185,9 +186,14 @@ export function Hero() {
 
   // reduced-motion / brak intro → treść natychmiast (klient-only; SSR renderuje
   // stan świeżego wejścia, efekt go koryguje po pierwszym malowaniu).
+  // ★ INTRO TYLKO ≥lg (decyzja 2026-08-27, dyrektywa Natana „100/100 wszędzie"):
+  // pełnoekranowa kurtyna na telefonie trzymała Speed Index na ~3,6 s (pomarańcz)
+  // — z intro na mobile Perf 100 jest matematycznie nieosiągalny. Desktop
+  // (showpiece, bez throttlingu PSI) zachowuje pełne intro bez zmian.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (reduce) {
+    const mobile = window.matchMedia("(max-width: 1023px)").matches;
+    if (reduce || mobile) {
       markIntroPlayed();
       setIntroActive(false);
       setRevealed(true);

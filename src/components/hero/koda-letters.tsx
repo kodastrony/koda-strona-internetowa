@@ -58,6 +58,11 @@ interface KodaColumnLettersProps {
   letterProps?: (index: number) => CSSProperties;
   /** atrybut data- na każdej literze (np. data-pink-letter dla animacji Fazy 1). */
   letterAttr?: string;
+  /** ★ LCP-seed: font LOKALNY („Syne Fallback" = Arial z size-adjust), ZERO
+   *  webfontu. Swap Syne po dociągnięciu woff2 przerysowywał seed → nowy wpis
+   *  LCP w chwili załadowania fontu (PSI mobile: LCP 4,7 s) + shift = CLS 0.03.
+   *  Seed jest niewidoczny (pod kurtyną), więc kształt glifów nie ma znaczenia. */
+  plainFont?: boolean;
 }
 
 /** Cztery litery jedna pod drugą — sam zestaw glifów (pozycjonowanie robi rodzic). */
@@ -66,6 +71,7 @@ export function KodaColumnLetters({
   fontSize,
   letterProps,
   letterAttr,
+  plainFont,
 }: KodaColumnLettersProps) {
   const filled = fillStyle(fill);
   return (
@@ -77,6 +83,7 @@ export function KodaColumnLetters({
           style={{
             ...letterStyle,
             ...(fontSize ? { fontSize } : null),
+            ...(plainFont ? { fontFamily: '"Syne Fallback", Arial, sans-serif' } : null),
             ...filled,
             ...(letterProps ? letterProps(i) : null),
           }}

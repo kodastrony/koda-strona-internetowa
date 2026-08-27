@@ -289,7 +289,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         className="pointer-events-none absolute top-0 hidden select-none lg:block"
         style={{ left: KODA_LEFT, width: "max-content" }}
       >
-        <KodaColumnLetters fill={finalFill} />
+        <KodaColumnLetters fill={finalFill} plainFont />
       </div>
       <div
         ref={seedBRef}
@@ -297,7 +297,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         className="pointer-events-none absolute inset-0 flex items-center justify-center select-none lg:hidden"
       >
         <div className="flex flex-col items-center">
-          <KodaColumnLetters fill={finalFill} fontSize={KODA_FONT_CENTER} />
+          <KodaColumnLetters fill={finalFill} fontSize={KODA_FONT_CENTER} plainFont />
         </div>
       </div>
 
