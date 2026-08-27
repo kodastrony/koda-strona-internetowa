@@ -30,9 +30,20 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Jedna strona, która sprzedaje jedną rzecz.",
     from: 2900,
     typical: "3 500 – 4 500 zł",
-    // Chipy = keywordy, które zna business owner (korekta Natana 27.08:
-    // SEO / AI search / CRM / CTA / konwersja) + termin startu.
-    chips: ["pod Google Ads i Meta", "CTA pod konwersję", "SEO + AI search", "start w 2–3 tygodnie"],
+    // Chipy = keywordy business ownera (SEO / AI search / CRM / CTA /
+    // konwersja). KAŻDY tier niesie pełną jakość (SEO, 100/100, analityka,
+    // animacje — korekta Natana 27.08: „każda strona jest premium quality,
+    // tiery różnią się zakresem, nie jakością") + swoje chipy zakresu.
+    chips: [
+      "SEO + AI search",
+      "szybkość 100/100",
+      "pod Google Ads i Meta",
+      "CTA pod konwersję",
+      "analityka konwersji",
+      "animacje premium",
+      "formularz + telefon",
+      "start w 2–3 tygodnie",
+    ],
   },
   {
     id: "wizytowka",
@@ -41,7 +52,16 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Pełna obecność firmy — do 5 podstron.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
-    chips: ["SEO lokalne + Google Maps", "CTA: telefon i formularz", "do 5 podstron", "start w 2–4 tygodnie"],
+    chips: [
+      "SEO lokalne + Google Maps",
+      "AI search (AEO)",
+      "szybkość 100/100",
+      "do 5 podstron",
+      "CTA: telefon i formularz",
+      "analityka odwiedzin",
+      "animacje premium",
+      "start w 2–4 tygodnie",
+    ],
   },
   {
     id: "firmowa",
@@ -50,7 +70,16 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "6–10 podstron z treściami i strukturą pod SEO.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
-    chips: ["SEO + AI search (AEO)", "copywriting w cenie", "integracje: CRM, analityka", "start w 4–6 tygodni"],
+    chips: [
+      "SEO + AI search (AEO)",
+      "szybkość 100/100",
+      "6–10 podstron",
+      "copywriting w cenie",
+      "integracja CRM",
+      "analityka i cele konwersji",
+      "animacje premium",
+      "start w 4–6 tygodni",
+    ],
   },
   {
     id: "premium",
@@ -59,7 +88,16 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory.",
     from: 12900,
     typical: "15 000 – 25 000 zł",
-    chips: ["autorski design 3D / WebGL", "konfiguratory produktów", "SEO + AI search", "start w 6–10 tygodni"],
+    chips: [
+      "autorski design 3D / WebGL",
+      "konfiguratory produktów",
+      "kalkulatory wyceny",
+      "zaawansowane animacje",
+      "SEO + AI search (AEO)",
+      "szybkość 100/100",
+      "analityka konwersji",
+      "start w 6–10 tygodni",
+    ],
   },
 ];
 
