@@ -120,8 +120,8 @@ function HeroCopy({ play }: { play: boolean }) {
           }}
         >
           Projektujemy i kodujemy strony internetowe premium dla firm — z Bielska-Białej, dla
-          całej Polski. Każda strona internetowa powstaje od zera, pod konkretny cel — i
-          realnie przynosi klientów.
+          całej Polski. Każda strona internetowa, która u nas powstaje, jest budowana od zera —
+          pod konkretny cel — i realnie przynosi klientów.
         </p>
       </FadeUp>
 

@@ -123,6 +123,16 @@ export function Footer() {
             <Link href="/polityka-prywatnosci" className="transition-colors hover:text-white">
               Polityka prywatności
             </Link>
+            {/* Jedyny link zewnętrzny w serwisie (realny profil z sameAs w JSON-LD) —
+                domyka też check „external links" w audytach on-page. */}
+            <a
+              href="https://github.com/kodastrony"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-white"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </div>

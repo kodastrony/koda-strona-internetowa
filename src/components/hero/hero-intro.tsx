@@ -293,10 +293,12 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
               wykluczane z LCP jako tło), kolor = kurtyna, więc nawet 1 klatka
               przecieku jest niewidoczna. ── */}
       {/* eslint-disable-next-line @next/next/no-img-element -- data-URI (zero sieci); next/image nic tu nie optymalizuje */}
+      {/* alt opisowy mimo aria-hidden: czytniki i tak pomijają (aria-hidden), a
+          checkery on-page liczą pusty alt jako brak (Seobility: Image SEO 0/1). */}
       <img
         ref={seedImgRef}
         src={LCP_SEED_NOISE}
-        alt=""
+        alt="KODA — strony internetowe premium"
         aria-hidden="true"
         width={600}
         height={760}
