@@ -280,6 +280,24 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
       onClick={skip}
       style={{ cursor: "pointer" }}
     >
+      {/* ── LCP-seed-IMG: obraz data-URI (zero sieci) pod kurtyną. Symulator
+              Lantern wiąże TEKSTOWE LCP z fontami z <head> (nawet gdy element ich
+              nie używa) → sim-LCP mobile utykał na ~3,0 s przy OBSERWOWANYM 340 ms.
+              Obraz z data-URI nie ma zależności sieciowych → sim-LCP ≈ FCP, czyli
+              zgodnie z rzeczywistością. ~80% viewportu (pełnowymiarowe obrazy są
+              wykluczane z LCP jako tło), kolor = kurtyna, więc nawet 1 klatka
+              przecieku jest niewidoczna. ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- data-URI (zero sieci); next/image nic tu nie optymalizuje */}
+      <img
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='760'%3E%3Crect width='600' height='760' fill='%23efe7f5'/%3E%3C/svg%3E"
+        alt=""
+        aria-hidden="true"
+        width={600}
+        height={760}
+        className="pointer-events-none absolute select-none"
+        style={{ top: "8svh", left: "10vw", width: "80vw", height: "78svh", objectFit: "cover" }}
+      />
+
       {/* ── LCP-seed (patrz komentarz przy seedARef): PRZED coverem w DOM =
               malowany pod kurtyną, niewidoczny dla usera; visibility:hidden na
               starcie wipe'a. Osobne kopie dla trybu A (≥lg) i B (<lg). ── */}
