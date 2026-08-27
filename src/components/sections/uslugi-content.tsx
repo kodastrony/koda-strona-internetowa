@@ -1007,14 +1007,53 @@ function WycenaTicker() {
         </div>
       </FadeUp>
 
+      {/* Kontekstowe CTA — linia i przycisk ZMIENIAJĄ się z wybranym tierem
+          (crossfade), wzorce spójne ze stroną: Magnetic PillLink + telefon. */}
       <FadeUp inView delay={0.16}>
-        <Link
-          href="/cennik"
-          className="mt-8 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-          style={{ color: "var(--color-ink)" }}
-        >
-          Pełny cennik: dodatki i opieka od 149 zł/mc →
-        </Link>
+        <div className="mt-9">
+          <motion.div
+            key={p.id}
+            initial={reduce ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: EASE.out }}
+          >
+            <p
+              className="font-heading font-semibold"
+              style={{
+                fontSize: "clamp(1.1rem,1.5vw,1.3rem)",
+                letterSpacing: "-0.01em",
+                color: "var(--color-ink)",
+                maxWidth: "44ch",
+              }}
+            >
+              {p.cta.line}
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-4">
+              <Magnetic>
+                <PillLink
+                  href="/kontakt"
+                  bg="#b32a9d"
+                  border="rgba(255,255,255,0.14)"
+                  className="text-white hover:text-white hover:shadow-[0_18px_44px_-12px_rgba(207,67,184,0.55)]"
+                >
+                  {p.cta.label}
+                </PillLink>
+              </Magnetic>
+              <PhoneLink
+                className="inline-flex min-h-[44px] items-center font-heading text-[1rem] font-bold transition-colors duration-300 hover:text-pink"
+                style={{ color: "var(--color-ink)" }}
+                label={`lub zadzwoń: ${CONTACT.phone}`}
+              />
+            </div>
+          </motion.div>
+          <Link
+            href="/cennik"
+            className="mt-6 inline-flex text-[0.9rem] underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+            style={{ fontFamily: "var(--font-body)", color: "var(--color-ink-muted)" }}
+          >
+            Pełny cennik: dodatki i opieka od 149 zł/mc →
+          </Link>
+        </div>
       </FadeUp>
     </div>
   );

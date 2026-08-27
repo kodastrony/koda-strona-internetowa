@@ -23,6 +23,8 @@ export interface CennikPakiet {
   inherits?: string;
   /** NOWE rzeczy tego tiera, w 2–4-słownych chipach. */
   chips: string[];
+  /** Kontekstowe CTA sekcji Wycena (/uslugi): linia zachęty + label przycisku. */
+  cta: { line: string; label: string };
 }
 
 export const CENNIK_PAKIETY: CennikPakiet[] = [
@@ -49,6 +51,10 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "analityka konwersji",
       "start w 1–2 tygodnie",
     ],
+    cta: {
+      line: "Landing pod Twoją kampanię? Opisz cel — wrócimy z konkretem w 24 h.",
+      label: "Wyceń landing page",
+    },
   },
   {
     id: "wizytowka",
@@ -65,6 +71,10 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "FAQ pod AI search",
       "start w 2–3 tygodnie",
     ],
+    cta: {
+      line: "Taka wizytówka może być Twoja. Opisz firmę — konkret w 24 h.",
+      label: "Wyceń wizytówkę",
+    },
   },
   {
     id: "firmowa",
@@ -81,6 +91,10 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "każda podstrona sprzedaje",
       "start w 3–5 tygodni",
     ],
+    cta: {
+      line: "Strona firmowa, która przynosi klientów? Umówmy krótką rozmowę.",
+      label: "Wyceń stronę firmową",
+    },
   },
   {
     id: "premium",
@@ -99,6 +113,10 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "koncept kreatywny 1:1",
       "start w 5–8 tygodni",
     ],
+    cta: {
+      line: "Masz pomysł na coś wyjątkowego? Pogadajmy o koncepcie.",
+      label: "Wyceń projekt premium",
+    },
   },
 ];
 
