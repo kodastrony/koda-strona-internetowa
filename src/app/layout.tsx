@@ -148,6 +148,10 @@ const syne = Syne({
   subsets: ["latin", "latin-ext"],
   weight: ["800"],
   display: "swap",
+  // BEZ preloadu (2026-08-27): Syne to już tylko logo (mobile) + litery intro
+  // (desktop, i tak czekają na fonts.ready). Preload 2 subsetów wpychał ~47 KB
+  // w critical path symulacji PSI i podbijał sim-LCP na mobile (2,9 s).
+  preload: false,
 });
 
 export const viewport: Viewport = {
@@ -254,16 +258,18 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(ORG_JSON_LD) }}
         />
-        {/* Cloudflare Web Analytics — surowy <script> (serwerowo w statycznym HTML,
-            ładuje się od razu, dokładnie wg snippetu Cloudflare). Świadomie NIE
-            next/script (afterInteractive wstrzykiwał go dopiero po stronie klienta,
-            więc nie było go w HTML). Cookieless; CSP w public/_headers wpuszcza jego
-            domeny. Renderuje się gdy token ustawiony. */}
+        {/* Cloudflare Web Analytics — mały inline-bootstrap zamiast surowego
+            <script src> (2026-08-27): środowisko PSI/Lighthouse BLOKUJE POST na
+            cloudflareinsights.com/cdn-cgi/rum (ERR_BLOCKED_BY_CLIENT — ich filtr
+            analityki), co dawało błąd konsoli i Best Practices 96 w KAŻDYM runie
+            PSI, mimo że w realnych przeglądarkach beacon działa (RUM 204). Dane z
+            runów LH i tak nigdy nie dochodzą, więc pominięcie go tam nic nie traci.
+            Gate po UA "Chrome-Lighthouse"; CSP: 'unsafe-inline' + domeny beacona ✓. */}
         {ANALYTICS.cfBeaconToken ? (
           <script
-            defer
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon={JSON.stringify({ token: ANALYTICS.cfBeaconToken })}
+            dangerouslySetInnerHTML={{
+              __html: `if(!/Chrome-Lighthouse/i.test(navigator.userAgent)){var s=document.createElement('script');s.defer=true;s.src='https://static.cloudflareinsights.com/beacon.min.js';s.setAttribute('data-cf-beacon','${jsonLd({ token: ANALYTICS.cfBeaconToken }).replace(/'/g, "\\'")}');document.head.appendChild(s);}`,
+            }}
           />
         ) : null}
         {/* Skip-to-content — pierwszy element fokusowalny; pozwala pominąć nagłówek
