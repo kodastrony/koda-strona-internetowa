@@ -64,8 +64,8 @@ const OFERTA_JSON_LD = {
   itemListElement: [
     ...[
       ["Landing page / one-page", 2900, "Jedna strona sprzedażowa: do 6 sekcji, formularz, animacje."],
-      ["Strona wizytówka", 3900, "Cała firma profesjonalnie pokazana w internecie — galeria realizacji, FAQ pod AI search, spójny branding."],
-      ["Strona firmowa", 6900, "Rozbudowana strona, która sprzedaje i pozycjonuje — architektura treści pod SEO, integracja CRM, cele konwersji."],
+      ["Strona wizytówka", 3900, "Cała firma profesjonalnie pokazana w internecie — galeria realizacji i FAQ pod AI search."],
+      ["Strona firmowa", 6900, "Rozbudowana strona, która sprzedaje i pozycjonuje — profesjonalny branding, treści pod konwersję, integracja CRM."],
       ["Strona premium 2D/3D", 12900, "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory."],
     ].map(([name, minPrice, description]) => ({
       "@type": "Offer",

@@ -36,14 +36,12 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     // LANDING = pełna baza premium: WSZYSTKO, co realnie dajemy w najniższym
     // tierze (rebrand 27.08: „robimy tylko strony premium"). Wyższe tiery
     // DZIEDZICZĄ ten zestaw (chip „Wszystko z…") i dodają swój rząd.
-    // Bez oczywistości (korekta Natana 27.08: „wypierdol to, czego ludzie
-    // i tak się spodziewają"). Chipy wyższych tierów = EKSKLUZYWNE featury
-    // tego tiera (nie liczba podstron — „pierdoli mnie ile jest podstron");
-    // SEO lokalne + Maps siedzi w BAZIE, bo dajemy je każdemu.
+    // Bez oczywistości i bez Google Maps (nie robimy — korekta Natana).
+    // Chipy wyższych tierów = to, na czym NAJBARDZIEJ zależy kupującemu
+    // dany tier; zero dubli z bazą Landing.
     chips: [
       "autorski design premium",
       "SEO + AI search (AEO)",
-      "SEO lokalne + Google Maps",
       "szybkość 100/100",
       "animacje premium",
       "CTA pod konwersję",
@@ -59,13 +57,9 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Cała firma profesjonalnie pokazana w internecie.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
+    // Buyer wizytówki (lokalna firma): chce POKAZAĆ firmę i budzić zaufanie.
     inherits: "Wszystko z Landing",
-    chips: [
-      "galeria realizacji",
-      "FAQ pod AI search",
-      "spójny branding całości",
-      "start w 2–4 tygodnie",
-    ],
+    chips: ["galeria realizacji", "FAQ pod AI search", "start w 2–4 tygodnie"],
   },
   {
     id: "firmowa",
@@ -74,11 +68,12 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Rozbudowana strona, która sprzedaje i pozycjonuje.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
+    // Buyer firmowej (właściciel rosnącej firmy): marka, treści, leady.
     inherits: "Wszystko z Wizytówki",
     chips: [
-      "architektura treści pod SEO",
+      "profesjonalny branding firmy",
+      "treści pod konwersję",
       "integracja CRM",
-      "cele konwersji w analityce",
       "start w 4–6 tygodni",
     ],
   },
