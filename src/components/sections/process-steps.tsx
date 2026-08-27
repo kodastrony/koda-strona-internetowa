@@ -100,14 +100,22 @@ function StepBody({
   title,
   desc,
   align = "center",
+  asHeading = true,
 }: {
   title: string;
   desc: string;
   align?: "center" | "left";
+  /* Oba layouty (poziomy lg+ i pionowy <lg) siedzą w DOM naraz — tytuł może być
+     <h3> tylko w JEDNYM z nich, inaczej crawlery widzą każdy nagłówek podwójnie
+     (Seobility: "Remove duplicate heading texts"). h3 zostaje w wariancie
+     mobilnym (mobile-first indexing), desktopowy renderuje <p> o tej samej
+     typografii. */
+  asHeading?: boolean;
 }) {
+  const TitleTag = asHeading ? "h3" : "p";
   return (
     <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
-      <h3
+      <TitleTag
         className="font-heading font-semibold"
         style={{
           fontSize: "clamp(1.2rem,1.7vw,1.5rem)",
@@ -117,7 +125,7 @@ function StepBody({
         }}
       >
         {title}
-      </h3>
+      </TitleTag>
       <p
         className="mt-2.5"
         style={{
@@ -176,7 +184,7 @@ export function ProcessSteps() {
               <div className="flex flex-col items-center">
                 <Node n={step.n} inView={hIn} delay={NODE_DELAY[i]} size={56} reduce={!!reduce} />
                 <div className="mt-7">
-                  <StepBody title={step.title} desc={step.desc} align="center" />
+                  <StepBody title={step.title} desc={step.desc} align="center" asHeading={false} />
                 </div>
               </div>
             </FadeUp>

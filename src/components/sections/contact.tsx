@@ -592,9 +592,9 @@ export function Contact() {
           </div>
           <div className="ph-lead-in" style={{ animationDelay: "0.13s" }}>
             <p className="mt-5 max-w-[460px] font-body text-[16px] leading-relaxed text-black/60">
-              Opowiedz nam o projekcie, a wrócimy z pomysłem i wyceną w ciągu 24 godzin. Im więcej
-              szczegółów podasz — cel strony, przykłady, budżet — tym szybciej wrócimy z konkretem
-              zamiast kolejnych pytań. Wolisz e-mail?{" "}
+              Zacznijmy od konkretu: opisz projekt, a wrócimy z pomysłem i wyceną w ciągu 24
+              godzin. Im więcej szczegółów podasz — cel strony, przykłady, budżet — tym szybciej
+              wrócimy z konkretem zamiast kolejnych pytań. Wolisz e-mail?{" "}
               <EmailLink className="text-[#0f0f0f] underline decoration-pink/40 underline-offset-4 transition-colors duration-300 hover:decoration-pink" />
             </p>
           </div>

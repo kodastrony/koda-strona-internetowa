@@ -105,6 +105,8 @@ export interface WebPageInput {
   dateModified: string;
   /** @id węzła, o którym ta strona „jest" (Article/Service/CreativeWork…). Opcjonalne. */
   mainEntityId?: string;
+  /** Podtyp schema.org (AboutPage/ContactPage/CollectionPage…). Domyślnie WebPage. */
+  pageType?: "WebPage" | "AboutPage" | "ContactPage" | "CollectionPage";
 }
 
 /**
@@ -113,10 +115,17 @@ export interface WebPageInput {
  * po @id. Uzupełnia graf encji z layoutu (isPartOf → #website) — czysty sygnał
  * dla Google i silników AI, zero nowych treści (name/description = metadane strony).
  */
-export function webPageLd({ path, name, description, dateModified, mainEntityId }: WebPageInput) {
+export function webPageLd({
+  path,
+  name,
+  description,
+  dateModified,
+  mainEntityId,
+  pageType = "WebPage",
+}: WebPageInput) {
   return {
     "@context": "https://schema.org",
-    "@type": "WebPage",
+    "@type": pageType,
     "@id": `${SITE_CONFIG.url}${path}#webpage`,
     url: `${SITE_CONFIG.url}${path}`,
     name,

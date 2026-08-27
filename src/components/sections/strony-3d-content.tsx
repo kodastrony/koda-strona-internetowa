@@ -145,7 +145,7 @@ export function Strony3DContent() {
       {/* ── Live dema (dowód) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="dema" className="font-heading font-semibold" style={h2Style}>
             Zobacz nasze strony 3D i animowane na żywo
           </h2>
         </FadeUp>
@@ -168,7 +168,7 @@ export function Strony3DContent() {
       {/* ── Kiedy się opłaca ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="kiedy-sie-oplaca" className="font-heading font-semibold" style={h2Style}>
             Kiedy strona 3D albo z animacjami się opłaca?
           </h2>
         </FadeUp>
@@ -201,7 +201,7 @@ export function Strony3DContent() {
       {/* ── Jak budujemy (stack) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="jak-budujemy" className="font-heading font-semibold" style={h2Style}>
             Jak budujemy 3D i animacje
           </h2>
         </FadeUp>
@@ -240,7 +240,7 @@ export function Strony3DContent() {
       {/* ── Mini-FAQ (zasila FAQPage JSON-LD) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="faq" className="font-heading font-semibold" style={h2Style}>
             Częste pytania o strony 3D i animowane
           </h2>
         </FadeUp>

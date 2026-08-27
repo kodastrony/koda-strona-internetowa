@@ -11,7 +11,7 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 ]);
 
 export const metadata: Metadata = pageMetadata({
-  title: "O nas — studio web design",
+  title: "O nas — studio stron internetowych z Bielska",
   description:
     "Projektujemy i kodujemy strony internetowe dla firm w Polsce. Bezpośredni kontakt, jasne zasady i opieka po starcie — pod konkretny cel, nie pod szablon.",
   path: "/o-nas/",
@@ -23,6 +23,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   description:
     "Projektujemy i kodujemy strony internetowe dla firm w Polsce. Bezpośredni kontakt, jasne zasady i opieka po starcie — pod konkretny cel, nie pod szablon.",
   dateModified: LASTMOD["/o-nas/"],
+  pageType: "AboutPage",
 });
 
 export default function ONasPage() {

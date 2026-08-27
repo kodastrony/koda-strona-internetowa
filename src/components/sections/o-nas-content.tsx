@@ -45,6 +45,7 @@ export function ONasContent() {
           <div className="md:col-span-5">
             <div className="ph-lead-in">
               <h2
+                id="manifest"
                 className="font-heading font-semibold md:sticky md:top-32"
                 style={{
                   fontSize: "clamp(2rem,4.4vw,3.4rem)",
@@ -143,7 +144,7 @@ export function ONasContent() {
 
         <div className="container-koda section-y relative z-10">
           <FadeUp inView>
-            <h2 className="text-section-title max-w-[18ch]">
+            <h2 id="zasady" className="text-section-title max-w-[18ch]">
               Cztery zasady, które prowadzą każdy projekt
             </h2>
           </FadeUp>
@@ -208,6 +209,7 @@ export function ONasContent() {
           <div className="md:col-span-5">
             <FadeUp inView>
               <h2
+                id="technologia"
                 className="font-heading font-semibold md:sticky md:top-32"
                 style={{
                   fontSize: "clamp(1.8rem,3.6vw,2.8rem)",

@@ -255,10 +255,15 @@ export function MenuOverlay({
                         className="relative block"
                         style={{ paddingBlock: "clamp(2px, 0.4vw, 6px)" }}
                       >
-                        {/* numer 01–05 — w miejscu zwolnionym przez słowo */}
+                        {/* numer 01–05 — w miejscu zwolnionym przez słowo.
+                            Cyfra przez CSS content: attr(data-n) (klasa .menu-num w
+                            globals.css), NIE jako tekst w DOM — tekst wewnątrz <a>
+                            wchodzi crawlerom do anchor textu ("01Strona główna")
+                            i zaśmiecał linkowanie wewnętrzne na każdej stronie. */}
                         <motion.span
                           aria-hidden="true"
-                          className="absolute"
+                          data-n={`0${i + 1}`}
+                          className="menu-num absolute"
                           style={{
                             left: 0,
                             top: "0.65em",
@@ -270,9 +275,7 @@ export function MenuOverlay({
                           }}
                           animate={{ opacity: isHover ? 1 : 0, x: isHover ? 0 : -6 }}
                           transition={{ duration: 0.45, ease: EASE.smooth }}
-                        >
-                          0{i + 1}
-                        </motion.span>
+                        />
 
                         {/* słowo — wysuwa się w prawo + przygasa */}
                         <motion.span

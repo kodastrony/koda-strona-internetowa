@@ -25,9 +25,13 @@ export async function generateMetadata({
   // OG w JPG 1200×630 (crop z showcase, pre-generowany w public/) — .webp 1680×1050
   // odrzucał LinkedIn (format) i był przycinany w feedach (ratio 1,6 vs 1,91).
   const ogImage = project.showcase.replace("-showcase.webp", "-og.jpg");
+  // seoTitle/seoDescription (projects.ts) nadpisują domyślne `title — type` /
+  // summary, gdy te wypadają poza okna 50–60 / 150–160 znaków (audyt on-page).
+  const metaTitle = project.seoTitle ?? `${project.title} — ${project.type}`;
+  const metaDesc = project.seoDescription ?? project.summary;
   return {
-    title: `${project.title} — ${project.type}`,
-    description: project.summary,
+    title: metaTitle,
+    description: metaDesc,
     alternates: { canonical: `/realizacje/${project.id}/` },
     openGraph: {
       // Komplet pól OG (type/locale/siteName) — spójnie z pageMetadata(); bez nich
@@ -35,8 +39,8 @@ export async function generateMetadata({
       type: "article",
       locale: "pl_PL",
       siteName: "KODA Studio",
-      title: `${project.title} — ${project.type} | KODA`,
-      description: project.summary,
+      title: `${metaTitle} | KODA`,
+      description: metaDesc,
       url: `/realizacje/${project.id}/`,
       images: [
         {
@@ -50,8 +54,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${project.title} — ${project.type} | KODA`,
-      description: project.summary,
+      title: `${metaTitle} | KODA`,
+      description: metaDesc,
       images: [ogImage],
     },
   };
@@ -90,6 +94,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       : {}),
   };
 
+  // VideoObject — realny klip .mp4 z /public/realizacje (poster = realna miniatura,
+  // duration zmierzone ffprobe — NIE zgadywane). uploadDate = data publikacji case'ów.
+  const VIDEO_JSON_LD = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": `${SITE_CONFIG.url}/realizacje/${project.id}/#video`,
+    name: `${project.title} — pokaz interakcji`,
+    description: project.summary,
+    thumbnailUrl: `${SITE_CONFIG.url}${project.poster}`,
+    // Realna data publikacji klipów w portfolio (commit 56f3826, 2026-06-19) —
+    // NIE PROJECT_LASTMOD, który bumpuje się przy każdej edycji metadanych.
+    uploadDate: "2026-06-19",
+    contentUrl: `${SITE_CONFIG.url}${project.video}`,
+    duration: project.videoDuration,
+    inLanguage: "pl-PL",
+    // Bez embedUrl: self-hostowany <video>, brak playera iframe — nie fabrykujemy.
+  };
+
   // WebPage — węzeł „ta strona case-study" (mainEntity → #work): czysty podział
   // strona-o-utworze vs sam utwór.
   const WEBPAGE_JSON_LD = webPageLd({
@@ -120,6 +142,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(VIDEO_JSON_LD) }}
       />
       <ProjectDetail project={project} prev={prev} next={next} />
       <CTABand

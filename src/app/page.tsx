@@ -15,9 +15,11 @@ import { SITE_CONFIG } from "@/lib/constants";
 export const metadata: Metadata = {
   // Spójne z og:title i banerem OG (ten sam keyword z przodu) → mocny sygnał
   // encyjny dla Google i AI search; „absolute" pomija szablon (home = korzeń).
-  title: { absolute: "Strony internetowe dla firm — projekt i kod | KODA Studio" },
+  // „premium" (2026-08-27): rebrand + audyt SXO — fraza „strony internetowe
+  // premium" nie występowała w żadnym crawlowalnym title/H1 domeny. 56 znaków.
+  title: { absolute: "Strony internetowe premium — projekt i kod | KODA Studio" },
   description:
-    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+    "Projektujemy i kodujemy strony internetowe premium — z Bielska-Białej, dla firm w całej Polsce. Bez szablonów, zakres i termin w umowie. Odpowiadamy w 24 h.",
   alternates: { canonical: "/" },
 };
 
@@ -41,9 +43,9 @@ const FAQ_JSON_LD = {
 // WebPage — jawny węzeł „ta strona" także na home (spójnie z podstronami).
 const WEBPAGE_JSON_LD = webPageLd({
   path: "/",
-  name: "Strony internetowe dla firm — projekt i kod | KODA Studio",
+  name: "Strony internetowe premium — projekt i kod | KODA Studio",
   description:
-    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+    "Projektujemy i kodujemy strony internetowe premium — z Bielska-Białej, dla firm w całej Polsce. Bez szablonów, zakres i termin w umowie. Odpowiadamy w 24 h.",
   dateModified: LASTMOD["/"],
 });
 

@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element -- Static export (images.unoptimized): we ship
-   hand-optimized webp with manual srcset/sizes; next/image can't srcset here. */
+/* Static export (images.unoptimized): we ship hand-optimized webp/avif with a
+   manual <picture> + srcset/sizes; next/image can't srcset here. */
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
@@ -197,6 +197,11 @@ export function ProjectCard({
   const srcSet = has640
     ? `${src640} 640w, ${src960} 960w, ${project.image} 1200w`
     : imageSrcSet;
+  // AVIF siblings (te same 3 szerokości, sharp q55) — PSI mobile 2026-08-27:
+  // „Ulepsz dostarczanie obrazów −84 KiB". Tylko dla standardowego kadru karty.
+  const srcSetAvif = has640
+    ? `${src640.replace(/\.webp$/, ".avif")} 640w, ${src960.replace(/\.webp$/, ".avif")} 960w, ${project.image.replace(/\.webp$/, ".avif")} 1200w`
+    : undefined;
 
   return (
     <FadeUp inView delay={delay} y={48} duration={0.7} ease={EASE.expo}>
@@ -242,24 +247,27 @@ export function ProjectCard({
                 <div className="absolute inset-0" style={{ background: project.bg }} />
 
                 {img ? (
-                  <img
-                    src={img}
-                    srcSet={srcSet}
-                    sizes={sizes}
-                    alt={`${project.title} — ${project.type}`}
-                    width={1200}
-                    height={900}
-                    loading={priority ? "eager" : "lazy"}
-                    decoding="async"
-                    fetchPriority={priority ? "high" : "auto"}
-                    className="absolute inset-0 h-full w-full object-cover object-top"
-                    style={{
-                      transform: hovered && !reduce ? "scale(1.06)" : "scale(1)",
-                      transition: `transform 700ms ${cssBezier(EASE.expo)}`,
-                      // Promote to its own layer only during the hover zoom (no idle layers).
-                      willChange: hovered && !reduce ? "transform" : "auto",
-                    }}
-                  />
+                  <picture>
+                    {srcSetAvif && <source type="image/avif" srcSet={srcSetAvif} sizes={sizes} />}
+                    <img
+                      src={img}
+                      srcSet={srcSet}
+                      sizes={sizes}
+                      alt={`${project.title} — ${project.type}`}
+                      width={1200}
+                      height={900}
+                      loading={priority ? "eager" : "lazy"}
+                      decoding="async"
+                      fetchPriority={priority ? "high" : "auto"}
+                      className="absolute inset-0 h-full w-full object-cover object-top"
+                      style={{
+                        transform: hovered && !reduce ? "scale(1.06)" : "scale(1)",
+                        transition: `transform 700ms ${cssBezier(EASE.expo)}`,
+                        // Promote to its own layer only during the hover zoom (no idle layers).
+                        willChange: hovered && !reduce ? "transform" : "auto",
+                      }}
+                    />
+                  </picture>
                 ) : (
                   <MockWebsite accent={project.glow} />
                 )}

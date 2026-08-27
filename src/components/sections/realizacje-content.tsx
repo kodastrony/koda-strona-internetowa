@@ -58,6 +58,53 @@ export function RealizacjeContent() {
             </div>
           ))}
         </div>
+
+        {/* Blok zamykający (audyt on-page 2026-08-27: /realizacje/ było najcieńszą
+            stroną w indeksie, ~170 słów czystej treści). Fakty, nie ozdobniki:
+            wspólny standard techniczny + zaproszenie. Cytowalny pasaż pod AEO. */}
+        <div className="mx-auto mt-[clamp(56px,8vw,110px)] max-w-[640px]">
+          <h2
+            id="standard"
+            className="font-heading font-semibold"
+            style={{
+              fontSize: "clamp(1.7rem,3vw,2.6rem)",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.08,
+              color: "var(--color-ink)",
+              textWrap: "balance",
+            }}
+          >
+            Jeden standard, cztery różne zadania.
+          </h2>
+          <p
+            className="mt-5"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "1.05rem",
+              lineHeight: 1.65,
+              color: "var(--color-ink-muted)",
+            }}
+          >
+            Konfigurator budynków modułowych 3D, model produktu z kalkulatorem doboru, spacer po
+            lokalu w przeglądarce i spokojna strona firmowa dla rzemiosła. Wszystkie te strony
+            internetowe zbudowaliśmy w tym samym standardzie: autorski kod (React / Next.js, a przy
+            grafice 3D — Three.js i WebGL), szybkie wczytywanie na telefonie, dostępność i
+            techniczne SEO od pierwszego dnia.
+          </p>
+          <p
+            className="mt-4"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "1.05rem",
+              lineHeight: 1.65,
+              color: "var(--color-ink-muted)",
+            }}
+          >
+            Każdą realizację można przeklikać na żywo — na komputerze i na telefonie. Jeśli Twoja
+            firma potrzebuje strony o podobnym charakterze, opisz projekt: bezpłatną wycenę i
+            wstępny pomysł odsyłamy w ciągu 24 godzin.
+          </p>
+        </div>
       </div>
     </section>
   );

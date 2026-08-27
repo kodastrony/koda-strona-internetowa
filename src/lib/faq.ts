@@ -27,11 +27,19 @@ export const FAQS: Faq[] = [
     // Answer-first: ramy czasowe w PIERWSZYM zdaniu (orientacyjne, rynkowe —
     // wiążący dla klienta jest wyłącznie termin z umowy, jak w drugim zdaniu).
     q: "Ile trwa zrobienie strony?",
-    a: "Landing page powstaje zwykle w 1–2 tygodnie, prosta strona firmowa w 2–5 tygodni, a rozbudowana — z indywidualnym projektem, animacjami czy grafiką 3D — w 5–8 tygodni. W KODA konkretny termin ustalamy w umowie, zanim zaczniemy, i go pilnujemy. Pracujemy etapami i pokazujemy postępy na bieżąco, więc strona powstaje sprawnie, a Ty przez cały czas wiesz, na czym stoimy.",
+    // Terminy IDENTYCZNE jak /cennik i llms.txt (landing 1–2 / wizytówka 2–3 /
+    // firmowa 3–5 / premium 5–8) — rozjazd między stronami psuje zaufanie AI search.
+    a: "Landing page powstaje zwykle w 1–2 tygodnie, strona wizytówka w 2–3 tygodnie, strona firmowa w 3–5 tygodni, a projekt premium — z indywidualnymi animacjami czy grafiką 3D — w 5–8 tygodni. W KODA konkretny termin ustalamy w umowie, zanim zaczniemy, i go pilnujemy. Pracujemy etapami i pokazujemy postępy na bieżąco, więc tworzenie strony internetowej przebiega sprawnie, a Ty przez cały czas wiesz, na czym stoimy.",
   },
   {
     q: "Czy strona jest moja po starcie?",
     a: "Tak — strona, domena i wszystkie pliki należą do Ciebie, a po starcie przekazujemy Ci pełne dostępy. Nic nie jest zablokowane po stronie KODA. Większość klientów zostaje z nami na opiece technicznej (aktualizacje, bezpieczeństwo i drobne zmiany w stałej, rozsądnej opłacie) — ale to Twój wybór, nie warunek.",
+  },
+  {
+    // Answer-first pod frazę „strony internetowe premium" (rebrand 2026-08:
+    // to nasz najbardziej wygrywalny keyword; SXO 2026-08-27). Fakty z /cennik.
+    q: "Czym różni się strona premium od zwykłej strony firmowej?",
+    a: "Strona premium w KODA to projekt w całości szyty na miarę: indywidualne animacje, często grafika 3D (WebGL/Three.js) i dopracowany każdy detal interakcji — od 12 900 zł netto, realizacja 5–8 tygodni. Zwykła strona firmowa (od 6 900 zł) opiera się na naszym sprawdzonym standardzie: autorski kod i szybkość te same, mniej indywidualnych animacji. W obu wypadkach zakres i termin są zapisane w umowie.",
   },
   {
     q: "Czy strona będzie dobrze widoczna w Google?",

@@ -22,8 +22,9 @@ export const CONTACT = {
   // /dziekujemy, JSON-LD (telephone) i llms.txt — NAP identyczny wszędzie.
   phone: "511 107 468",
   phoneHref: "tel:+48511107468",
-  /** E.164 do danych strukturalnych (schema.org telephone). */
-  phoneE164: "+48 511 107 468",
+  /** E.164 do danych strukturalnych (schema.org telephone) — BEZ spacji, spójne
+   *  z href tel: (audyt local SEO 2026-08-27; wcześniej format ze spacjami). */
+  phoneE164: "+48511107468",
   domain: "kodastrony.pl",
   city: "Bielsko-Biała",
   // ⬇️ Opcjonalnie — po wpisaniu NIP renderuje się sam w stopce („NIP: …"). Puste = nie pokazuje się.

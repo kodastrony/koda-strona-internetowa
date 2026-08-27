@@ -764,7 +764,7 @@ export function ProjectDetail({
               href="/realizacje"
               className="font-heading text-[11px] font-bold tracking-[0.16em] text-[var(--color-ink-muted)] uppercase transition-colors duration-300 hover:text-pink"
             >
-              Wszystkie →
+              Wszystkie realizacje →
             </Link>
           </div>
           <FadeUp inView y={32} duration={0.8} ease={EASE.expo}>

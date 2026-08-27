@@ -3,6 +3,8 @@ import { PageHero } from "@/components/sections/page-hero";
 import { RealizacjeContent } from "@/components/sections/realizacje-content";
 import { CTABand } from "@/components/sections/cta-band";
 import { LASTMOD } from "@/app/sitemap";
+import { PROJECTS } from "@/lib/projects";
+import { SITE_CONFIG } from "@/lib/constants";
 import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 const BREADCRUMB_JSON_LD = breadcrumbLd([
@@ -11,11 +13,27 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 ]);
 
 export const metadata: Metadata = pageMetadata({
-  title: "Realizacje stron internetowych",
+  title: "Realizacje — portfolio stron internetowych",
   description:
-    "Realizacje KODA — strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Realne marki i autorskie koncepty.",
+    "Realizacje KODA — strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Realne marki i autorskie koncepty. Zobacz na żywo.",
   path: "/realizacje/",
 });
+
+// ItemList — spina 4 case studies w kolekcję (CollectionPage + lista pozycji);
+// zero nowych faktów, tylko referencje do istniejących podstron.
+const ITEMLIST_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": `${SITE_CONFIG.url}/realizacje/#lista`,
+  name: "Realizacje KODA Studio",
+  numberOfItems: PROJECTS.length,
+  itemListElement: PROJECTS.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: `${SITE_CONFIG.url}/realizacje/${p.id}/`,
+    name: `${p.title} — ${p.type}`,
+  })),
+};
 
 const WEBPAGE_JSON_LD = webPageLd({
   path: "/realizacje/",
@@ -23,6 +41,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   description:
     "Realizacje KODA — strony internetowe (3D, produktowe, landingi) zbudowane od zera: projekt, kod i animacje. Realne marki i autorskie koncepty.",
   dateModified: LASTMOD["/realizacje/"],
+  pageType: "CollectionPage",
 });
 
 export default function RealizacjePage() {
@@ -35,6 +54,10 @@ export default function RealizacjePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(ITEMLIST_JSON_LD) }}
       />
       <PageHero
         label="Wybrane projekty"

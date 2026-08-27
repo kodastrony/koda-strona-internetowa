@@ -17,21 +17,23 @@ export const dynamic = "force-static";
 // wszędzie). Poprzedni bump: 2026-08-17 (nowe OG/ikony).
 // export: te same daty zasilają WebPage.dateModified w JSON-LD (lib/seo.ts →
 // webPageLd) — jedno źródło prawdy, zero rozjazdu sitemap↔schema.
+// 2026-08-27: overhaul SEO/AEO ×2 — „premium" w title/description home, nowy
+// wpis FAQ, linia zaufania (Work), lead /uslugi i /strony-3d, blok „Jeden
+// standard" na /realizacje, poprawki polityki (Cloudflare, data), kotwice #id.
 export const LASTMOD: Record<string, string> = {
   "/": "2026-08-27",
-  "/uslugi/": "2026-08-26",
-  "/uslugi/strony-3d/": "2026-08-26",
+  "/uslugi/": "2026-08-27",
+  "/uslugi/strony-3d/": "2026-08-27",
   "/cennik/": "2026-08-27",
-  "/realizacje/": "2026-08-26",
-  "/o-nas/": "2026-08-26",
-  "/kontakt/": "2026-08-26",
-  "/polityka-prywatnosci/": "2026-08-26",
+  "/realizacje/": "2026-08-27",
+  "/o-nas/": "2026-08-27",
+  "/kontakt/": "2026-08-27",
+  "/polityka-prywatnosci/": "2026-08-27",
 };
 
-// Realizacje (case studies) — 2026-08-26: nowe OG (JPG 1200×630), disclaimer
-// „koncept" w JSON-LD, pauza wideo (wcześniej: publikacja portfolio 2026-06-15).
-// export: j.w. — WebPage.dateModified na stronach case studies.
-export const PROJECT_LASTMOD = "2026-08-26";
+// Realizacje (case studies) — 2026-08-27: VideoObject JSON-LD (realne czasy
+// z ffprobe), seoTitle/seoDescription, AVIF kart (wcześniej 2026-08-26: nowe OG).
+export const PROJECT_LASTMOD = "2026-08-27";
 
 // Trailing slashes match the served URLs (next.config trailingSlash:true →
 // /uslugi/ etc.) and the per-page canonicals, so search engines see one

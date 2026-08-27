@@ -275,10 +275,21 @@ html[data-koda-light] .cta-footer-wash {
   --z-grain: 50; /* film-grain overlay — above section content, below UI */
   --z-scrollbar: 60; /* custom scroll-progress bar (right edge)            */
   --z-intro: 200; /* intro overlay (covers hero bg during the entrance) */
-  --z-hero-content: 210; /* hero text — ABOVE the intro so it reveals mid-sweep */
+  /* hero text POD kurtyną intro (od 2026-08-27): H1 jest malowany od 1. klatki
+     (fix LCP), więc NIE może być nad overlayem — wipe kurtyny i tak fizycznie
+     odsłania treść (mid-sweep reveal zostaje), a fade MODE B robi crossfade. */
+  --z-hero-content: 190;
   --z-menu: 280; /* full-screen expanding menu overlay                  */
   --z-header: 300; /* header logo + menu button (above menu so X works)   */
   --z-cursor: 400; /* custom cursor follower (above everything)           */
+}
+
+/* ── Numer pozycji menu (01–05) przez CSS content ─────────────────────
+   Cyfra NIE może być tekstem w DOM wewnątrz <a> — crawlery doklejały ją do
+   anchor textu ("01Strona główna"). content: attr(data-n) jest niewidoczny
+   dla parserów treści, a wygląda identycznie. */
+.menu-num::before {
+  content: attr(data-n);
 }
 
 /* ── Keyframe animations ─────────────────────────────────────────── */

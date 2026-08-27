@@ -59,6 +59,11 @@ export interface Project {
   liveUrl: string;
   /** One-line summary for cards + lists. */
   summary: string;
+  /** Opcjonalny SEO <title> (bez sufiksu marki) — gdy `title — type` wypada poza
+   *  okno 50–60 znaków z template'em „| KODA Studio". */
+  seoTitle?: string;
+  /** Opcjonalna meta description 150–160 znaków — gdy summary za krótkie/za długie. */
+  seoDescription?: string;
   /** Longer intro paragraph for the case-study hero. */
   intro: string;
   /** The business problem this kind of company faces (headline + paragraph). */
@@ -87,6 +92,8 @@ export interface Project {
   /** Looping clip of the signature animation (mp4, muted) + its poster frame. */
   video: string;
   poster: string;
+  /** Czas trwania klipu (ISO 8601) do VideoObject JSON-LD — REALNY, z ffprobe. */
+  videoDuration: string;
   /** True = concept/demo piece for a fictional brand (renders honest framing). */
   concept?: boolean;
   /** Card background gradient (brand-world base, shows as glow/loading state). */
@@ -108,6 +115,8 @@ const PROJECTS_DATA: Project[] = [
     liveUrl: "https://rikoszet.kodastrony.pl",
     summary:
       "Bar i klub gier, który zwiedzasz w 3D — cały lokal w przeglądarce, z rezerwacją stołu na planie sali.",
+    seoDescription:
+      "Bar i klub gier, który zwiedzasz w 3D — cały lokal w przeglądarce: tryb nocny z neonami, rezerwacja konkretnego stołu na planie sali i godziny otwarcia na żywo.",
     intro:
       "RIKOSZET to bar w starej rozlewni: bilard, rzutki, karaoke i scena pod jednym dachem. Zamiast galerii zdjęć zbudowaliśmy cały lokal w 3D — można obejrzeć go z każdej strony, zajrzeć do środka i od razu zarezerwować konkretny stół. Wszystko działa płynnie w przeglądarce, na telefonie i na komputerze.",
     challengeTitle: "Lokal pełen atrakcji, którego nie da się pokazać zdjęciem.",
@@ -183,6 +192,7 @@ const PROJECTS_DATA: Project[] = [
     mobileImage: "/realizacje/rikoszet-mobile.webp",
     video: "/realizacje/rikoszet.mp4",
     poster: "/realizacje/rikoszet-poster.webp",
+    videoDuration: "PT11S",
     concept: true,
     bg: "linear-gradient(150deg,#0e1a14 0%,#13241c 55%,#1b3327 100%)",
     glow: "#efb24a",
@@ -198,6 +208,7 @@ const PROJECTS_DATA: Project[] = [
     liveUrl: "https://jr-modular-systems.kodastrony.pl",
     summary:
       "Producent budynków modułowych z filmowym hero i konfiguratorem 3D — układasz obiekt z kontenerów 20'/40', dokładasz okna, drzwi, panele PV i taras.",
+    seoTitle: "JR Modular — strona z konfiguratorem 3D",
     intro:
       "JR Modular Systems stawia budynki z modułów — biura, przedszkola, gastronomię, hotele. Stronie daliśmy filmowy, przemysłowy charakter i autorski konfigurator 3D: klient układa swój obiekt z kontenerów 20' i 40', piętruje moduły, dokłada okna, drzwi, panele PV i taras — a gotowy projekt wysyła do wyceny.",
     challengeTitle: "Modułowy producent musi pokazać skalę i elastyczność naraz.",
@@ -274,6 +285,7 @@ const PROJECTS_DATA: Project[] = [
     mobileImage: "/realizacje/jr-mobile.webp",
     video: "/realizacje/jr.mp4",
     poster: "/realizacje/jr-poster.webp",
+    videoDuration: "PT14S",
     bg: "linear-gradient(150deg,#14130e 0%,#201d12 55%,#2b2614 100%)",
     glow: "#f4c020",
     rgb: "244,192,32",
@@ -364,6 +376,7 @@ const PROJECTS_DATA: Project[] = [
     mobileImage: "/realizacje/drblocks-mobile.webp",
     video: "/realizacje/drblocks.mp4",
     poster: "/realizacje/drblocks-poster.webp",
+    videoDuration: "PT14S",
     bg: "linear-gradient(150deg,#0c1f24 0%,#11313a 55%,#16454c 100%)",
     glow: "#2dbdb0",
     rgb: "45,189,176",
@@ -378,6 +391,9 @@ const PROJECTS_DATA: Project[] = [
     liveUrl: "https://grabowski.kodastrony.pl",
     summary:
       "Strona pracowni stolarskiej w szwajcarskim stylu — spokojna, elegancka, z realizacjami w pełnoekranowych galeriach.",
+    seoTitle: "Grabowski — strona firmowa dla stolarni",
+    seoDescription:
+      "Strona pracowni stolarskiej w szwajcarskim stylu — płynny scroll, galerie realizacji scrubowane scrollem i autorski slider w hero. Spokojna elegancja rzemiosła.",
     intro:
       "Grabowski projektuje kuchnie, zabudowy i meble z litego drewna na wymiar. Strona miała oddać to, czym jest dobre rzemiosło: spokój, precyzję i jakość. Postawiliśmy na dużo światła, dużą typografię i płynny scroll — a realizacje pokazujemy w poziomych galeriach przewijanych ruchem strony.",
     challengeTitle: "Najwyższa jakość rzemiosła i strona jak u wszystkich.",
@@ -454,6 +470,7 @@ const PROJECTS_DATA: Project[] = [
     mobileImage: "/realizacje/grabowski-mobile.webp",
     video: "/realizacje/grabowski.mp4",
     poster: "/realizacje/grabowski-poster.webp",
+    videoDuration: "PT9S",
     concept: true,
     bg: "linear-gradient(150deg,#17130f 0%,#241c14 55%,#33271a 100%)",
     glow: "#c9a06a",

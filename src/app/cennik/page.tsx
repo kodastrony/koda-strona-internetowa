@@ -9,7 +9,7 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Cennik stron internetowych 2026 — ceny KODA",
   description:
-    "Landing od 2 900 zł, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium 3D od 12 900 zł netto. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
+    "Landing od 2 900 zł, wizytówka od 3 900 zł, firmowa od 6 900 zł, premium 3D od 12 900 zł. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
   path: "/cennik/",
 });
 
@@ -33,7 +33,14 @@ const ARTICLE_JSON_LD = {
   isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
   mainEntityOfPage: `${SITE_CONFIG.url}/cennik/`,
   about: { "@type": "Thing", name: "Koszt strony internetowej" },
-  image: [`${SITE_CONFIG.url}/opengraph-image`],
+  image: [
+    {
+      "@type": "ImageObject",
+      url: `${SITE_CONFIG.url}/opengraph-image`,
+      width: 1200,
+      height: 630,
+    },
+  ],
 };
 
 // FAQPage — to samo źródło co sekcja FAQ na stronie (CENNIK_FAQ). Rich result FAQ
@@ -81,7 +88,7 @@ const OFERTA_JSON_LD = {
         "@type": "Service",
         name,
         provider: { "@id": `${SITE_CONFIG.url}/#business` },
-        areaServed: "Polska",
+        areaServed: { "@type": "Country", name: "Polska" },
       },
     })),
     ...[
@@ -103,7 +110,7 @@ const OFERTA_JSON_LD = {
         "@type": "Service",
         name,
         provider: { "@id": `${SITE_CONFIG.url}/#business` },
-        areaServed: "Polska",
+        areaServed: { "@type": "Country", name: "Polska" },
       },
     })),
   ],
@@ -147,8 +154,10 @@ export default function CennikPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(WEBPAGE_JSON_LD) }}
       />
+      {/* Widoczna data w labelu (audyt SXO 2026-08-27): SERP-y „ile kosztuje
+          strona" nagradzają jawną świeżość cennika; spójna z LASTMOD/sitemap. */}
       <PageHero
-        label="Cennik"
+        label="Cennik · aktualizacja: sierpień 2026"
         title="Ile kosztuje strona w KODA"
         lead="Konkretne ceny „od” dla każdego typu strony, dodatków i opieki — plus widełki rynkowe 2026 do porównania. Wycena zawsze bezpłatna, w 24 h."
         hue={300}

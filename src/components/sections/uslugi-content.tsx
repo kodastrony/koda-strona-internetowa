@@ -83,7 +83,10 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-15% 0px -15% 0px" });
-  const [val, setVal] = useState(0);
+  // Start = wartość KOŃCOWA, nie 0: SSR/surowy HTML musi pokazywać realny wynik
+  // (crawlery i AI czytały "0/0/0" i widziały sprzeczność z copy „100/100").
+  // Animacja 0→to startuje dopiero przy wejściu w widok (sekcja pod zagięciem).
+  const [val, setVal] = useState(to);
 
   useEffect(() => {
     if (!inView || reduce) return; // reduce: render niżej pokazuje od razu wartość końcową
@@ -759,7 +762,10 @@ function CareChatVisual() {
 
   return (
     <Parallax speed={14}>
-      <div ref={wrapRef} aria-hidden="true" className="flex flex-col gap-4 md:px-8">
+      {/* data-nosnippet: scenka jest ILUSTRACJĄ (aria-hidden), ale ekstraktory
+          tekstu (Google snippety, LLM-y) czytały dialog jak prawdziwą rozmowę
+          z klientem — nosnippet wycina go z cytowań (audyt content 2026-08-27). */}
+      <div ref={wrapRef} aria-hidden="true" data-nosnippet className="flex flex-col gap-4 md:px-8">
         {/* 1: klient pisze… / wiadomość */}
         {typingLeft1 ? (
           <ChatBubble side="left" visible typing bob={1}>

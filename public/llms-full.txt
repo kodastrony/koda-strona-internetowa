@@ -1,0 +1,77 @@
+# KODA Studio — pełna treść serwisu (llms-full.txt)
+
+> KODA Studio projektuje i koduje strony internetowe premium dla firm w Polsce — niezależne studio z Bielska-Białej, pracujące zdalnie dla klientów z całej Polski. Bez gotowych szablonów: autorski kod (Next.js, React, TypeScript, Three.js/WebGL), ustalony zakres i termin w umowie, opieka po starcie. Kontakt: 511 107 468, kontakt@kodastrony.pl. Aktualizacja treści: sierpień 2026.
+
+## Kim jest KODA Studio
+
+KODA Studio to niezależne studio projektowania i kodowania stron internetowych z siedzibą w Bielsku-Białej (woj. śląskie), pracujące zdalnie dla firm z całej Polski. Każdy projekt — od pierwszej rozmowy, przez projekt graficzny i kod, po opiekę po starcie — prowadzi to samo studio, bez podwykonawców i bez gotowych szablonów. Odpowiedź na każde zapytanie w ciągu 24 godzin, bezpłatna wycena, zakres i termin zawsze zapisane w umowie.
+
+Cztery zasady pracy KODA: (1) cel biznesowy przed ozdobami, (2) szybkość jako standard (Core Web Vitals 100/100), (3) projekt pod konkretny biznes, nie pod szablon, (4) opieka po starcie — nie znikamy po wdrożeniu.
+
+## Usługi (https://kodastrony.pl/uslugi/)
+
+1. Projektowanie UX/UI — układ i ścieżki strony pod jeden cel: odwiedzający ma szybko zrozumieć ofertę i wysłać zapytanie. Strategia, ścieżka klienta, makiety do akceptacji przed kodowaniem, responsywność, mikroanimacje.
+2. Strony internetowe 2D i 3D — strony firmowe, landingi i wizytówki na autorskim kodzie: Next.js 16, React 19, Tailwind CSS 4, TypeScript, sceny 3D w Three.js/WebGL, animacje Motion i Lenis, hosting edge CDN.
+3. SEO (pozycjonowanie strony) — Core Web Vitals 100/100, SEO techniczne, AEO / AI Search (ChatGPT, Perplexity, Google AI Overviews), dane strukturalne schema.org, analityka bez cookies (RODO-friendly), dostępność WCAG 2.2 AA.
+4. Wsparcie i opieka — gwarancja techniczna 14 dni po starcie, wsparcie telefoniczne (511 107 468), odpowiedź w 24 h, aktualizacje, kopie zapasowe, monitoring bezpieczeństwa 24/7, rozbudowa strony.
+
+Proces pracy w 4 krokach: rozmowa o celu → projektowanie (makiety do akceptacji) → budowa i testy (opiniowanie na bieżąco) → start i rozwój.
+
+## Cennik (https://kodastrony.pl/cennik/) — ceny netto, „od" = minimalny zakres
+
+- Landing page: od 2 900 zł, realizacja 1–2 tygodnie.
+- Strona wizytówka (do 5 podstron): od 3 900 zł, 2–3 tygodnie.
+- Strona firmowa (6–10 podstron): od 6 900 zł, 3–5 tygodni.
+- Strona premium z animacjami i 3D: od 12 900 zł (typowo 15 000–25 000 zł), 5–8 tygodni.
+
+W cenie każdej strony: autorski kod (zero szablonów), responsywność, Core Web Vitals 100/100, SEO techniczne + schema.org, formularz i mapa dojazdu, analityka bez cookies, wzór polityki prywatności, makiety do akceptacji przed kodem, umowa z zakresem i terminem, gwarancja techniczna 14 dni.
+
+Dodatki: dodatkowa podstrona od 400 zł; copywriting podstrony od 300 zł; wersja językowa (do 5 podstron) od 1 500 zł; kalkulator wyceny / formularz z logiką od 1 900 zł; sekcja 3D (model produktu) od 2 900 zł; konfigurator produktu od 6 900 zł; system rezerwacji od 1 200 zł; analityka rozszerzona od 900 zł; logo od 1 500 zł; SEO start dla istniejącej strony od 1 200 zł; redesign od 2 900 zł; tryb ekspres +30%.
+
+Opieka techniczna po starcie (hosting w cenie): „Czuwanie" od 149 zł/mc (monitoring 24/7, aktualizacje, kopie, zmiany do 1 h), „Opieka+" 349 zł/mc (zmiany do 3 h, miesięczny raport szybkości i widoczności, priorytet), „Rozwój" 799 zł/mc (do 6 h rozwoju miesięcznie, konsultacje, kwartalny przegląd). Bez abonamentu: 150 zł/h.
+
+Płatność: jednorazowo — 30% zaliczki na start, reszta przy oddaniu; strona, pliki i domena należą do klienta. Stały koszt po starcie: domena (ok. 100 zł/rok) i opcjonalna opieka.
+
+Rynek polski 2026 (dla porównania): wizytówka 2 000–4 000 zł, firmowa na WordPressie 3 000–8 000 zł, firmowa na autorskim kodzie (Next.js/React) 12 000–35 000 zł, kreatywne projekty premium 20 000–80 000 zł; średnia cena projektu strony u freelancera ok. 1 900 zł (Index Useme).
+
+## Najczęstsze pytania (FAQ)
+
+### Ile kosztuje strona?
+W KODA landing page kosztuje od 2 900 zł netto, strona wizytówka od 3 900 zł, strona firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Cena „od" to minimalny zakres pakietu; konkret dla Twojego projektu podajemy bezpłatnie w 24 godziny i zapisujemy w umowie — bez ukrytych kosztów później.
+
+### Czym różni się strona premium od zwykłej strony firmowej?
+Strona premium w KODA to projekt w całości szyty na miarę: indywidualne animacje, często grafika 3D (WebGL/Three.js) i dopracowany każdy detal interakcji — od 12 900 zł netto, realizacja 5–8 tygodni. Zwykła strona firmowa (od 6 900 zł) opiera się na sprawdzonym standardzie: autorski kod i szybkość te same, mniej indywidualnych animacji. W obu wypadkach zakres i termin są zapisane w umowie.
+
+### Ile trwa zrobienie strony?
+Landing page powstaje zwykle w 1–2 tygodnie, strona wizytówka w 2–3 tygodnie, strona firmowa w 3–5 tygodni, a projekt premium — z indywidualnymi animacjami czy grafiką 3D — w 5–8 tygodni. Konkretny termin KODA ustala w umowie przed startem. Za dopłatą +30% dostępny jest tryb ekspres z priorytetem terminu.
+
+### Czy strona jest moja po starcie?
+Tak — strona, domena i wszystkie pliki należą do klienta; po starcie KODA przekazuje pełne dostępy. Nic nie jest zablokowane po stronie studia. Opieka techniczna jest opcją, nie warunkiem.
+
+### Czy strona będzie dobrze widoczna w Google?
+Każdą stronę KODA buduje z technicznym SEO w standardzie: poprawna struktura, szybkość, responsywność i dane strukturalne. Pozycje w Google budują się potem treścią i czasem — można je rozwijać w ramach opieki po starcie.
+
+### Czy strona 3D nie spowalnia ładowania?
+Nie musi. W KODA sceny 3D powstają na autorskim, lekkim kodzie z systemem dopasowującym jakość grafiki do mocy urządzenia — na słabszym telefonie scena się upraszcza. Pierwszy ekran to statyczny poster, 3D dogrywa się w tle — strona zdaje Core Web Vitals.
+
+### Czy strona 3D działa na telefonie?
+Tak. Każda scena testowana jest od telefonu po ekran 4K; na słabszym sprzęcie jakość obniża się automatycznie albo przełącza na statyczną grafikę. Wspierany jest tryb ograniczonego ruchu (reduced motion).
+
+### Skąd jesteście i czy pracujecie zdalnie?
+KODA Studio pracuje z Bielska-Białej, a projekty prowadzi zdalnie dla firm z całej Polski. Spotkania odbywają się online, postępy widać na bieżąco, a zakres i termin są zapisane w umowie.
+
+### Jak szybko odpowiadacie?
+Na każde zapytanie KODA odpowiada w ciągu 24 godzin — zawsze ta sama osoba, która prowadzi projekt.
+
+## Realizacje (https://kodastrony.pl/realizacje/)
+
+- JR Modular Systems (klient) — producent budynków modułowych: filmowe hero i konfigurator 3D „Kreator" do układania obiektu z kontenerów 20'/40' (okna, drzwi, panele PV, taras, metraż i liczba modułów na żywo). https://kodastrony.pl/realizacje/jr-modular/
+- DrBlocks (klient) — regulowane bloczki fundamentowe: interaktywny model 3D produktu (wariant Standard/Plus, regulacja 120–200 mm) i kalkulator doboru rozstawu podpór i nośności. https://kodastrony.pl/realizacje/drblocks/
+- RIKOSZET (projekt koncepcyjny KODA, nie realny klient) — bar i klub gier zwiedzany w 3D w przeglądarce: tryb nocny z neonami, rezerwacja konkretnego stołu na planie sali, godziny otwarcia liczone na żywo. https://kodastrony.pl/realizacje/rikoszet/
+- Grabowski (projekt koncepcyjny KODA) — pracownia stolarska w szwajcarskim stylu: płynny scroll, galerie realizacji scrubowane scrollem, autorski slider w hero. https://kodastrony.pl/realizacje/grabowski/
+
+Wszystkie realizacje działają na żywo i można je przeklikać na telefonie i komputerze. Wspólny standard: autorski kod (React/Next.js, przy 3D — Three.js/WebGL), szybkie wczytywanie, dostępność, techniczne SEO.
+
+## Kontakt (https://kodastrony.pl/kontakt/)
+
+Telefon: 511 107 468 (naciśnij i zadzwoń). E-mail: kontakt@kodastrony.pl. Formularz kontaktowy na stronie — bezpłatna wycena i wstępny pomysł w ciągu 24 godzin, bez zobowiązań. KODA Studio, Bielsko-Biała, Polska; klienci z całej Polski (praca zdalna).

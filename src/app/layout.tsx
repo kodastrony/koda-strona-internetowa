@@ -7,7 +7,7 @@ import { PageCanvas } from "@/components/fx/page-canvas";
 import { Grain } from "@/components/fx/grain";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { CustomCursor } from "@/components/ui/custom-cursor";
+import { CursorGate } from "@/components/ui/cursor-gate";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
 import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
 import { jsonLd } from "@/lib/seo";
@@ -27,6 +27,9 @@ const ORG_JSON_LD = {
       "@type": "Organization",
       "@id": `${SITE_CONFIG.url}/#organization`,
       name: SITE_CONFIG.name,
+      // alternateName: warianty, pod którymi marka funkcjonuje w sieci (domena,
+      // krótka nazwa) — pomaga silnikom AI skleić wzmianki w jedną encję.
+      alternateName: ["KODA", "kodastrony", "kodastrony.pl"],
       url: SITE_CONFIG.url,
       email: CONTACT.email,
       telephone: CONTACT.phoneE164,
@@ -37,7 +40,7 @@ const ORG_JSON_LD = {
         height: 512,
       },
       description: SITE_CONFIG.description,
-      areaServed: "PL",
+      areaServed: { "@type": "Country", name: "Polska" },
       sameAs: ["https://github.com/kodastrony"],
       contactPoint: {
         "@type": "ContactPoint",
@@ -62,6 +65,9 @@ const ORG_JSON_LD = {
       // telephone: REALNY numer (dodany 2026-08-26 na życzenie Natana) — domyka
       // NAP (nazwa+adres+telefon) i odblokowuje spójność z przyszłym GBP.
       telephone: CONTACT.phoneE164,
+      // priceRange: realne widełki z /cennik/ (landing od 2 900 zł → premium
+      // typowo do 25 000 zł netto) — właściwość LocalBusiness, wzmacnia local pack.
+      priceRange: "2900-25000 PLN",
       image: [`${SITE_CONFIG.url}/icon.svg`, `${SITE_CONFIG.url}/opengraph-image`],
       parentOrganization: { "@id": `${SITE_CONFIG.url}/#organization` },
       description: SITE_CONFIG.tagline,
@@ -169,12 +175,16 @@ export const metadata: Metadata = {
   // własny kod, bez szablonów), brand last. <title>, og:title, the H1 story and
   // the OG banner all tell the SAME story → Google ma mniejszy powód, by
   // przepisać tytuł (spójny encyjny sygnał, ważny też dla AI search / AEO).
+  // „premium" w title/description (2026-08-27): rebrand „KODA robi tylko strony
+  // premium" + audyt SXO — fraza „strony internetowe premium" była wcześniej
+  // NIEOBECNA w crawlowalnym title/H1 całej domeny, a to nasz najbardziej
+  // wygrywalny keyword. 56 znaków = okno 50–60.
   title: {
-    default: "Strony internetowe dla firm — projekt i kod | KODA Studio",
+    default: "Strony internetowe premium — projekt i kod | KODA Studio",
     template: "%s | KODA Studio",
   },
   description:
-    "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+    "Projektujemy i kodujemy strony internetowe premium — z Bielska-Białej, dla firm w całej Polsce. Bez szablonów, zakres i termin w umowie. Odpowiadamy w 24 h.",
   // Bez meta keywords: Google ignoruje od 2009, część audytorów flaguje jako
   // przestarzałe, a lista zdradzała strategię fraz konkurencji (audyt 2026-08-26).
   authors: [{ name: "KODA Studio", url: "https://kodastrony.pl" }],
@@ -185,15 +195,15 @@ export const metadata: Metadata = {
     url: "https://kodastrony.pl",
     siteName: "KODA Studio",
     // bez sufiksu marki — siteName już pokazuje „KODA Studio" w embedzie
-    title: "Strony internetowe dla firm — projekt i kod na miarę",
+    title: "Strony internetowe premium — projekt i kod na miarę",
     description:
-      "Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej i całej Polski. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+      "Projektujemy i kodujemy strony internetowe premium — z Bielska-Białej, dla firm w całej Polsce. Bez szablonów, zakres i termin w umowie. Odpowiadamy w 24 h.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Strony internetowe dla firm — KODA Studio",
+    title: "Strony internetowe premium — KODA Studio",
     description:
-      "Projektujemy i kodujemy strony internetowe dla firm w całej Polsce. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
+      "Projektujemy i kodujemy strony internetowe premium dla firm w całej Polsce. Bez szablonów, z zakresem i terminem w umowie. Odpowiadamy w 24 h.",
   },
   metadataBase: new URL("https://kodastrony.pl"),
   alternates: {
@@ -290,7 +300,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
-              <CustomCursor />
+              <CursorGate />
             </HeaderThemeProvider>
           </MotionProvider>
         </SmoothScroll>

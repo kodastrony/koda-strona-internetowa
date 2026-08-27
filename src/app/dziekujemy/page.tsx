@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 import { FadeUp } from "@/components/motion";
 import { PillLink } from "@/components/ui/pill-link";
 import { SuccessCheck } from "@/components/ui/success-check";
@@ -8,13 +9,15 @@ import { PhoneLink } from "@/components/ui/phone-link";
 
 // Strona-podziękowanie — cel `_next` po wysłaniu formularza (FormSubmit).
 // noindex: nie chcemy jej w wynikach wyszukiwania.
+// pageMetadata: canonical + KOMPLET OG/Twitter z og:url=self — bez helpera strona
+// dziedziczyła og:url "/" z layoutu (rozjazd z canonical, flagowany walidatorami).
 export const metadata: Metadata = {
-  title: "Dziękujemy",
-  description: "Wiadomość wysłana — odezwiemy się w ciągu 24 godzin.",
+  ...pageMetadata({
+    title: "Dziękujemy",
+    description: "Wiadomość wysłana — odezwiemy się w ciągu 24 godzin.",
+    path: "/dziekujemy/",
+  }),
   robots: { index: false, follow: false },
-  // Self-canonical — bez tego strona DZIEDZICZY canonical "/" z layoutu (mieszany
-  // sygnał: noindex + canonical na home). Nieszkodliwe, ale walidatory to flagują.
-  alternates: { canonical: "/dziekujemy/" },
 };
 
 export default function DziekujemyPage() {

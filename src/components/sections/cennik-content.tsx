@@ -284,7 +284,7 @@ export function CennikContent() {
       {/* ── PAKIETY — wiersze hairline, wielka cena, chipy zakresu ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="pakiety" className="font-heading font-semibold" style={h2Style}>
             Cennik KODA — strony
           </h2>
         </FadeUp>
@@ -389,7 +389,7 @@ export function CennikContent() {
         <div className="grid grid-cols-1 gap-y-6 md:grid-cols-12 md:gap-x-12">
           <div className="md:col-span-5">
             <FadeUp inView>
-              <h2 className="font-heading font-semibold" style={h2Style}>
+              <h2 id="w-cenie" className="font-heading font-semibold" style={h2Style}>
                 W cenie każdej strony
               </h2>
             </FadeUp>
@@ -430,7 +430,7 @@ export function CennikContent() {
       {/* ── DODATKI ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="dodatki" className="font-heading font-semibold" style={h2Style}>
             Dodatki i rozbudowa
           </h2>
         </FadeUp>
@@ -491,7 +491,7 @@ export function CennikContent() {
       {/* ── OPIEKA ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="opieka" className="font-heading font-semibold" style={h2Style}>
             Opieka po starcie
           </h2>
         </FadeUp>
@@ -568,7 +568,7 @@ export function CennikContent() {
       {/* ── ZASADY ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="zasady" className="font-heading font-semibold" style={h2Style}>
             Zasady — bez gwiazdek
           </h2>
         </FadeUp>
@@ -594,7 +594,7 @@ export function CennikContent() {
       {/* ── RYNEK 2026 — kontekst (SEO/AEO: tabele = format #1 cytowań) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="rynek" className="font-heading font-semibold" style={h2Style}>
             Ile kosztuje strona internetowa na rynku?
           </h2>
         </FadeUp>
@@ -658,7 +658,7 @@ export function CennikContent() {
       {/* ── Kto tworzy stronę (porównanie) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="porownanie" className="font-heading font-semibold" style={h2Style}>
             Kreator, freelancer czy agencja — co wybrać?
           </h2>
         </FadeUp>
@@ -800,7 +800,7 @@ export function CennikContent() {
       {/* ── Co wpływa na cenę ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="czynniki" className="font-heading font-semibold" style={h2Style}>
             Co wpływa na cenę strony?
           </h2>
         </FadeUp>
@@ -862,7 +862,7 @@ export function CennikContent() {
       {/* ── Mini-FAQ (zasila FAQPage JSON-LD; answer-first pod AI) ── */}
       <div className="container-koda" style={sectionDivider}>
         <FadeUp inView>
-          <h2 className="font-heading font-semibold" style={h2Style}>
+          <h2 id="faq" className="font-heading font-semibold" style={h2Style}>
             Najczęstsze pytania o cenę strony
           </h2>
         </FadeUp>

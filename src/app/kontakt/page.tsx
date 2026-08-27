@@ -22,6 +22,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   description:
     "Zadzwoń: 511 107 468 albo opisz projekt w formularzu — wrócimy z pomysłem i wyceną w 24 h. Studio z Bielska-Białej, bezpośredni kontakt, bez zobowiązań.",
   dateModified: LASTMOD["/kontakt/"],
+  pageType: "ContactPage",
 });
 
 export default function KontaktPage() {

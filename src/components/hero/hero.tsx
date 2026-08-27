@@ -80,6 +80,11 @@ function HeroCopy({ play }: { play: boolean }) {
           textWrap: "balance",
         }}
       >
+        {/* ★ LCP: H1 MUSI być namalowany w 1. klatce (pod nieprzezroczystą kurtyną
+            intro — elementy przykryte overlayem liczą się do LCP, przycięte
+            overflow:hidden NIE). Dlatego ZERO clip-masky i ZERO opacity:0 — tylko
+            transform-only settle (26px→0) po intro. Poprzedni wariant (y:112% w
+            masce) trzymał LCP na ~5,7 s mobile (PSI 2026-08-27). */}
         {[
           <>Strona internetowa, która</>,
           <>
@@ -87,20 +92,12 @@ function HeroCopy({ play }: { play: boolean }) {
             <span style={{ color: "var(--color-ink)" }}>.</span>
           </>,
         ].map((line, i) => (
-          <span
-            key={i}
-            style={{
-              display: "block",
-              overflow: "hidden",
-              paddingBottom: "0.12em",
-              marginBottom: "-0.12em",
-            }}
-          >
+          <span key={i} style={{ display: "block" }}>
             <motion.span
               data-reveal
               style={{ display: "block", willChange: "transform" }}
-              initial={{ y: reduce ? "0%" : "112%" }}
-              animate={{ y: play ? "0%" : "112%" }}
+              initial={{ y: reduce ? 0 : 26 }}
+              animate={{ y: play ? 0 : 26 }}
               transition={
                 reduce
                   ? { duration: 0 }
@@ -122,8 +119,8 @@ function HeroCopy({ play }: { play: boolean }) {
             maxWidth: "46ch",
           }}
         >
-          Projektujemy i kodujemy strony internetowe dla firm — z Bielska-Białej, dla całej
-          Polski. Od zera, pod konkretny cel.
+          Projektujemy i kodujemy strony internetowe premium dla firm — z Bielska-Białej, dla
+          całej Polski. Każda strona internetowa powstaje od zera, pod konkretny cel.
         </p>
       </FadeUp>
 

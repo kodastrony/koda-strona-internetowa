@@ -63,6 +63,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   description:
     "Projektowanie UX/UI, strony internetowe 2D i 3D, SEO oraz opieka po starcie — dla firm z Bielska-Białej i całej Polski. Pod konkretny cel, nie pod szablon.",
   dateModified: LASTMOD["/uslugi/"],
+  pageType: "CollectionPage",
 });
 
 export default function UslugiPage() {
@@ -85,7 +86,7 @@ export default function UslugiPage() {
       <PageHero
         label="Usługi"
         title="Strony internetowe, które robimy dla Ciebie"
-        lead="Cztery obszary, jeden cel: strona, która dobrze wygląda i pozyskuje klientów. Od pierwszej rozmowy po wsparcie długo po starcie."
+        lead="Cztery obszary, jeden cel: robimy dla Ciebie stronę, która dobrze wygląda i pozyskuje klientów. Od pierwszej rozmowy po wsparcie długo po starcie."
         hue={300}
       />
       <UslugiContent />

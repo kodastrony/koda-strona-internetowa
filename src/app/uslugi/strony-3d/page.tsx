@@ -83,7 +83,7 @@ export default function Strony3DPage() {
       <PageHero
         label="Usługi · 3D i animacje"
         title="Strony internetowe 3D i animowane"
-        lead="Interaktywne sceny w przeglądarce i animacje, które wyróżniają markę — z czterema działającymi demami. Szybkie, dostępne i na każdym ekranie."
+        lead="Strony animowane i interaktywne sceny 3D w przeglądarce — z czterema działającymi demami. Wyróżniają markę, a przy tym są szybkie, dostępne i działają na każdym ekranie."
         hue={324}
       />
       <Strony3DContent />

@@ -1,6 +1,6 @@
 # KODA Studio
 
-> KODA Studio projektuje i koduje strony internetowe dla firm w Polsce — niezależne studio z Bielska-Białej, obsługujące klientów zdalnie w całej Polsce. Bez gotowych szablonów: autorski kod, ustalony zakres i termin w umowie, opieka po starcie. Specjalizacja: strony 2D i 3D (WebGL / Three.js / React Three Fiber), animacje, SEO techniczne, dostępność (WCAG).
+> KODA Studio projektuje i koduje strony internetowe premium dla firm w Polsce — niezależne studio z Bielska-Białej, obsługujące klientów zdalnie w całej Polsce. Bez gotowych szablonów: autorski kod, ustalony zakres i termin w umowie, opieka po starcie. Specjalizacja: strony 2D i 3D (WebGL / Three.js / React Three Fiber), animacje, SEO techniczne, dostępność (WCAG). Pełna wersja treści: https://kodastrony.pl/llms-full.txt
 
 KODA Studio to niezależne studio projektowania i kodowania stron internetowych z siedzibą w Bielsku-Białej (Polska), pracujące zdalnie dla firm z całej Polski. Każdy projekt — od pierwszej rozmowy, przez projekt i kod, po opiekę po starcie — prowadzi to samo studio, bez podwykonawców i bez gotowych szablonów. Odpowiedź na zapytanie w ciągu 24 godzin, bezpłatna wycena, zakres i termin zawsze w umowie. Kontakt: telefon 511 107 468, e-mail kontakt@kodastrony.pl.
 

@@ -72,6 +72,23 @@ export function Work() {
               </motion.span>
             ))}
           </h2>
+          {/* Linia zaufania (audyt SXO 2026-08-27: Authority 3/15 na home) — TYLKO
+              realni klienci z nazwy (RIKOSZET/Grabowski to koncepty — nie wolno ich
+              podpisać „zaufali nam"). Fakt + weryfikowalność (żywe strony). */}
+          <FadeUp inView delay={0.15}>
+            <p
+              className="mt-5 max-w-[52ch]"
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "1rem",
+                lineHeight: 1.6,
+                color: "var(--color-ink-muted)",
+              }}
+            >
+              Wśród nich strony klienckie dla <strong>DrBlocks</strong> i{" "}
+              <strong>JR Modular Systems</strong> — każdą realizację można przeklikać na żywo.
+            </p>
+          </FadeUp>
         </div>
 
         {/* ── 2×2 grid (4 kwadraty) ──
@@ -87,10 +104,11 @@ export function Work() {
             // reduced-motion = Parallax przepuszcza statycznie (zero ruchu). Te
             // same wartości prędkości co realizacje (spójny feel obu siatek).
             <Parallax key={p.id} speed={i % 2 === 0 ? -26 : 34}>
+              {/* Bez priority: sekcja jest POD zagięciem — preload fetchpriority=high
+                  dwóch kart kradł pasmo fontom/JS na critical path (PSI mobile 2026-08-27). */}
               <ProjectCard
                 project={p}
                 delay={i * 0.06}
-                priority={i < 2}
                 sizes="(min-width: 768px) 46vw, 47vw"
               />
             </Parallax>

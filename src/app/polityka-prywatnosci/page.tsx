@@ -6,7 +6,8 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Polityka prywatności",
-  description: "Polityka prywatności i ochrony danych osobowych KODA Studio.",
+  description:
+    "Polityka prywatności kodastrony.pl — jakie dane zbiera formularz kontaktowy KODA Studio, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
   path: "/polityka-prywatnosci/",
 });
 
@@ -19,7 +20,8 @@ const BREADCRUMB_JSON_LD = breadcrumbLd([
 const WEBPAGE_JSON_LD = webPageLd({
   path: "/polityka-prywatnosci/",
   name: "Polityka prywatności",
-  description: "Polityka prywatności i ochrony danych osobowych KODA Studio.",
+  description:
+    "Polityka prywatności kodastrony.pl — jakie dane zbiera formularz kontaktowy KODA Studio, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
   dateModified: LASTMOD["/polityka-prywatnosci/"],
 });
 
@@ -54,12 +56,12 @@ export default function PolitykaPrywatnosciPage() {
             marginBottom: "2.5rem",
           }}
         >
-          Ochrona danych<span className="text-pink">.</span>
+          Polityka prywatności<span className="text-pink">.</span>
         </h1>
 
         <div className="font-body text-[16px] leading-relaxed text-[var(--color-ink-muted)]">
           <p className="mb-10 text-[14px] text-[var(--color-ink-faint)]">
-            Ostatnia aktualizacja: 7 czerwca 2026
+            Ostatnia aktualizacja: 27 sierpnia 2026
           </p>
 
           <h2 className="mt-10 mb-3 font-heading text-[1.3rem] font-bold text-[var(--color-ink)]">
@@ -135,7 +137,8 @@ export default function PolitykaPrywatnosciPage() {
           <p>
             Strona <strong>kodastrony.pl</strong> nie używa własnych plików cookie do celów
             śledzenia ani analitycznych. Pliki cookie mogą być stosowane przez infrastrukturę
-            serwera (OVH) w celach technicznych.
+            hostingową (Cloudflare) wyłącznie w celach technicznych, np. bezpieczeństwa
+            połączenia.
           </p>
 
           <h2 className="mt-10 mb-3 font-heading text-[1.3rem] font-bold text-[var(--color-ink)]">

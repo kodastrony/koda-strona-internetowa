@@ -21,6 +21,7 @@ const AI_AND_SEARCH_BOTS = [
   // Anthropic / Claude
   "ClaudeBot",
   "Claude-SearchBot",
+  "Claude-User",
   "anthropic-ai",
   // Google (Gemini / AI Overviews / AI Mode — osobny token od Googlebota)
   "Google-Extended",
@@ -40,6 +41,10 @@ const AI_AND_SEARCH_BOTS = [
   "MistralAI-User",
   // ByteDance (Doubao) — spójnie ze strategią „wpuszczamy wszystkie silniki AI"
   "Bytespider",
+  // Cohere, You.com, Diffbot (knowledge graph dla wielu silników AI)
+  "cohere-ai",
+  "YouBot",
+  "Diffbot",
 ];
 
 export default function robots(): MetadataRoute.Robots {
