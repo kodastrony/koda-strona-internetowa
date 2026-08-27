@@ -12,6 +12,7 @@ import {
   KODA_FILL_LIGHT,
 } from "./hero-config";
 import { KodaColumnLetters, KODA_LEFT, KODA_FONT_CENTER } from "./koda-letters";
+import { LCP_SEED_NOISE } from "./lcp-seed-noise";
 
 /* ══════════════════════════════════════════════════════════════════════════
    HeroIntro — intro „dwóch linii" (baunfire DNA), odporne na każdy rozmiar ekranu.
@@ -289,11 +290,11 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
               przecieku jest niewidoczna. ── */}
       {/* eslint-disable-next-line @next/next/no-img-element -- data-URI (zero sieci); next/image nic tu nie optymalizuje */}
       <img
-        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='760'%3E%3Crect width='600' height='760' fill='%23efe7f5'/%3E%3C/svg%3E"
+        src={LCP_SEED_NOISE}
         alt=""
         aria-hidden="true"
-        width={600}
-        height={760}
+        width={96}
+        height={120}
         className="pointer-events-none absolute select-none"
         style={{ top: "8svh", left: "10vw", width: "80vw", height: "78svh", objectFit: "cover" }}
       />
