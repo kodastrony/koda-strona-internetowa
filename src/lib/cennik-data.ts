@@ -37,10 +37,13 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     // tierze (rebrand 27.08: „robimy tylko strony premium"). Wyższe tiery
     // DZIEDZICZĄ ten zestaw (chip „Wszystko z…") i dodają swój rząd.
     // Bez oczywistości (korekta Natana 27.08: „wypierdol to, czego ludzie
-    // i tak się spodziewają" — responsywność, formularz, opinie itp.).
+    // i tak się spodziewają"). Chipy wyższych tierów = EKSKLUZYWNE featury
+    // tego tiera (nie liczba podstron — „pierdoli mnie ile jest podstron");
+    // SEO lokalne + Maps siedzi w BAZIE, bo dajemy je każdemu.
     chips: [
       "autorski design premium",
       "SEO + AI search (AEO)",
+      "SEO lokalne + Google Maps",
       "szybkość 100/100",
       "animacje premium",
       "CTA pod konwersję",
@@ -53,22 +56,27 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     id: "wizytowka",
     name: "Strona wizytówka",
     short: "Wizytówka",
-    desc: "Pełna obecność firmy — do 5 podstron.",
+    desc: "Cała firma profesjonalnie pokazana w internecie.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
     inherits: "Wszystko z Landing",
-    chips: ["do 5 podstron", "SEO lokalne + Google Maps", "start w 2–4 tygodnie"],
+    chips: [
+      "galeria realizacji",
+      "FAQ pod AI search",
+      "spójny branding całości",
+      "start w 2–4 tygodnie",
+    ],
   },
   {
     id: "firmowa",
     name: "Strona firmowa",
     short: "Firmowa",
-    desc: "6–10 podstron z treściami i strukturą pod SEO.",
+    desc: "Rozbudowana strona, która sprzedaje i pozycjonuje.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
     inherits: "Wszystko z Wizytówki",
     chips: [
-      "6–10 podstron",
+      "architektura treści pod SEO",
       "integracja CRM",
       "cele konwersji w analityce",
       "start w 4–6 tygodni",
