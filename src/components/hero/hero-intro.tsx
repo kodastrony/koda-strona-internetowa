@@ -76,6 +76,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
   // inaczej półprzezroczyste finalFill malowałoby się PODWÓJNIE (przyciemnienie).
   const seedARef = useRef<HTMLDivElement>(null);
   const seedBRef = useRef<HTMLDivElement>(null);
+  const seedImgRef = useRef<HTMLImageElement>(null);
   // Dwie kolumny: A = off-center (≥lg), B = wyśrodkowana (<lg). Aktywna wg matchMedia.
   const finalRefA = useRef<HTMLDivElement>(null);
   const pinkRefA = useRef<HTMLDivElement>(null);
@@ -136,6 +137,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         );
         if (seedARef.current) seedARef.current.style.visibility = "hidden";
         if (seedBRef.current) seedBRef.current.style.visibility = "hidden";
+        if (seedImgRef.current) seedImgRef.current.style.visibility = "hidden";
         pink
           .querySelectorAll<HTMLElement>("[data-pink-letter]")
           .forEach((el) => ((el.style.opacity = "1"), (el.style.transform = "translateY(0%)")));
@@ -170,10 +172,12 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
             (oba tryby — różni się tylko geometria m: ~0.5 środek / ~0.65 off-center). */
       const lineAnims: Animation[] = [];
 
-      // Wipe odsłoni obszar pod coverem — seed MUSI zniknąć w tym samym commicie,
-      // inaczej finalFill (rgba) maluje się podwójnie i litery ciemnieją.
+      // Wipe odsłoni obszar pod coverem — seedy MUSZĄ zniknąć w tym samym commicie:
+      // litery (finalFill rgba malowałby się podwójnie = ciemnienie) i seed-IMG
+      // (wipe odsłaniałby porcelanowy szum zamiast prawdziwego hero).
       if (seedARef.current) seedARef.current.style.visibility = "hidden";
       if (seedBRef.current) seedBRef.current.style.visibility = "hidden";
+      if (seedImgRef.current) seedImgRef.current.style.visibility = "hidden";
 
       if (pink && finalEl) {
         const r = pink.getBoundingClientRect();
@@ -290,6 +294,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
               przecieku jest niewidoczna. ── */}
       {/* eslint-disable-next-line @next/next/no-img-element -- data-URI (zero sieci); next/image nic tu nie optymalizuje */}
       <img
+        ref={seedImgRef}
         src={LCP_SEED_NOISE}
         alt=""
         aria-hidden="true"
