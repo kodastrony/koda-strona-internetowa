@@ -1,6 +1,5 @@
-# ── KODA — przekierowania dla Cloudflare Pages ────────────────────────────────
-# www → apex (301): bez tego www.kodastrony.pl serwuje 200 z pełną kopią strony
-# = duplikacja domeny (Seobility: Error). Plik trafia z public/ do out/ i jest
-# czytany z roota builda przez Cloudflare Pages. Składnia host-based wymaga
-# pełnego URL-a po stronie źródła.
+# KODA — przekierowania Cloudflare Pages. www → apex (301): bez tego
+# www.kodastrony.pl serwuje 200 z pelna kopia strony (duplikacja domeny).
 https://www.kodastrony.pl/* https://kodastrony.pl/:splat 301
+# Diagnostyka (2026-08-27): czy CF Pages w ogole przetwarza ten plik.
+/qa-redirect-test/ https://kodastrony.pl/ 302
