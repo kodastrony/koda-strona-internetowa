@@ -85,8 +85,11 @@ function HeroCopy({ play }: { play: boolean }) {
             overflow:hidden NIE). Dlatego ZERO clip-masky i ZERO opacity:0 — tylko
             transform-only settle (26px→0) po intro. Poprzedni wariant (y:112% w
             masce) trzymał LCP na ~5,7 s mobile (PSI 2026-08-27). */}
+        {/* Spacja na końcu 1. linii: linie to OSOBNE blokowe spany, więc textContent
+            skleja się bez odstępu — crawlery widziały token „któraprzynosi" i
+            Seobility zgłaszał „Words from H1 not found in text". Wizualnie zero różnicy. */}
         {[
-          <>Strona internetowa, która</>,
+          <>Strona internetowa, która </>,
           <>
             <span style={{ color: "var(--color-accent)" }}>przynosi klientów</span>
             <span style={{ color: "var(--color-ink)" }}>.</span>

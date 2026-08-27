@@ -404,7 +404,9 @@ export function Statement() {
               color: "#ffffff",
             }}
           >
-            {["Zbudujmy stronę,", "która przynosi klientów."].map((line, i) => (
+            {/* Spacja na końcu 1. linii — osobne blokowe spany kleją textContent
+                („stronę,która" dla crawlerów), jak w hero. */}
+            {["Zbudujmy stronę, ", "która przynosi klientów."].map((line, i) => (
               <motion.span
                 key={i}
                 data-reveal

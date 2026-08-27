@@ -54,7 +54,9 @@ export function Work() {
             <span className="label-koda mb-5 block">Realizacje</span>
           </FadeUp>
           <h2 className="text-section-title">
-            {["Nasze realizacje", "stron internetowych."].map((line, i) => (
+            {/* Spacja na końcu 1. linii — jak w hero: osobne blokowe spany kleją
+                textContent („realizacjestron" dla crawlerów). */}
+            {["Nasze realizacje ", "stron internetowych."].map((line, i) => (
               <motion.span
                 key={line}
                 data-reveal
