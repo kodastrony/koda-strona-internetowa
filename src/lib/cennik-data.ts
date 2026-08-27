@@ -36,6 +36,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     // LANDING = pełna baza premium: WSZYSTKO, co realnie dajemy w najniższym
     // tierze (rebrand 27.08: „robimy tylko strony premium"). Wyższe tiery
     // DZIEDZICZĄ ten zestaw (chip „Wszystko z…") i dodają swój rząd.
+    // Bez oczywistości (korekta Natana 27.08: „wypierdol to, czego ludzie
+    // i tak się spodziewają" — responsywność, formularz, opinie itp.).
     chips: [
       "autorski design premium",
       "SEO + AI search (AEO)",
@@ -44,8 +46,6 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "CTA pod konwersję",
       "pod Google Ads i Meta",
       "analityka konwersji",
-      "formularz + telefon",
-      "responsywność 100%",
       "start w 2–3 tygodnie",
     ],
   },
@@ -57,13 +57,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     from: 3900,
     typical: "4 500 – 6 000 zł",
     inherits: "Wszystko z Landing",
-    chips: [
-      "do 5 podstron",
-      "SEO lokalne + Google Maps",
-      "podstrony oferty",
-      "sekcja opinii klientów",
-      "start w 2–4 tygodnie",
-    ],
+    chips: ["do 5 podstron", "SEO lokalne + Google Maps", "start w 2–4 tygodnie"],
   },
   {
     id: "firmowa",
@@ -75,10 +69,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     inherits: "Wszystko z Wizytówki",
     chips: [
       "6–10 podstron",
-      "copywriting w cenie",
       "integracja CRM",
       "cele konwersji w analityce",
-      "sekcja aktualności",
       "start w 4–6 tygodni",
     ],
   },
