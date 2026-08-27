@@ -944,31 +944,37 @@ function WycenaTicker() {
         </div>
       </FadeUp>
 
-      {/* Chipy zakresu — kaskada przy każdym przełączeniu */}
+      {/* Chipy zakresu — tiery KUMULATYWNE: wyróżniony chip „Wszystko z…"
+          + NOWE rzeczy tego tiera, kaskada przy każdym przełączeniu */}
       <ul key={p.id} className="mt-5 flex flex-wrap gap-2" role="list">
-        {p.chips.map((c, i) => (
-          <motion.li
-            key={c}
-            initial={reduce ? false : { opacity: 0, y: 9, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={
-              reduce
-                ? { duration: 0 }
-                : { duration: 0.3, ease: EASE.out, delay: 0.05 + i * 0.05 }
-            }
-            style={{
-              border: "1px solid var(--color-line)",
-              borderRadius: 999,
-              padding: "0.35rem 0.85rem",
-              fontFamily: "var(--font-body)",
-              fontSize: "0.85rem",
-              color: "var(--color-ink-muted)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {c}
-          </motion.li>
-        ))}
+        {(p.inherits ? [p.inherits, ...p.chips] : p.chips).map((c, i) => {
+          const inherit = i === 0 && !!p.inherits;
+          return (
+            <motion.li
+              key={c}
+              initial={reduce ? false : { opacity: 0, y: 9, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : { duration: 0.3, ease: EASE.out, delay: 0.05 + i * 0.05 }
+              }
+              style={{
+                border: `1px solid ${inherit ? "rgba(179,42,157,0.45)" : "var(--color-line)"}`,
+                backgroundColor: inherit ? "rgba(179,42,157,0.08)" : "transparent",
+                borderRadius: 999,
+                padding: "0.35rem 0.85rem",
+                fontFamily: "var(--font-body)",
+                fontSize: "0.85rem",
+                fontWeight: inherit ? 600 : 400,
+                color: inherit ? "#9a2487" : "var(--color-ink-muted)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {inherit ? `★ ${c}` : c}
+            </motion.li>
+          );
+        })}
       </ul>
 
       {/* W cenie KAŻDEGO pakietu — dowody, które zamykają sprzedaż */}

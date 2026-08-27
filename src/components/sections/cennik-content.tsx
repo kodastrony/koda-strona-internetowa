@@ -312,7 +312,21 @@ export function CennikContent() {
                   <p className="mt-1.5" style={{ ...bodyStyle, fontSize: "1rem", maxWidth: "44ch" }}>
                     {p.desc}
                   </p>
+                  {/* Tiery kumulatywne: wyróżniony chip „Wszystko z…" + nowości */}
                   <ul className="mt-4 flex flex-wrap gap-2" role="list">
+                    {p.inherits && (
+                      <li
+                        style={{
+                          ...chipStyle,
+                          border: "1px solid rgba(179,42,157,0.45)",
+                          backgroundColor: "rgba(179,42,157,0.08)",
+                          color: "#9a2487",
+                          fontWeight: 600,
+                        }}
+                      >
+                        ★ {p.inherits}
+                      </li>
+                    )}
                     {p.chips.map((c) => (
                       <li key={c} style={chipStyle}>
                         {c}

@@ -18,7 +18,10 @@ export interface CennikPakiet {
   from: number;
   /** Typowy przedział realizacji (tekstowo, z „zł"). */
   typical: string;
-  /** Zakres w 2–4-słownych chipach. */
+  /** Chip dziedziczenia „Wszystko z X" (tiery KUMULATYWNE — rebrand 27.08:
+   *  najniższy tier = pełny serwis premium, wyższe DODAJĄ zakres). */
+  inherits?: string;
+  /** NOWE rzeczy tego tiera, w 2–4-słownych chipach. */
   chips: string[];
 }
 
@@ -30,18 +33,19 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Jedna strona, która sprzedaje jedną rzecz.",
     from: 2900,
     typical: "3 500 – 4 500 zł",
-    // Chipy = keywordy business ownera (SEO / AI search / CRM / CTA /
-    // konwersja). KAŻDY tier niesie pełną jakość (SEO, 100/100, analityka,
-    // animacje — korekta Natana 27.08: „każda strona jest premium quality,
-    // tiery różnią się zakresem, nie jakością") + swoje chipy zakresu.
+    // LANDING = pełna baza premium: WSZYSTKO, co realnie dajemy w najniższym
+    // tierze (rebrand 27.08: „robimy tylko strony premium"). Wyższe tiery
+    // DZIEDZICZĄ ten zestaw (chip „Wszystko z…") i dodają swój rząd.
     chips: [
-      "SEO + AI search",
+      "autorski design premium",
+      "SEO + AI search (AEO)",
       "szybkość 100/100",
-      "pod Google Ads i Meta",
-      "CTA pod konwersję",
-      "analityka konwersji",
       "animacje premium",
+      "CTA pod konwersję",
+      "pod Google Ads i Meta",
+      "analityka konwersji",
       "formularz + telefon",
+      "responsywność 100%",
       "start w 2–3 tygodnie",
     ],
   },
@@ -52,14 +56,12 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Pełna obecność firmy — do 5 podstron.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
+    inherits: "Wszystko z Landing",
     chips: [
-      "SEO lokalne + Google Maps",
-      "AI search (AEO)",
-      "szybkość 100/100",
       "do 5 podstron",
-      "CTA: telefon i formularz",
-      "analityka odwiedzin",
-      "animacje premium",
+      "SEO lokalne + Google Maps",
+      "podstrony oferty",
+      "sekcja opinii klientów",
       "start w 2–4 tygodnie",
     ],
   },
@@ -70,14 +72,13 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "6–10 podstron z treściami i strukturą pod SEO.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
+    inherits: "Wszystko z Wizytówki",
     chips: [
-      "SEO + AI search (AEO)",
-      "szybkość 100/100",
       "6–10 podstron",
       "copywriting w cenie",
       "integracja CRM",
-      "analityka i cele konwersji",
-      "animacje premium",
+      "cele konwersji w analityce",
+      "sekcja aktualności",
       "start w 4–6 tygodni",
     ],
   },
@@ -88,14 +89,13 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory.",
     from: 12900,
     typical: "15 000 – 25 000 zł",
+    inherits: "Wszystko z Firmowej",
     chips: [
-      "autorski design 3D / WebGL",
+      "koncept kreatywny 1:1",
+      "sceny 3D / WebGL",
       "konfiguratory produktów",
       "kalkulatory wyceny",
-      "zaawansowane animacje",
-      "SEO + AI search (AEO)",
-      "szybkość 100/100",
-      "analityka konwersji",
+      "scrollytelling i intro",
       "start w 6–10 tygodni",
     ],
   },
