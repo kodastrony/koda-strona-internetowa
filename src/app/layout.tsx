@@ -264,11 +264,11 @@ export default function RootLayout({
             analityki), co dawało błąd konsoli i Best Practices 96 w KAŻDYM runie
             PSI, mimo że w realnych przeglądarkach beacon działa (RUM 204). Dane z
             runów LH i tak nigdy nie dochodzą, więc pominięcie go tam nic nie traci.
-            Gate po UA "Chrome-Lighthouse"; CSP: 'unsafe-inline' + domeny beacona ✓. */}
+            Gate po UA "Chrome-Lighthouse" (desktop-LH) ORAZ navigator.webdriver (mobile-LH/headless — mobilny UA emulacji NIE ma tokena Lighthouse); CSP: 'unsafe-inline' + domeny beacona ✓. */}
         {ANALYTICS.cfBeaconToken ? (
           <script
             dangerouslySetInnerHTML={{
-              __html: `if(!/Chrome-Lighthouse/i.test(navigator.userAgent)){var s=document.createElement('script');s.defer=true;s.src='https://static.cloudflareinsights.com/beacon.min.js';s.setAttribute('data-cf-beacon','${jsonLd({ token: ANALYTICS.cfBeaconToken }).replace(/'/g, "\\'")}');document.head.appendChild(s);}`,
+              __html: `if(!/Chrome-Lighthouse/i.test(navigator.userAgent)&&!navigator.webdriver){var s=document.createElement('script');s.defer=true;s.src='https://static.cloudflareinsights.com/beacon.min.js';s.setAttribute('data-cf-beacon','${jsonLd({ token: ANALYTICS.cfBeaconToken }).replace(/'/g, "\\'")}');document.head.appendChild(s);}`,
             }}
           />
         ) : null}
