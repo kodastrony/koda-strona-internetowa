@@ -920,7 +920,8 @@ function WycenaTicker() {
             </span>
           </div>
 
-          {/* Opis + typowy zakres: crossfade przy zmianie, wyraźna hierarchia */}
+          {/* Opis pakietu: crossfade przy zmianie. „Typowy zakres" usunięty
+              (korekta Natana 27.08: mylił — pełne widełki zostają na /cennik). */}
           <motion.div
             key={p.id}
             initial={reduce ? false : { opacity: 0, y: 6 }}
@@ -938,18 +939,6 @@ function WycenaTicker() {
               }}
             >
               {p.desc}
-            </p>
-            <p className="mt-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="label-koda" style={{ color: "var(--color-ink-faint)" }}>
-                Typowy zakres
-              </span>
-              <span
-                className="font-heading font-semibold"
-                style={{ fontSize: "clamp(1rem,1.25vw,1.15rem)", color: "var(--color-ink)" }}
-              >
-                {p.typical}{" "}
-                <span style={{ color: "var(--color-ink-muted)", fontWeight: 500 }}>netto</span>
-              </span>
             </p>
           </motion.div>
         </div>

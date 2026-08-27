@@ -30,7 +30,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Jedna strona, która sprzedaje jedną rzecz.",
     from: 2900,
     typical: "3 500 – 4 500 zł",
-    chips: ["do 6 sekcji", "formularz + telefon", "animacje", "2–3 tygodnie"],
+    // Chipy = korzyści, nie cechy (korekta Natana 27.08: „mają przekonywać").
+    chips: ["gotowy pod reklamy", "kontakt w 1 klik", "animacje premium", "start w 2–3 tygodnie"],
   },
   {
     id: "wizytowka",
@@ -39,7 +40,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Pełna obecność firmy — do 5 podstron.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
-    chips: ["do 5 podstron", "mapa dojazdu", "rozbudowany home", "2–4 tygodnie"],
+    chips: ["znajdą Cię w Google", "mapa i dojazd", "do 5 podstron", "start w 2–4 tygodnie"],
   },
   {
     id: "firmowa",
@@ -48,7 +49,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "6–10 podstron z treściami i strukturą pod SEO.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
-    chips: ["6–10 podstron", "treści z nami", "struktura SEO", "4–6 tygodni"],
+    chips: ["teksty piszemy my", "struktura pod Google", "6–10 podstron", "start w 4–6 tygodni"],
   },
   {
     id: "premium",
@@ -57,7 +58,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory.",
     from: 12900,
     typical: "15 000 – 25 000 zł",
-    chips: ["autorski koncept", "sceny 3D / WebGL", "konfiguratory", "6–10 tygodni"],
+    chips: ["design nie do podrobienia", "sceny 3D i animacje", "konfiguratory produktów", "start w 6–10 tygodni"],
   },
 ];
 
