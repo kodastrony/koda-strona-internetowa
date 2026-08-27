@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FadeUp } from "@/components/motion";
+import { CENNIK_PAKIETY, formatPln } from "@/lib/cennik-data";
 
 /* ════════════════════════════════════════════════════════════════════════════
    /cennik — REALNY CENNIK KODA + kontekst rynkowy (przebudowa 27.08.2026).
@@ -57,44 +58,10 @@ export const CENNIK_FAQ: CennikFaq[] = [
   },
 ];
 
-/* ── CENNIK KODA — dane (źródło: marketing/CENNIK-MODEL-2026.md) ─────────── */
+/* ── CENNIK KODA — dane pakietów z lib/cennik-data (jedno źródło prawdy;
+      liczby z marketing/CENNIK-MODEL-2026.md) ─────────────────────────────── */
 
-const PAKIETY: {
-  name: string;
-  desc: string;
-  from: string;
-  typical: string;
-  chips: string[];
-}[] = [
-  {
-    name: "Landing page",
-    desc: "Jedna strona, która sprzedaje jedną rzecz.",
-    from: "2 900",
-    typical: "3 500 – 4 500 zł",
-    chips: ["do 6 sekcji", "formularz + telefon", "animacje", "2–3 tygodnie"],
-  },
-  {
-    name: "Strona wizytówka",
-    desc: "Pełna obecność firmy — do 5 podstron.",
-    from: "3 900",
-    typical: "4 500 – 6 000 zł",
-    chips: ["do 5 podstron", "mapa dojazdu", "rozbudowany home", "2–4 tygodnie"],
-  },
-  {
-    name: "Strona firmowa",
-    desc: "6–10 podstron z treściami i strukturą pod SEO.",
-    from: "6 900",
-    typical: "8 000 – 12 000 zł",
-    chips: ["6–10 podstron", "treści z nami", "struktura SEO", "4–6 tygodni"],
-  },
-  {
-    name: "Premium 2D / 3D",
-    desc: "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory.",
-    from: "12 900",
-    typical: "15 000 – 25 000 zł",
-    chips: ["autorski koncept", "sceny 3D / WebGL", "konfiguratory", "6–10 tygodni"],
-  },
-];
+const PAKIETY = CENNIK_PAKIETY;
 
 /** Zawsze w cenie — rynek za większość z tego dolicza osobno. */
 const W_CENIE: string[] = [
@@ -374,7 +341,7 @@ export function CennikContent() {
                     >
                       od
                     </span>
-                    {p.from}
+                    {formatPln(p.from)}
                     <span style={{ fontSize: "0.45em", fontWeight: 600, marginLeft: "0.35rem" }}>
                       zł
                     </span>

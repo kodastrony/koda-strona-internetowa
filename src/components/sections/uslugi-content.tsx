@@ -13,6 +13,7 @@ import { PhoneLink } from "@/components/ui/phone-link";
 import { VideoShowcase } from "@/components/ui/video-showcase";
 import { CONTACT } from "@/lib/constants";
 import { SERVICES, type Service } from "@/lib/services-data";
+import { CENNIK_PAKIETY, formatPln } from "@/lib/cennik-data";
 
 /* ════════════════════════════════════════════════════════════════════════════
    /uslugi v3 — „USŁUGI POKAZANE PRACĄ" (2026-08-26, po dwóch korektach Natana).
@@ -796,6 +797,161 @@ function CareChatVisual() {
   );
 }
 
+/* ── Wycena (redesign 27.08, korekta Natana: ściana tekstu → interakcja) ────
+   Mini-cennik do klikania: pigułki typów strony przełączają OGROMNĄ cenę
+   „od" (ticker rAF przelicza starą→nową jak kalkulator), pod spodem typowy
+   zakres i chipy zakresu (crossfade). Sekcja sama jest demem mikrointerakcji
+   — dokładnie tego, co sprzedajemy. Dane: lib/cennik-data (to samo źródło,
+   co /cennik). reduced-motion: wartości skaczą bez tweenów. */
+function PriceTicker({ value }: { value: number }) {
+  const reduce = useReducedMotion();
+  const [shown, setShown] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    if (reduce) {
+      prevRef.current = value;
+      return; // render niżej bierze wartość wprost
+    }
+    const from = prevRef.current;
+    prevRef.current = value;
+    if (from === value) return;
+    const t0 = performance.now();
+    const dur = 480;
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 4); // quart-out
+      setShown(Math.round(from + (value - from) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, reduce]);
+
+  return (
+    <span style={{ fontVariantNumeric: "tabular-nums" }}>
+      {formatPln(reduce ? value : shown)}
+    </span>
+  );
+}
+
+function WycenaTicker() {
+  const reduce = useReducedMotion();
+  const [sel, setSel] = useState(0);
+  const p = CENNIK_PAKIETY[sel];
+
+  const pill = (active: boolean) =>
+    `rounded-full border px-4 py-2 font-heading text-[0.9rem] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
+      active
+        ? "border-[#b32a9d] bg-[#b32a9d] text-white"
+        : "border-[var(--color-line)] text-[var(--color-ink-muted)] hover:border-[#b32a9d] hover:text-[#9a2487]"
+    }`;
+
+  return (
+    <div className="md:col-span-7">
+      {/* Pigułki typów — przełącznik wyceny */}
+      <FadeUp inView delay={0.08}>
+        <div role="group" aria-label="Wybierz typ strony" className="flex flex-wrap gap-2">
+          {CENNIK_PAKIETY.map((pk, i) => (
+            <button
+              key={pk.id}
+              type="button"
+              aria-pressed={i === sel}
+              onClick={() => setSel(i)}
+              className={pill(i === sel)}
+            >
+              {pk.short}
+            </button>
+          ))}
+        </div>
+      </FadeUp>
+
+      {/* OGROMNA cena „od" — ticker przelicza przy zmianie */}
+      <FadeUp inView delay={0.14}>
+        <div aria-live="polite" className="mt-8">
+          <div
+            className="font-heading font-semibold"
+            style={{
+              fontSize: "clamp(3rem, 7vw, 5.4rem)",
+              letterSpacing: "-0.035em",
+              lineHeight: 1,
+              color: "var(--color-ink)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "0.36em",
+                fontWeight: 600,
+                color: "var(--color-ink-muted)",
+                marginRight: "0.6rem",
+                letterSpacing: "0",
+              }}
+            >
+              od
+            </span>
+            <PriceTicker value={p.from} />
+            <span style={{ fontSize: "0.36em", fontWeight: 600, marginLeft: "0.4rem" }}>
+              zł
+            </span>
+          </div>
+          <p
+            className="mt-3"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "clamp(0.95rem,1.1vw,1.05rem)",
+              color: "var(--color-ink-muted)",
+            }}
+          >
+            {p.desc} Typowy zakres:{" "}
+            <strong style={{ color: "var(--color-ink)", fontWeight: 600 }}>
+              {p.typical} netto
+            </strong>
+            .
+          </p>
+        </div>
+      </FadeUp>
+
+      {/* Chipy zakresu wybranego pakietu — crossfade przy przełączeniu */}
+      <motion.ul
+        key={p.id}
+        initial={reduce ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, ease: EASE.out }}
+        className="mt-5 flex flex-wrap gap-2"
+        role="list"
+      >
+        {p.chips.map((c) => (
+          <li
+            key={c}
+            style={{
+              border: "1px solid var(--color-line)",
+              borderRadius: 999,
+              padding: "0.35rem 0.85rem",
+              fontFamily: "var(--font-body)",
+              fontSize: "0.85rem",
+              color: "var(--color-ink-muted)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {c}
+          </li>
+        ))}
+      </motion.ul>
+
+      <FadeUp inView delay={0.2}>
+        <Link
+          href="/cennik"
+          className="mt-8 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
+          style={{ color: "var(--color-ink)" }}
+        >
+          Pełny cennik: dodatki i opieka od 149 zł/mc →
+        </Link>
+      </FadeUp>
+    </div>
+  );
+}
+
 /* ── Sekcja usługi: tekst (nazwa → wynik → chipy → dowód) + wizual ── */
 function ServiceSection({ s, index }: { s: Service; index: number }) {
   const reversed = index % 2 === 1;
@@ -955,50 +1111,22 @@ export function UslugiContent() {
                 Ile kosztuje strona?
               </h2>
             </FadeUp>
-          </div>
-          <div className="md:col-span-7">
             <FadeUp inView delay={0.1}>
-              <p
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "clamp(1.02rem,1.25vw,1.18rem)",
-                  lineHeight: 1.65,
-                  color: "var(--color-ink-muted)",
-                  maxWidth: "56ch",
-                }}
-              >
-                Landing page kosztuje u nas od 2 900 zł netto, wizytówka od 3 900 zł, strona
-                firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Dokładna
-                kwota zależy od zakresu: liczby podstron, treści, integracji i terminu — opisz nam
-                krótko projekt, a wrócimy z konkretem w 24 h. Bezpłatnie i bez zobowiązań.
-              </p>
-            </FadeUp>
-            <FadeUp inView delay={0.16}>
               <p
                 className="mt-5"
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "clamp(1.02rem,1.25vw,1.18rem)",
-                  lineHeight: 1.65,
-                  color: "var(--color-ink)",
-                  maxWidth: "56ch",
+                  fontSize: "clamp(1rem,1.2vw,1.12rem)",
+                  lineHeight: 1.6,
+                  color: "var(--color-ink-muted)",
+                  maxWidth: "36ch",
                 }}
               >
-                Kreator i gotowy szablon są tanie na start, ale wyglądają jak tysiąc innych stron i
-                trudno je rozwijać. U nas dostajesz coś innego: kod pisany pod Twój konkretny
-                biznes, bezpośredni kontakt z osobami, które go tworzą, i zakres ustalony w umowie.
+                Wybierz, co budujemy. Konkret dla Twojego projektu — w bezpłatnej wycenie, w 24 h.
               </p>
             </FadeUp>
-            <FadeUp inView delay={0.22}>
-              <Link
-                href="/cennik"
-                className="mt-6 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
-                style={{ color: "var(--color-ink)" }}
-              >
-                Zobacz pełny cennik i co wpływa na cenę →
-              </Link>
-            </FadeUp>
           </div>
+          <WycenaTicker />
         </div>
       </section>
 
