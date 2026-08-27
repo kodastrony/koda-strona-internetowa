@@ -836,34 +836,58 @@ function PriceTicker({ value }: { value: number }) {
   );
 }
 
+/* 6 punktów „w cenie" — stałe dla każdego pakietu, sformułowane pod zaufanie
+   (te same fakty, co na /cennik; renderer Emph podświetla kluczowe frazy). */
+const WYCENA_INCLUDED: string[] = [
+  "**Autorski kod** — zero szablonów i wtyczek",
+  "**Szybkość 100/100** w Google (Core Web Vitals)",
+  "**Umowa:** zakres, termin i stała cena",
+  "**14 dni gwarancji** technicznej po starcie",
+  "**Strona jest Twoja** — kod, pliki, domena",
+  "**SEO techniczne** + dane strukturalne od startu",
+];
+
 function WycenaTicker() {
   const reduce = useReducedMotion();
   const [sel, setSel] = useState(0);
   const p = CENNIK_PAKIETY[sel];
 
-  const pill = (active: boolean) =>
-    `rounded-full border px-4 py-2 font-heading text-[0.9rem] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
-      active
-        ? "border-[#b32a9d] bg-[#b32a9d] text-white"
-        : "border-[var(--color-line)] text-[var(--color-ink-muted)] hover:border-[#b32a9d] hover:text-[#9a2487]"
-    }`;
-
   return (
     <div className="md:col-span-7">
-      {/* Pigułki typów — przełącznik wyceny */}
+      {/* Pigułki typów — różowe tło PŁYNIE między przyciskami (layoutId) */}
       <FadeUp inView delay={0.08}>
         <div role="group" aria-label="Wybierz typ strony" className="flex flex-wrap gap-2">
-          {CENNIK_PAKIETY.map((pk, i) => (
-            <button
-              key={pk.id}
-              type="button"
-              aria-pressed={i === sel}
-              onClick={() => setSel(i)}
-              className={pill(i === sel)}
-            >
-              {pk.short}
-            </button>
-          ))}
+          {CENNIK_PAKIETY.map((pk, i) => {
+            const active = i === sel;
+            return (
+              <button
+                key={pk.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setSel(i)}
+                className={`relative rounded-full border px-4 py-2 font-heading text-[0.9rem] font-semibold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9a2487] ${
+                  active
+                    ? "border-[#b32a9d] text-white"
+                    : "border-[var(--color-line)] text-[var(--color-ink-muted)] hover:border-[#b32a9d] hover:text-[#9a2487]"
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="wycena-pill-bg"
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: "var(--color-accent)", zIndex: 0 }}
+                    transition={
+                      reduce ? { duration: 0 } : { type: "spring", duration: 0.5, bounce: 0.22 }
+                    }
+                  />
+                )}
+                <span className="relative" style={{ zIndex: 1 }}>
+                  {pk.short}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </FadeUp>
 
@@ -895,35 +919,54 @@ function WycenaTicker() {
               zł
             </span>
           </div>
-          <p
-            className="mt-3"
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "clamp(0.95rem,1.1vw,1.05rem)",
-              color: "var(--color-ink-muted)",
-            }}
+
+          {/* Opis + typowy zakres: crossfade przy zmianie, wyraźna hierarchia */}
+          <motion.div
+            key={p.id}
+            initial={reduce ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: EASE.out }}
+            className="mt-4"
           >
-            {p.desc} Typowy zakres:{" "}
-            <strong style={{ color: "var(--color-ink)", fontWeight: 600 }}>
-              {p.typical} netto
-            </strong>
-            .
-          </p>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "clamp(1.02rem,1.2vw,1.15rem)",
+                lineHeight: 1.5,
+                color: "var(--color-ink)",
+                maxWidth: "48ch",
+              }}
+            >
+              {p.desc}
+            </p>
+            <p className="mt-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="label-koda" style={{ color: "var(--color-ink-faint)" }}>
+                Typowy zakres
+              </span>
+              <span
+                className="font-heading font-semibold"
+                style={{ fontSize: "clamp(1rem,1.25vw,1.15rem)", color: "var(--color-ink)" }}
+              >
+                {p.typical}{" "}
+                <span style={{ color: "var(--color-ink-muted)", fontWeight: 500 }}>netto</span>
+              </span>
+            </p>
+          </motion.div>
         </div>
       </FadeUp>
 
-      {/* Chipy zakresu wybranego pakietu — crossfade przy przełączeniu */}
-      <motion.ul
-        key={p.id}
-        initial={reduce ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28, ease: EASE.out }}
-        className="mt-5 flex flex-wrap gap-2"
-        role="list"
-      >
-        {p.chips.map((c) => (
-          <li
+      {/* Chipy zakresu — kaskada przy każdym przełączeniu */}
+      <ul key={p.id} className="mt-5 flex flex-wrap gap-2" role="list">
+        {p.chips.map((c, i) => (
+          <motion.li
             key={c}
+            initial={reduce ? false : { opacity: 0, y: 9, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={
+              reduce
+                ? { duration: 0 }
+                : { duration: 0.3, ease: EASE.out, delay: 0.05 + i * 0.05 }
+            }
             style={{
               border: "1px solid var(--color-line)",
               borderRadius: 999,
@@ -935,11 +978,41 @@ function WycenaTicker() {
             }}
           >
             {c}
-          </li>
+          </motion.li>
         ))}
-      </motion.ul>
+      </ul>
 
-      <FadeUp inView delay={0.2}>
+      {/* W cenie KAŻDEGO pakietu — dowody, które zamykają sprzedaż */}
+      <FadeUp inView delay={0.1}>
+        <div
+          className="mt-9"
+          style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1.75rem" }}
+        >
+          <span className="label-koda block" style={{ color: "var(--color-ink-faint)" }}>
+            W cenie każdego pakietu
+          </span>
+          <ul className="mt-5 grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2" role="list">
+            {WYCENA_INCLUDED.map((w, i) => (
+              <li key={w} className="flex items-start gap-3">
+                <CheckBadge delay={0.15 + i * 0.06} />
+                <span
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "clamp(0.95rem,1.05vw,1.02rem)",
+                    lineHeight: 1.5,
+                    color: "var(--color-ink-muted)",
+                    paddingTop: "2px",
+                  }}
+                >
+                  <Emph text={w} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </FadeUp>
+
+      <FadeUp inView delay={0.16}>
         <Link
           href="/cennik"
           className="mt-8 inline-flex font-heading text-[0.95rem] font-semibold underline decoration-pink/40 underline-offset-4 transition-colors hover:decoration-pink"
