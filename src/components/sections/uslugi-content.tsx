@@ -977,40 +977,13 @@ function WycenaTicker() {
         })}
       </ul>
 
-      {/* W cenie KAŻDEGO pakietu — dowody, które zamykają sprzedaż */}
-      <FadeUp inView delay={0.1}>
+      {/* Kontekstowe CTA — linia i przycisk ZMIENIAJĄ się z wybranym tierem
+          (crossfade), wzorce spójne ze stroną: Magnetic PillLink + telefon. */}
+      <FadeUp inView delay={0.16}>
         <div
           className="mt-9"
           style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1.75rem" }}
         >
-          <span className="label-koda block" style={{ color: "var(--color-ink-faint)" }}>
-            W cenie każdego pakietu
-          </span>
-          <ul className="mt-5 grid grid-cols-1 gap-x-8 gap-y-3.5 sm:grid-cols-2" role="list">
-            {WYCENA_INCLUDED.map((w, i) => (
-              <li key={w} className="flex items-start gap-3">
-                <CheckBadge delay={0.15 + i * 0.06} />
-                <span
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "clamp(0.95rem,1.05vw,1.02rem)",
-                    lineHeight: 1.5,
-                    color: "var(--color-ink-muted)",
-                    paddingTop: "2px",
-                  }}
-                >
-                  <Emph text={w} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </FadeUp>
-
-      {/* Kontekstowe CTA — linia i przycisk ZMIENIAJĄ się z wybranym tierem
-          (crossfade), wzorce spójne ze stroną: Magnetic PillLink + telefon. */}
-      <FadeUp inView delay={0.16}>
-        <div className="mt-9">
           <motion.div
             key={p.id}
             initial={reduce ? false : { opacity: 0, y: 8 }}
@@ -1231,6 +1204,36 @@ export function UslugiContent() {
               >
                 Wybierz, co budujemy. Konkret dla Twojego projektu — w bezpłatnej wycenie, w 24 h.
               </p>
+            </FadeUp>
+            {/* W cenie KAŻDEGO pakietu — wypełnia lewą kolumnę (balans:
+                wcześniej pustka po lewej, ściana tekstu po prawej) */}
+            <FadeUp inView delay={0.16}>
+              <div
+                className="mt-9"
+                style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1.75rem" }}
+              >
+                <span className="label-koda block" style={{ color: "var(--color-ink-faint)" }}>
+                  W cenie każdego pakietu
+                </span>
+                <ul className="mt-5 flex flex-col gap-3.5" role="list">
+                  {WYCENA_INCLUDED.map((w, i) => (
+                    <li key={w} className="flex items-start gap-3">
+                      <CheckBadge delay={0.15 + i * 0.06} />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "clamp(0.95rem,1.05vw,1.02rem)",
+                          lineHeight: 1.5,
+                          color: "var(--color-ink-muted)",
+                          paddingTop: "2px",
+                        }}
+                      >
+                        <Emph text={w} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </FadeUp>
           </div>
           <WycenaTicker />

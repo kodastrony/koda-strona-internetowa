@@ -52,7 +52,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "start w 1–2 tygodnie",
     ],
     cta: {
-      line: "Landing pod Twoją kampanię? Opisz cel — wrócimy z konkretem w 24 h.",
+      line: "Landing pod Twoją kampanię? Konkretna wycena w 24 godziny.",
       label: "Wyceń landing page",
     },
   },
@@ -72,7 +72,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "start w 2–3 tygodnie",
     ],
     cta: {
-      line: "Taka wizytówka może być Twoja. Opisz firmę — konkret w 24 h.",
+      line: "Taka wizytówka może być Twoja. Konkretna wycena w 24 godziny.",
       label: "Wyceń wizytówkę",
     },
   },
@@ -92,7 +92,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "start w 3–5 tygodni",
     ],
     cta: {
-      line: "Strona firmowa, która przynosi klientów? Umówmy krótką rozmowę.",
+      line: "Strona firmowa, która przynosi klientów. Konkretna wycena w 24 godziny.",
       label: "Wyceń stronę firmową",
     },
   },
@@ -114,7 +114,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "start w 5–8 tygodni",
     ],
     cta: {
-      line: "Masz pomysł na coś wyjątkowego? Pogadajmy o koncepcie.",
+      line: "Projekt, którego nie ma nikt inny. Przygotujemy koncept i wycenę.",
       label: "Wyceń projekt premium",
     },
   },
