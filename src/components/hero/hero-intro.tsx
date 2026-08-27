@@ -67,6 +67,14 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
+  // ★ LCP-seed: statyczna kopia kolumny KODA namalowana w 1. KLATCE pod kurtyną.
+  // Bez niej LCP-elementem są animowane litery (WAAPI, opacity 0→1 po boot JS)
+  // i symulowane LCP mobile utyka na ~5,8 s mimo TBT ~10 ms (PSI 2026-08-27).
+  // Elementy przykryte nieprzezroczystym coverem LICZĄ SIĘ do LCP; usunięcie/
+  // ukrycie później nie cofa wpisu. Chowamy seed dokładnie na starcie wipe'a —
+  // inaczej półprzezroczyste finalFill malowałoby się PODWÓJNIE (przyciemnienie).
+  const seedARef = useRef<HTMLDivElement>(null);
+  const seedBRef = useRef<HTMLDivElement>(null);
   // Dwie kolumny: A = off-center (≥lg), B = wyśrodkowana (<lg). Aktywna wg matchMedia.
   const finalRefA = useRef<HTMLDivElement>(null);
   const pinkRefA = useRef<HTMLDivElement>(null);
@@ -125,6 +133,8 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
           0.875,
           Math.max(0.125, (r.left + r.width / 2) / (window.innerWidth || 1))
         );
+        if (seedARef.current) seedARef.current.style.visibility = "hidden";
+        if (seedBRef.current) seedBRef.current.style.visibility = "hidden";
         pink
           .querySelectorAll<HTMLElement>("[data-pink-letter]")
           .forEach((el) => ((el.style.opacity = "1"), (el.style.transform = "translateY(0%)")));
@@ -158,6 +168,11 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
       /* ── Faza 3: dwie linie krzyżujące się w środku liter ───────────────────
             (oba tryby — różni się tylko geometria m: ~0.5 środek / ~0.65 off-center). */
       const lineAnims: Animation[] = [];
+
+      // Wipe odsłoni obszar pod coverem — seed MUSI zniknąć w tym samym commicie,
+      // inaczej finalFill (rgba) maluje się podwójnie i litery ciemnieją.
+      if (seedARef.current) seedARef.current.style.visibility = "hidden";
+      if (seedBRef.current) seedBRef.current.style.visibility = "hidden";
 
       if (pink && finalEl) {
         const r = pink.getBoundingClientRect();
@@ -265,6 +280,27 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
       onClick={skip}
       style={{ cursor: "pointer" }}
     >
+      {/* ── LCP-seed (patrz komentarz przy seedARef): PRZED coverem w DOM =
+              malowany pod kurtyną, niewidoczny dla usera; visibility:hidden na
+              starcie wipe'a. Osobne kopie dla trybu A (≥lg) i B (<lg). ── */}
+      <div
+        ref={seedARef}
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 hidden select-none lg:block"
+        style={{ left: KODA_LEFT, width: "max-content" }}
+      >
+        <KodaColumnLetters fill={finalFill} />
+      </div>
+      <div
+        ref={seedBRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none lg:hidden"
+      >
+        <div className="flex flex-col items-center">
+          <KodaColumnLetters fill={finalFill} fontSize={KODA_FONT_CENTER} />
+        </div>
+      </div>
+
       {/* ── Linia A: „kurtyna" (cover). scaleX(1→0) origin:right = odsłania L→P
               PRAWDZIWE tło hero pod overlayem (transform = kompozytor, zero repaintu). ── */}
       <div
