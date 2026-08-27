@@ -298,8 +298,8 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
         src={LCP_SEED_NOISE}
         alt=""
         aria-hidden="true"
-        width={96}
-        height={120}
+        width={600}
+        height={760}
         className="pointer-events-none absolute select-none"
         style={{ top: "8svh", left: "10vw", width: "80vw", height: "78svh", objectFit: "cover" }}
       />
