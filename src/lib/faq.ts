@@ -27,7 +27,7 @@ export const FAQS: Faq[] = [
     // Answer-first: ramy czasowe w PIERWSZYM zdaniu (orientacyjne, rynkowe —
     // wiążący dla klienta jest wyłącznie termin z umowy, jak w drugim zdaniu).
     q: "Ile trwa zrobienie strony?",
-    a: "Prosta strona firmowa powstaje zwykle w 2–4 tygodnie, a rozbudowana — z indywidualnym projektem, animacjami czy grafiką 3D — w 6–10 tygodni. W KODA konkretny termin ustalamy w umowie, zanim zaczniemy, i go pilnujemy. Pracujemy etapami i pokazujemy postępy na bieżąco, więc strona powstaje sprawnie, a Ty przez cały czas wiesz, na czym stoimy.",
+    a: "Landing page powstaje zwykle w 1–2 tygodnie, prosta strona firmowa w 2–5 tygodni, a rozbudowana — z indywidualnym projektem, animacjami czy grafiką 3D — w 5–8 tygodni. W KODA konkretny termin ustalamy w umowie, zanim zaczniemy, i go pilnujemy. Pracujemy etapami i pokazujemy postępy na bieżąco, więc strona powstaje sprawnie, a Ty przez cały czas wiesz, na czym stoimy.",
   },
   {
     q: "Czy strona jest moja po starcie?",

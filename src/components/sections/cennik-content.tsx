@@ -50,7 +50,7 @@ export const CENNIK_FAQ: CennikFaq[] = [
   },
   {
     q: "Ile trwa zrobienie strony internetowej?",
-    a: "Landing page robimy zwykle w 2–3 tygodnie, wizytówkę w 2–4 tygodnie, stronę firmową w 4–6 tygodni, a projekty premium z animacjami i 3D w 6–10 tygodni. Najwięcej czasu zajmują treści i rundy poprawek, dlatego termin ustalamy w umowie przed startem — i go pilnujemy. Za dopłatą +30% realizujemy tryb ekspres z priorytetem terminu.",
+    a: "Landing page robimy zwykle w 1–2 tygodnie, wizytówkę w 2–3 tygodnie, stronę firmową w 3–5 tygodni, a projekty premium z animacjami i 3D w 5–8 tygodni. Najwięcej czasu zajmują treści i rundy poprawek, dlatego termin ustalamy w umowie przed startem — i go pilnujemy. Za dopłatą +30% realizujemy tryb ekspres z priorytetem terminu.",
   },
   {
     q: "Płaci się raz, czy co miesiąc?",

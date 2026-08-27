@@ -47,7 +47,7 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
       "CTA pod konwersję",
       "pod Google Ads i Meta",
       "analityka konwersji",
-      "start w 2–3 tygodnie",
+      "start w 1–2 tygodnie",
     ],
   },
   {
@@ -57,9 +57,14 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Cała firma profesjonalnie pokazana w internecie.",
     from: 3900,
     typical: "4 500 – 6 000 zł",
-    // Buyer wizytówki (lokalna firma): chce POKAZAĆ firmę i budzić zaufanie.
+    // Buyer wizytówki: chce się PREZENTOWAĆ — duma z własnej strony.
     inherits: "Wszystko z Landing",
-    chips: ["galeria realizacji", "FAQ pod AI search", "start w 2–4 tygodnie"],
+    chips: [
+      "design, którym się pochwalisz",
+      "galeria realizacji",
+      "FAQ pod AI search",
+      "start w 2–3 tygodnie",
+    ],
   },
   {
     id: "firmowa",
@@ -68,13 +73,13 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Rozbudowana strona, która sprzedaje i pozycjonuje.",
     from: 6900,
     typical: "8 000 – 12 000 zł",
-    // Buyer firmowej (właściciel rosnącej firmy): marka, treści, leady.
+    // Buyer firmowej: obchodzi go KASA — strona ma przynosić klientów.
     inherits: "Wszystko z Wizytówki",
     chips: [
       "profesjonalny branding firmy",
       "treści pod konwersję",
-      "integracja CRM",
-      "start w 4–6 tygodni",
+      "każda podstrona sprzedaje",
+      "start w 3–5 tygodni",
     ],
   },
   {
@@ -84,14 +89,15 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     desc: "Indywidualny koncept: zaawansowane animacje, sceny 3D, konfiguratory.",
     from: 12900,
     typical: "15 000 – 25 000 zł",
+    // Buyer premium: szczęka ma opaść od SPECJALISTYCZNYCH rzeczy.
     inherits: "Wszystko z Firmowej",
     chips: [
-      "koncept kreatywny 1:1",
-      "sceny 3D / WebGL",
+      "silnik 3D w przeglądarce (WebGL)",
       "konfiguratory produktów",
       "kalkulatory wyceny",
       "scrollytelling i intro",
-      "start w 6–10 tygodni",
+      "koncept kreatywny 1:1",
+      "start w 5–8 tygodni",
     ],
   },
 ];
