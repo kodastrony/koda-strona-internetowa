@@ -156,15 +156,16 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
               { opacity: 0, transform: "translateY(50%)" },
               { opacity: 1, transform: "translateY(0%)" },
             ],
-            // 550/60 (było 700/100): ta sama choreografia, ciaśniejszy takt —
-            // intro blokuje LCP home (audyt CWV 2026-08-26), każde 100 ms się liczy.
-            { duration: 550, delay: i * 60, easing: QUART_OUT, fill: "both" }
+            // ★ 700/100 — ORYGINALNY, wolniejszy takt (przywrócony 2026-08-31 na
+            // żądanie Natana: 550/60 z „ciaśniejszego taktu" było szarpane i brzydkie).
+            // LCP home jest zabezpieczone seedami pod kurtyną, nie skracaniem intro.
+            { duration: 700, delay: i * 100, easing: QUART_OUT, fill: "both" }
           )
         );
         anims.push(...phase1);
         await Promise.all(phase1.map((a) => a.finished)).catch(() => {});
         if (cancelled) return;
-        await wait(50);
+        await wait(70);
         if (cancelled) return;
       }
 
@@ -188,14 +189,14 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
 
         lineAnims.push(
           cover.animate(coverScaleKeyframes(m), {
-            duration: 550,
+            duration: 700,
             easing: "linear",
             fill: "forwards",
           })
         );
         lineAnims.push(
           pink.animate([{ clipPath: "inset(0% 0% 0% 0%)" }, { clipPath: "inset(0% 100% 0% 0%)" }], {
-            duration: 550,
+            duration: 700,
             easing: "linear",
             fill: "forwards",
           })
@@ -232,7 +233,7 @@ export function HeroIntro({ onDone, light = false }: HeroIntroProps) {
               podwójnego malowania). Treść hero wjeżdża PO tym (mobilny `base`)
               → napis NIE nakłada się z treścią podczas znikania. */
         const fade = overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: 300,
+          duration: 450,
           easing: cssBezier(EASE.primary),
           fill: "forwards",
         });

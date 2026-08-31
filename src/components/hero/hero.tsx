@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { EASE } from "@/lib/motion";
 import { FadeUp } from "@/components/motion";
@@ -59,11 +59,91 @@ function PhoneGlyph() {
   );
 }
 
+/* Wjazd H1 na <lg (bez maski — patrz komentarz przy `masked`): dystans w px.
+   Większy niż stare 26px, żeby wejście na telefonie było WIDOCZNE, a nie „drgnięciem". */
+const H1_RISE_MOBILE = 44;
+
+/* ── H1 rozbity na SŁOWA. Reveal (maska) musi działać na WIDOCZNYCH LINIACH, nie
+      na blokach zdania — przy dłuższym copy („Strona internetowa, która" łamie się
+      na 3 linie) maska ścinała linię w połowie liter i kaskada się rozjeżdżała.
+      Słowa są mierzone po pierwszym malowaniu i grupowane w linie wg pozycji Y.
+      `tail` = kropka w kolorze ink doklejona do słowa (nie może zostać sama). ── */
+const H1_WORDS: { text: string; accent?: boolean; tail?: string }[] = [
+  { text: "Strona" },
+  { text: "internetowa," },
+  { text: "która" },
+  { text: "przynosi", accent: true },
+  { text: "klientów", accent: true, tail: "." },
+];
+
 /* ── Treść hero (H1/opis/CTA — tekst bez zmian). Wjeżdża, gdy `play` = true. ── */
-function HeroCopy({ play }: { play: boolean }) {
+function HeroCopy({ play, masked }: { play: boolean; masked: boolean }) {
   // H1 reveal respektuje reduced-motion (spójnie z FadeUp) — motion/react NIE jest
   // łapane globalną regułą CSS reduced-motion, więc gate'ujemy tu.
   const reduce = useReducedMotion();
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  // null = jeszcze nie zmierzone (jeden ciąg tekstu, naturalne łamanie).
+  // Po pomiarze: tablica linii, każda z indeksami swoich słów.
+  const [lines, setLines] = useState<number[][] | null>(null);
+
+  // ★ Pomiar linii MUSI odbywać się na nierozbitym H1 (naturalne łamanie), więc
+  // przed każdym pomiarem wracamy do stanu `null`. Powtarzamy po dociągnięciu
+  // fontu (Syne zmienia metryki → inne łamanie) i przy zmianie szerokości.
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      const tops = wordRefs.current.map((el) => (el ? el.getBoundingClientRect().top : 0));
+      const groups: number[][] = [];
+      tops.forEach((t, i) => {
+        const g = groups[groups.length - 1];
+        // 4 px tolerancji — subpixelowe różnice w obrębie jednej linii.
+        if (g && Math.abs(tops[g[0]] - t) < 4) g.push(i);
+        else groups.push([i]);
+      });
+      setLines(groups);
+    };
+    const remeasure = () => {
+      setLines(null);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+    remeasure();
+    document.fonts?.ready.then(remeasure).catch(() => {});
+    let w = window.innerWidth;
+    const onResize = () => {
+      // Tylko szerokość — pasek adresu na telefonie zmienia wysokość co scroll.
+      if (window.innerWidth === w) return;
+      w = window.innerWidth;
+      remeasure();
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const word = (i: number) => {
+    const wd = H1_WORDS[i];
+    return (
+      <span
+        key={i}
+        ref={(el) => {
+          wordRefs.current[i] = el;
+        }}
+        style={wd.accent ? { color: "var(--color-accent)" } : undefined}
+      >
+        {wd.text}
+        {wd.tail ? <span style={{ color: "var(--color-ink)" }}>{wd.tail}</span> : null}
+        {i < H1_WORDS.length - 1 ? " " : null}
+      </span>
+    );
+  };
+
+  // Przed pomiarem: JEDNA grupa = cały tekst leci naturalnie (i tak jest wtedy
+  // nieruchomy — `play` czeka na intro / pierwszą klatkę).
+  const groups = lines ?? [H1_WORDS.map((_, i) => i)];
+
   return (
     <div data-logo-hide-anchor className="w-full lg:w-[54%] lg:max-w-[620px]">
       <h1
@@ -80,40 +160,63 @@ function HeroCopy({ play }: { play: boolean }) {
           textWrap: "balance",
         }}
       >
-        {/* ★ LCP: H1 MUSI być namalowany w 1. klatce (pod nieprzezroczystą kurtyną
-            intro — elementy przykryte overlayem liczą się do LCP, przycięte
-            overflow:hidden NIE). Dlatego ZERO clip-masky i ZERO opacity:0 — tylko
-            transform-only settle (26px→0) po intro. Poprzedni wariant (y:112% w
-            masce) trzymał LCP na ~5,7 s mobile (PSI 2026-08-27). */}
-        {/* Spacja na końcu 1. linii: linie to OSOBNE blokowe spany, więc textContent
-            skleja się bez odstępu — crawlery widziały token „któraprzynosi" i
-            Seobility zgłaszał „Words from H1 not found in text". Wizualnie zero różnicy. */}
-        {[
-          <>Strona internetowa, która </>,
-          <>
-            <span style={{ color: "var(--color-accent)" }}>przynosi klientów</span>
-            <span style={{ color: "var(--color-ink)" }}>.</span>
-          </>,
-        ].map((line, i) => (
-          <span key={i} style={{ display: "block" }}>
-            <motion.span
-              data-reveal
-              style={{ display: "block", willChange: "transform" }}
-              initial={{ y: reduce ? 0 : 26 }}
-              animate={{ y: play ? 0 : 26 }}
-              transition={
-                reduce
-                  ? { duration: 0 }
-                  : { duration: 0.9, ease: EASE.expo, delay: play ? i * 0.1 : 0 }
+        {/* ★ REVEAL W MASCE (przywrócony 2026-08-31): każda WIDOCZNA linia wyjeżdża
+            zza krawędzi własnej maski (overflow:hidden + y 112%→0, expo 0,9 s,
+            kaskada 0,09 s) — takt jak przed optymalizacją ładowania.
+            ★ LCP: element przycięty overflow:hidden NIE jest malowany, więc maska
+            WŁĄCZA SIĘ DOPIERO PO PIERWSZEJ KLATCE (prop `masked`) i TYLKO na ≥lg,
+            gdzie H1 stoi pod nieprzezroczystą kurtyną intro. Pierwsza klatka = H1
+            namalowany normalnie → wpis LCP jest zrobiony (późniejsze przycięcie go
+            nie cofa). Na <lg maski NIE MA — tam H1 jest żywym elementem LCP (maska
+            trzymała LCP na ~5,7 s, PSI 2026-08-27), więc wjeżdża transformem. */}
+        {groups.map((g, i) => {
+          // Pozycja spoczynkowa: w masce 112% własnej wysokości (całkowicie za
+          // krawędzią), bez maski — px. paddingBottom/marginBottom kompensują
+          // przycięcie ogonków (ą, ó, y) przez overflow:hidden.
+          const rest = reduce ? 0 : masked ? "112%" : H1_RISE_MOBILE;
+          return (
+            <span
+              key={i}
+              style={
+                masked
+                  ? {
+                      display: "block",
+                      overflow: "hidden",
+                      paddingBottom: "0.12em",
+                      marginBottom: "-0.12em",
+                    }
+                  : { display: "block" }
               }
             >
-              {line}
-            </motion.span>
-          </span>
-        ))}
+              <motion.span
+                data-reveal
+                style={{ display: "block", willChange: "transform" }}
+                initial={{ y: reduce ? 0 : H1_RISE_MOBILE }}
+                animate={{ y: play ? 0 : rest }}
+                // Gdy jeszcze nie gramy, skok do pozycji spoczynkowej jest
+                // NATYCHMIASTOWY (duration 0) — inaczej włączenie maski po 1. klatce
+                // animowałoby 44px→112% pod kurtyną (zmarnowana klatka animacji).
+                transition={
+                  reduce || !play
+                    ? { duration: 0 }
+                    : { duration: 0.9, ease: EASE.expo, delay: i * 0.09 }
+                }
+              >
+                {g.map(word)}
+              </motion.span>
+            </span>
+          );
+        })}
       </h1>
 
-      <FadeUp play={play} delay={0.12} duration={0.6} ease={EASE.expo} y={22} className="mt-8">
+      <FadeUp
+        play={play}
+        delay={0.12}
+        duration={0.6}
+        ease={EASE.expo}
+        y={22}
+        className="mt-6 md:mt-8"
+      >
         <p
           className="leading-relaxed"
           style={{
@@ -122,9 +225,9 @@ function HeroCopy({ play }: { play: boolean }) {
             maxWidth: "46ch",
           }}
         >
-          Projektujemy i kodujemy strony internetowe premium dla firm — z Bielska-Białej, dla
-          całej Polski. Każda strona internetowa, która u nas powstaje, jest budowana od zera —
-          pod konkretny cel — i realnie przynosi klientów.
+          Projektujemy i kodujemy strony internetowe premium dla firm — z Bielska-Białej, dla całej
+          Polski. Każda strona internetowa, która u nas powstaje, jest budowana od zera — pod
+          konkretny cel — i realnie przynosi klientów.
         </p>
       </FadeUp>
 
@@ -135,12 +238,12 @@ function HeroCopy({ play }: { play: boolean }) {
         ease={EASE.back}
         y={16}
         scale={0.9}
-        className="mt-10"
+        className="mt-9 md:mt-10"
       >
         {/* CTA + telefon obok siebie (mobile: łamią się w kolumnę). Telefon dobrze
             widoczny na home (życzenie Natana 2026-08-26) — jeden tap i połączenie,
             prościej niż formularz, zwłaszcza na telefonie. */}
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
+        <div className="flex flex-wrap items-center gap-x-7 gap-y-5">
           <Magnetic strength={0.4}>
             {/* #b32a9d (nie #cf43b8): biały tekst 11–13px bold na #cf43b8 = 4,08:1
                 (<AA 4,5). Na #b32a9d = 5,62:1 — AA w obu motywach, róż zostaje. */}
@@ -166,7 +269,14 @@ function HeroCopy({ play }: { play: boolean }) {
         </div>
       </FadeUp>
 
-      <FadeUp play={play} delay={0.36} duration={0.6} ease={EASE.expo} y={10} className="mt-5">
+      <FadeUp
+        play={play}
+        delay={0.36}
+        duration={0.6}
+        ease={EASE.expo}
+        y={10}
+        className="mt-4 md:mt-5"
+      >
         <p className="text-[13px]" style={{ color: "var(--color-ink-faint)" }}>
           Odpowiadamy w 24 h · Bez zobowiązań
         </p>
@@ -186,6 +296,9 @@ export function Hero() {
   // w efekcie (overlay i tak ukryty CSS-em — patrz globals.css).
   const [introActive, setIntroActive] = useState(() => !introHasPlayed());
   const [revealed, setRevealed] = useState(() => introHasPlayed());
+  // ★ Maska reveal H1 — patrz komentarz w HeroCopy. Startuje FALSE (SSR i pierwsza
+  // klatka = H1 malowany normalnie → wpis LCP), włącza się w efekcie tylko na ≥lg.
+  const [masked, setMasked] = useState(false);
 
   // reduced-motion / brak intro → treść natychmiast (klient-only; SSR renderuje
   // stan świeżego wejścia, efekt go koryguje po pierwszym malowaniu).
@@ -199,8 +312,15 @@ export function Hero() {
     if (reduce || mobile) {
       markIntroPlayed();
       setIntroActive(false);
+      // <lg: bez kurtyny, ale WEJŚCIE JEST — treść jest zamontowana w pozycji
+      // spoczynkowej (`initial`) i wjeżdża od razu po tym commicie (H1 transformem,
+      // reszta FadeUp), więc telefon też dostaje animację, a Speed Index zostaje
+      // bez pełnoekranowej kurtyny. ★ NIE przez requestAnimationFrame — w ukrytej
+      // karcie rAF nie tyka i treść zastyga niewidoczna.
       setRevealed(true);
+      return;
     }
+    setMasked(true);
   }, [reduce]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -300,7 +420,7 @@ export function Hero() {
             (logo/przełącznik/burger) do startu treści — życzenie usera; hero ma
             teraz pełną wysokość, więc jest na to miejsce. ── */}
       <motion.div
-        className={`container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[128px] md:pt-[130px] [@media(max-height:600px)]:pt-[60px] ${
+        className={`container-koda relative z-[var(--z-hero-content)] flex flex-1 flex-col pt-[112px] md:pt-[130px] [@media(max-height:600px)]:pt-[60px] ${
           introActive ? "pointer-events-none" : ""
         }`}
         style={reduce ? undefined : { opacity: copyOpacity, y: copyY }}
@@ -313,9 +433,9 @@ export function Hero() {
               w lewym-górnym rogu nad pustą aurorą (to wyglądało niezbalansowanie). */}
         <div
           className="flex flex-1 flex-col justify-start md:justify-center"
-          style={{ paddingBottom: "clamp(50px, 7vh, 90px)" }}
+          style={{ paddingBottom: "clamp(36px, 6vh, 90px)" }}
         >
-          <HeroCopy play={revealed} />
+          <HeroCopy play={revealed} masked={masked} />
         </div>
       </motion.div>
 
