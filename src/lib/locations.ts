@@ -187,6 +187,7 @@ export const LOCATIONS: Location[] = [
       "Katowice to najgęstszy rynek usług w regionie — a to znaczy, że Twoja strona nie konkuruje z jedną firmą z sąsiedztwa, tylko z kilkudziesięcioma w tej samej branży, w promieniu kilkunastu kilometrów. Wygrywa nie ta ładniejsza, tylko ta, która w pierwszym ekranie odpowiada na pytanie klienta i nie każe go szukać.",
       "Robimy strony dla firm, które sprzedają kompetencję, a nie cenę: usług profesjonalnych, spółek technologicznych, firm produkcyjnych i podmiotów B2B z okolic Katowic. W takich projektach o wyniku decydują rzeczy niewidoczne na pierwszy rzut oka — struktura treści, szybkość na telefonie i to, czy formularz da się wypełnić bez irytacji.",
       "Cały kod piszemy sami, bez WordPressa i gotowych motywów. Na konkurencyjnym rynku różnica jednej sekundy ładowania jest różnicą między zapytaniem a zamkniętą kartą — a szablon z wtyczkami zawsze niesie balast, którego Twoja firma nigdy nie użyje.",
+      "Metropolia ma jeszcze jedną cechę, która zmienia sposób pisania treści: Twój klient rzadko szuka „firmy w Katowicach”. Szuka firmy w Ligocie, na Załężu, w Zabrzu albo w Sosnowcu — bo tak wygląda codzienny dojazd w aglomeracji, gdzie granica miasta jest umowna. Strona, która nazywa obsługiwany obszar tak, jak myśli o nim klient, wygrywa zapytania, o które nikt się nie bije.",
     ],
     industries: [
       {
@@ -241,6 +242,14 @@ export const LOCATIONS: Location[] = [
         q: "Czy zrobicie sklep internetowy?",
         a: "Nie robimy sklepów ani systemów płatności — celowo, bo skupiamy się na stronach, które pozyskują zapytania. Jeśli potrzebujesz sprzedaży online, powiemy to od razu na pierwszej rozmowie, zamiast brać projekt, który nie jest naszą specjalnością.",
       },
+      {
+        q: "Pracujecie z firmami z całej metropolii, czy tylko z samych Katowic?",
+        a: "Z całej aglomeracji — Chorzów, Sosnowiec, Gliwice, Zabrze, Tychy, Dąbrowa Górnicza. Przy pracy zdalnej granica administracyjna nie ma żadnego znaczenia, a obszar, na którym działa Twoja firma, opisujemy na stronie dokładnie tak, jak wygląda naprawdę — bo to on decyduje, komu Google pokaże Cię w wynikach lokalnych.",
+      },
+      {
+        q: "Potrzebuję strony na konkretną datę — targi, kampania, otwarcie. Da się?",
+        a: "Zwykle tak, jeśli data jest realna względem zakresu (landing 1–2 tygodnie, strona firmowa 3–5). Termin wpisujemy do umowy i to jest zobowiązanie, nie deklaracja. Jeśli data jest zbyt bliska dla wybranego pakietu, powiemy o tym przed podpisaniem i zaproponujemy węższy zakres na start, który zdążymy zrobić porządnie.",
+      },
     ],
     nearby: ["strony-internetowe-bielsko-biala", "strony-internetowe-czechowice-dziedzice"],
     lastmod: "2026-09-01",
@@ -262,6 +271,7 @@ export const LOCATIONS: Location[] = [
       "Czechowice-Dziedzice to miasto zakładów produkcyjnych, firm technicznych i mocnego zaplecza usługowego — z warsztatami, instalatorami i wykonawcami, którzy zleceń szukają w promieniu kilkunastu kilometrów. Przy takim zasięgu strona nie musi wygrywać z całą Polską. Musi wygrać z konkurencją z tej samej gminy i z sąsiedniego Bielska.",
       "To akurat jest wykonalne i stosunkowo tanie, bo lokalna konkurencja rzadko ma stronę szybką, poprawnie opisaną i pisaną pod to, czego klient faktycznie szuka. Zwykle stoi na szablonie sprzed kilku lat, którego nikt nie aktualizował.",
       "Robimy więc rzecz prostą do opisania i trudną do podrobienia: piszemy stronę od zera w autorskim kodzie, wkładamy w nią treść odpowiadającą na realne pytania klientów i pilnujemy, żeby ładowała się natychmiast również na telefonie w słabym zasięgu.",
+      "Jest tu jeszcze jeden czynnik, o którym łatwo zapomnieć: bliskość Bielska-Białej działa w obie strony. Klient z Czechowic bez wahania pojedzie kwadrans do Bielska, a bielska konkurencja równie chętnie bierze zlecenia w Czechowicach. Dlatego strona firmy z Czechowic-Dziedzic powinna być pisana pod oba te obszary naraz — inaczej oddajesz połowę rynku, który i tak jest w Twoim zasięgu.",
     ],
     industries: [
       {
@@ -312,6 +322,14 @@ export const LOCATIONS: Location[] = [
         q: "Czy mała firma potrzebuje strony, skoro ma profil w mediach społecznościowych?",
         a: "Profil jest wypożyczony — regulamin, zasięgi i sam dostęp zależą od cudzej platformy. Strona jest Twoja: to ona wychodzi w Google, gdy ktoś szuka usługi w okolicy, i to do niej prowadzi wizytówka Google. Jedno nie zastępuje drugiego, ale bez strony tracisz zapytania od ludzi, którzy szukają, zamiast przeglądać.",
       },
+      {
+        q: "Prowadzę jednoosobową działalność. Czy to nie za duży wydatek?",
+        a: "Przy jednoosobowej działalności zwykle najsensowniej zacząć od strony wizytówki (od 3 900 zł netto) albo landing page pod jedną usługę (od 2 900 zł) — a nie od rozbudowanego serwisu, w którym połowa podstron świeci pustkami. Powiemy wprost, który wariant ma u Ciebie sens, także wtedy, gdy oznacza to mniejsze zlecenie dla nas.",
+      },
+      {
+        q: "Czy będę mógł sam zmieniać treść na stronie?",
+        a: "Zależy, czego potrzebujesz. Przy stronie, która zmienia się rzadko, taniej i bezpieczniej jest zgłaszać nam drobne zmiany w ramach opieki (od 149 zł miesięcznie) niż utrzymywać panel administracyjny. Jeśli zamierzasz aktualizować treść regularnie — na przykład prowadzić aktualności albo cennik — dokładamy prosty panel do samodzielnej edycji i ustalamy to na etapie wyceny.",
+      },
     ],
     nearby: [
       "strony-internetowe-bielsko-biala",
@@ -337,6 +355,7 @@ export const LOCATIONS: Location[] = [
       "Żywiecczyzna ma inną strukturę klienta niż miasto przemysłowe: dużą część zapytań generuje tu turystyka — pensjonaty, domki, apartamenty i agroturystyka nad Jeziorem Żywieckim oraz w Beskidzie Żywieckim — obok solidnego zaplecza zakładów produkcyjnych, stolarstwa i usług lokalnych.",
       "W turystyce strona pracuje inaczej niż w usługach. Decyzja zapada w kilka minut, najczęściej na telefonie, na podstawie zdjęć i tego, czy da się szybko sprawdzić dostępność i cenę. Strona, która każe pisać maila z pytaniem o wolne terminy, traci gościa na rzecz portalu rezerwacyjnego — i potem oddaje mu prowizję.",
       "Dlatego obiekty prowadzimy pod jednym celem: rezerwacja bezpośrednia. Zdjęcia pokazane tak, żeby sprzedawały miejsce, cena i dostępność widoczne bez szukania, kontakt działający jedną ręką w trasie. Wszystko w autorskim kodzie, który ładuje się natychmiast również przy słabym zasięgu w dolinie.",
+      "Sezonowość zmienia też kalendarz samego projektu. Strona obiektu turystycznego powinna być gotowa i zaindeksowana na kilka miesięcy przed szczytem, bo rezerwacje na ferie czy lato zapadają dużo wcześniej niż sam wyjazd, a nowa strona potrzebuje czasu, zanim Google zacznie ją pokazywać. Najgorszy moment na start to środek sezonu — wtedy strona zdąży zebrać ruch dopiero na następny.",
     ],
     industries: [
       {
@@ -387,6 +406,14 @@ export const LOCATIONS: Location[] = [
         q: "Czy trzeba przyjechać do Bielska-Białej?",
         a: "Nie. Projekt prowadzimy zdalnie, a jeśli wolisz spotkanie, dojazd do Żywca to pół godziny — umówimy się bez dopłat.",
       },
+      {
+        q: "Czy strona wytrzyma ruch w szczycie sezonu?",
+        a: "Tak — i to jest realna różnica względem szablonu z wtyczkami. Strony budujemy jako statyczne, serwowane z sieci brzegowej, więc kilkukrotny skok ruchu w długi weekend nie zmienia czasu ładowania ani nie generuje dodatkowych kosztów serwera. Nie ma tu bazy danych, która potrafi się położyć w najgorszym możliwym momencie.",
+      },
+      {
+        q: "Mam obiekt na portalu rezerwacyjnym. Po co mi jeszcze własna strona?",
+        a: "Bo każda rezerwacja z własnej strony to rezerwacja bez prowizji, która przy kilkunastu procentach od pobytu potrafi zwrócić koszt strony w jeden sezon. Portal daje zasięg, ale zabiera marżę i relację z gościem. Zwykle najlepiej działa jedno i drugie równolegle: portal jako źródło pierwszego kontaktu, własna strona jako miejsce, do którego gość wraca przy kolejnym pobycie.",
+      },
     ],
     nearby: [
       "strony-internetowe-bielsko-biala",
@@ -412,6 +439,7 @@ export const LOCATIONS: Location[] = [
       "Cieszyn ma cechę, której nie mają sąsiednie miasta: granicę w środku. Spora część tutejszych firm obsługuje klientów po obu stronach Olzy, a ruch turystyczny w starówce jest w dużej mierze czeski. To zmienia wymagania wobec strony — czasem wystarczy jasna informacja o obsłudze w dwóch językach, czasem potrzebna jest pełna wersja obcojęzyczna z poprawnym oznaczeniem języka dla wyszukiwarki.",
       "Robimy strony wielojęzyczne technicznie poprawnie: osobne adresy dla każdej wersji i znaczniki hreflang, dzięki którym Google pokazuje właściwą wersję właściwemu użytkownikowi, zamiast traktować obie jako duplikat.",
       "Poza tym obowiązuje ta sama zasada co wszędzie u nas: autorski kod zamiast szablonu, treść pisana pod realne pytania klientów i szybkość, która nie zależy od tego, ile wtyczek ktoś kiedyś doinstalował.",
+      "Śląsk Cieszyński to przy tym rynek rozproszony: klienci przyjeżdżają z Ustronia, Wisły, Skoczowa i Goleszowa, a w sezonie dochodzi do tego ruch turystyczny z całej Polski i z Czech. Strona firmy z Cieszyna powinna więc mówić jasno, kogo i gdzie obsługuje — inaczej wypada z wyników w miejscowościach, z których i tak przyjeżdżają do niej klienci.",
     ],
     industries: [
       {
@@ -461,6 +489,14 @@ export const LOCATIONS: Location[] = [
       {
         q: "Czy pracujecie z firmami z całego Śląska Cieszyńskiego?",
         a: "Tak — Cieszyn, Skoczów, Ustroń, Wisła i okolice. Projekt prowadzimy zdalnie, a na spotkanie dojeżdżamy z Bielska-Białej bez dodatkowych kosztów.",
+      },
+      {
+        q: "Obsługuję klientów z Czech. Czy strona pomoże mnie tam znaleźć?",
+        a: "Wersja czeska pod własnym adresem i z poprawnym hreflang jest widoczna w czeskim Google jak każda inna strona — sam język strony nie jest przeszkodą, a domena polska też nią nie jest. Największą różnicę robi natomiast to, czy podajesz wprost warunki obsługi klienta zza granicy: rozliczenie, dostawę, język kontaktu. To są pytania, które i tak padną w pierwszym mailu.",
+      },
+      {
+        q: "Czy zapytania z formularza mogą przychodzić w dwóch językach?",
+        a: "Tak — formularz na każdej wersji językowej może mieć własne etykiety i trafiać do tej samej skrzynki z oznaczeniem, z której wersji przyszedł. Dzięki temu od razu wiesz, w jakim języku odpisać, bez zgadywania po treści wiadomości.",
       },
     ],
     nearby: [
