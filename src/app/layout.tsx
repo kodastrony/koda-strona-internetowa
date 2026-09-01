@@ -10,6 +10,7 @@ import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { CursorGate } from "@/components/ui/cursor-gate";
 import { HeaderThemeProvider } from "@/hooks/use-header-theme";
 import { SITE_CONFIG, CONTACT, ANALYTICS } from "@/lib/constants";
+import { LOCATIONS } from "@/lib/locations";
 import { jsonLd } from "@/lib/seo";
 import "./globals.css";
 
@@ -81,10 +82,15 @@ const ORG_JSON_LD = {
         "SEO techniczne i Core Web Vitals",
         "Dostępność cyfrowa (WCAG 2.2 AA)",
       ],
+      // areaServed: kraj → region → konkretne miasta. Lista miast pochodzi z
+      // lib/locations.ts, czyli DOKŁADNIE z tych miejscowości, dla których mamy
+      // realną podstronę z treścią (2026-09-01). Deklarowanie obsługi miasta,
+      // które nie ma pokrycia w treści serwisu, to pusty sygnał — a przy dłuższej
+      // liście wygląda jak spam lokalizacyjny.
       areaServed: [
         { "@type": "Country", name: "Polska" },
         { "@type": "AdministrativeArea", name: "województwo śląskie" },
-        { "@type": "City", name: CONTACT.city },
+        ...LOCATIONS.map((l) => ({ "@type": "City", name: l.city })),
       ],
       // Bez serviceType: to własność typu Service, NIE ProfessionalService/LocalBusiness
       // (walidator Google: UNKNOWN_FIELD ×4 na każdej stronie). Zakres usług niosą

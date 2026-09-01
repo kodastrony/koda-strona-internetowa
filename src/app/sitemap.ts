@@ -1,6 +1,7 @@
 ﻿import type { MetadataRoute } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
 import { PROJECTS } from "@/lib/projects";
+import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations";
 
 // Przy output: export route musi być statyczny — generowany raz przy buildzie.
 export const dynamic = "force-static";
@@ -78,6 +79,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // ── Strony lokalne ────────────────────────────────────────────────────
+    // 2026-09-01: nowe podstrony miejskie (research: zero wyświetleń na
+    // zapytania lokalne, bo nie było strony, która w nie celuje). Miasto
+    // siedziby ma priorytet 0.9 — wyżej niż pozostałe lokalizacje, bo to
+    // najważniejsze dla nas zapytanie w całym serwisie.
+    ...LOCATIONS.map((l) => ({
+      url: `${base}/${l.slug}/`,
+      lastModified: l.lastmod,
+      changeFrequency: "monthly" as const,
+      priority: l.slug === PRIMARY_LOCATION.slug ? 0.9 : 0.7,
+    })),
     // Case studies
     ...PROJECTS.map((p) => ({
       url: `${base}/realizacje/${p.id}/`,

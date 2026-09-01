@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { SITE_CONFIG, NAV_LINKS, CONTACT } from "@/lib/constants";
 import { EmailLink } from "@/components/ui/email-link";
 import { PhoneLink } from "@/components/ui/phone-link";
+import { LOCATIONS } from "@/lib/locations";
 import { KodaLogo } from "@/components/ui/koda-logo";
 import { EASE, cssBezier } from "@/lib/motion";
 
@@ -110,6 +111,30 @@ export function Footer() {
             {CONTACT.nip && <p className="text-sm text-ink-muted">NIP: {CONTACT.nip}</p>}
           </div>
         </div>
+
+        {/* ── Lokalizacje ──────────────────────────────────────────────────
+            Stopka to jedyne miejsce, które daje stronom lokalnym link z KAŻDEJ
+            podstrony serwisu. Bez tego wisiałyby wyłącznie na mapie witryny i
+            na linkach z siebie nawzajem — czyli w praktyce byłyby sierotami w
+            strukturze i wolniej wchodziłyby do indeksu. Wiersz tekstowy, nie
+            kolumna, żeby nie rozdymać stopki. */}
+        <nav aria-label="Obsługiwane miasta" className="mt-14">
+          <p className="label-koda mb-4" style={{ color: "var(--color-pink-bright)" }}>
+            Strony internetowe
+          </p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2" role="list">
+            {LOCATIONS.map((l) => (
+              <li key={l.slug}>
+                <Link
+                  href={`/${l.slug}`}
+                  className="text-sm text-ink-muted transition-colors duration-300 hover:text-white"
+                >
+                  {l.city}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-white/5 pt-8 text-xs text-ink-muted sm:flex-row sm:items-center">

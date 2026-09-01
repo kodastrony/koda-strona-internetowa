@@ -16,6 +16,16 @@ Cennik KODA (netto, ceny „od” dla minimalnego zakresu): landing page od 2 90
 - [O nas](https://kodastrony.pl/o-nas/): Kim jest KODA Studio, cztery zasady pracy (cel nie ozdoby, szybkość jako standard, projekt pod biznes nie pod szablon, opieka po starcie) i dobór technologii pod projekt.
 - [Kontakt](https://kodastrony.pl/kontakt/): Telefon 511 107 468 i formularz kontaktowy — bezpłatna wycena i wstępny pomysł w ciągu 24 godzin, bez zobowiązań. E-mail: kontakt@kodastrony.pl.
 
+## Lokalizacje
+
+Strony z opisem współpracy w konkretnym mieście: zakres, branże typowe dla danej miejscowości, ceny i odpowiedzi na najczęstsze pytania. Ceny i terminy są wszędzie identyczne — nie zależą od lokalizacji.
+
+- [Strony internetowe Bielsko-Biała](https://kodastrony.pl/strony-internetowe-bielsko-biala/): Miasto siedziby KODA. Firmy produkcyjne i kooperanci motoryzacji, usługi lokalne, gabinety, turystyka w Beskidach, budownictwo, kancelarie. Spotkanie na miejscu możliwe, projekt prowadzony zdalnie.
+- [Strony internetowe Katowice](https://kodastrony.pl/strony-internetowe-katowice/): Firmy z Katowic i metropolii — usługi profesjonalne, spółki technologiczne, B2B, medycyna, nieruchomości. Godzina drogi z Bielska-Białej drogą S1.
+- [Strony internetowe Czechowice-Dziedzice](https://kodastrony.pl/strony-internetowe-czechowice-dziedzice/): Zakłady produkcyjne, firmy techniczne, usługi budowlane i instalacyjne, warsztaty, handel lokalny. Kwadrans drogi z Bielska-Białej.
+- [Strony internetowe Żywiec](https://kodastrony.pl/strony-internetowe-zywiec/): Żywiecczyzna — pensjonaty, domki i agroturystyka nastawione na rezerwację bezpośrednią (bez prowizji portali), stolarstwo, produkcja, usługi lokalne. Pół godziny drogi.
+- [Strony internetowe Cieszyn](https://kodastrony.pl/strony-internetowe-cieszyn/): Śląsk Cieszyński, w tym firmy działające po obu stronach granicy — wersje językowe robione poprawnie (osobne adresy, hreflang), turystyka, rzemiosło, usługi profesjonalne.
+
 ## Realizacje — szczegóły
 
 - [JR Modular Systems](https://kodastrony.pl/realizacje/jr-modular/): Realny klient — producent budynków modułowych. Konfigurator 3D do układania obiektu z kontenerów 20'/40', okien, drzwi, paneli PV i tarasu.
