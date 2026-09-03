@@ -29,7 +29,7 @@ export const LASTMOD: Record<string, string> = {
   "/realizacje/": "2026-08-27",
   "/o-nas/": "2026-08-27",
   "/kontakt/": "2026-08-27",
-  "/polityka-prywatnosci/": "2026-08-27",
+  "/polityka-prywatnosci/": "2026-09-03",
 };
 
 // Realizacje (case studies) — 2026-08-27: VideoObject JSON-LD (realne czasy
