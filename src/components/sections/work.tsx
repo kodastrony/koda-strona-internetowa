@@ -6,23 +6,25 @@ import { FadeUp, Parallax } from "@/components/motion";
 import { GlowField } from "@/components/fx/glow-field";
 import { PillLink } from "@/components/ui/pill-link";
 import { ProjectCard } from "@/components/ui/project-card";
-import { getProject } from "@/lib/projects";
+import { PROJECTS } from "@/lib/projects";
 
 // ══════════════════════════════════════════════════════════════════════
 // Homepage "Nasze realizacje" — a curated teaser shown as a 2×2 grid of four
 // equal square-ish cards (życzenie usera „4 kwadraty, jak wcześniej"):
 //   ┌────────────┬────────────┐
-//   │ JR MODULAR │  DRBLOCKS  │   (lewy-górny / prawy-górny)
+//   │   ELBIS    │ JR MODULAR │   (lewy-górny / prawy-górny)
 //   ├────────────┼────────────┤
-//   │  RIKOSZET  │  GRABOWSKI │   (lewy-dolny / prawy-dolny)
+//   │ AGD PRIME  │  DRBLOCKS  │   (lewy-dolny / prawy-dolny)
 //   └────────────┴────────────┘
 // Kolejność w DOM = kolejność czytania siatki, więc grid-cols-2 układa je
 // dokładnie w te rogi. GÓRNY rząd = REALNI klienci (audyt treści 2026-08-26:
 // pierwsze wrażenie portfolio nie powinno zaczynać się dwiema etykietami
 // „Koncept" przed prawdziwymi wdrożeniami — E-E-A-T). Karty to wspólny
-// <ProjectCard> (ten sam komponent co na /realizacje). Siatka pokrywa dziś
-// CAŁE portfolio (4 projekty), więc /realizacje pokazuje ten sam zestaw.
-const GRID = ["jr-modular", "drblocks", "rikoszet", "grabowski"].map((id) => getProject(id)!);
+// <ProjectCard> (ten sam komponent co na /realizacje).
+// 2026-09-08: portfolio ma 7 realizacji — home pokazuje CZTERY NAJMOCNIEJSZE
+// (czoło DISPLAY_ORDER w projects.ts: ELBIS, JR Modular, AGD Prime, DrBlocks —
+// same realne wdrożenia); pełna lista na /realizacje.
+const GRID = PROJECTS.slice(0, 4);
 
 export function Work() {
   const reduce = useReducedMotion();
@@ -87,16 +89,17 @@ export function Work() {
                 color: "var(--color-ink-muted)",
               }}
             >
-              Wśród nich strony klienckie dla <strong>DrBlocks</strong> i{" "}
-              <strong>JR Modular Systems</strong> — każdą realizację można przeklikać na żywo.
+              Wśród nich strony klienckie dla <strong>ELBIS</strong>, <strong>AGD Prime</strong>,{" "}
+              <strong>JR Modular Systems</strong> i <strong>DrBlocks</strong> — każdą realizację
+              można przeklikać na żywo.
             </p>
           </FadeUp>
         </div>
 
         {/* ── 2×2 grid (4 kwadraty) ──
             Dwie kolumny NA KAŻDYM urządzeniu (siatka 2×2 = „cztery kwadraty”),
-            stała proporcja 4:3 wspólna z resztą portfolio. Kolejność rikoszet →
-            grabowski → jr-modular → drblocks daje rogi: TL, TR, BL, BR. */}
+            stała proporcja 4:3 wspólna z resztą portfolio. Kolejność elbis →
+            jr-modular → agdprime → drblocks daje rogi: TL, TR, BL, BR. */}
         <div className="grid grid-cols-2" style={{ gap: "clamp(12px,2.4vw,32px)" }}>
           {GRID.map((p, i) => (
             // Scroll-parallax jak na /realizacje (RealizacjeContent): kolumny
@@ -108,11 +111,7 @@ export function Work() {
             <Parallax key={p.id} speed={i % 2 === 0 ? -26 : 34}>
               {/* Bez priority: sekcja jest POD zagięciem — preload fetchpriority=high
                   dwóch kart kradł pasmo fontom/JS na critical path (PSI mobile 2026-08-27). */}
-              <ProjectCard
-                project={p}
-                delay={i * 0.06}
-                sizes="(min-width: 768px) 46vw, 47vw"
-              />
+              <ProjectCard project={p} delay={i * 0.06} sizes="(min-width: 768px) 46vw, 47vw" />
             </Parallax>
           ))}
         </div>

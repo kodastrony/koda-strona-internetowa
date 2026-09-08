@@ -28,6 +28,9 @@ Strony z opisem współpracy w konkretnym mieście: zakres, branże typowe dla d
 
 ## Realizacje — szczegóły
 
+- [ELBIS](https://kodastrony.pl/realizacje/elbis/): Realny klient — hurtownia AGD i chemii z Bielska-Białej. Strona firmowa w Next.js (PL/CZ/EN) z animowanym wejściem, hero przechodzącym w zdjęcie magazynu i dwukrokowym formularzem B2B (NIP → dane kontaktowe).
+- [AGD Prime](https://kodastrony.pl/realizacje/agdprime/): Realny klient — sklep internetowy AGD i chemii na PrestaShop. Interaktywne banery hero (światło za kursorem, punkty produktowe z kartami cen), kafle promocji i czytelny układ sklepu.
+- [KSBSS](https://kodastrony.pl/realizacje/ksbss/): Realny klient — klub strzelecki z Bielska-Białej. Prosta strona statyczna z interaktywnym trackerem „Droga do pozwolenia” w 5 krokach, kalendarzem zawodów i najbliższymi terminami w hero.
 - [JR Modular Systems](https://kodastrony.pl/realizacje/jr-modular/): Realny klient — producent budynków modułowych. Konfigurator 3D do układania obiektu z kontenerów 20'/40', okien, drzwi, paneli PV i tarasu.
 - [DrBlocks](https://kodastrony.pl/realizacje/drblocks/): Realny klient — regulowane bloczki fundamentowe. Interaktywny model 3D produktu i kalkulator doboru rozstawu, podpór i nośności.
 - [RIKOSZET](https://kodastrony.pl/realizacje/rikoszet/): Projekt koncepcyjny (pokaz możliwości, nie realny klient) — bar i klub gier zwiedzany w 3D w przeglądarce, z rezerwacją stołu na planie sali.

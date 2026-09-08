@@ -22,9 +22,10 @@ export function RealizacjeContent() {
             }}
           >
             Każdą stronę w tym portfolio KODA zaprojektowała i zakodowała od zera — bez szablonów —
-            i każda działa na żywo: klikniesz i sprawdzisz sam. Część powstała dla realnych klientów
-            (JR Modular Systems, DrBlocks), pozostałe to jasno oznaczone projekty koncepcyjne, które
-            pokazują nasz standard pracy — od konfiguratorów 3D po animowane strony produktowe.
+            i każda działa na żywo: klikniesz i sprawdzisz sam. Większość powstała dla realnych
+            klientów (ELBIS, AGD Prime, KSBSS, JR Modular Systems, DrBlocks), pozostałe to jasno
+            oznaczone projekty koncepcyjne, które pokazują nasz standard pracy — od stron firmowych
+            B2B i sklepów po konfiguratory 3D.
           </p>
         </div>
         <h2 className="sr-only">Wszystkie realizacje</h2>

@@ -32,9 +32,10 @@ export const LASTMOD: Record<string, string> = {
   "/polityka-prywatnosci/": "2026-09-03",
 };
 
-// Realizacje (case studies) — 2026-08-27: VideoObject JSON-LD (realne czasy
-// z ffprobe), seoTitle/seoDescription, AVIF kart (wcześniej 2026-08-26: nowe OG).
-export const PROJECT_LASTMOD = "2026-08-27";
+// Realizacje (case studies) — 2026-09-08: trzy nowe realizacje dla realnych
+// klientów (ELBIS, AGD Prime, KSBSS) z klipami highlightów; wcześniej 2026-08-27:
+// VideoObject JSON-LD (realne czasy z ffprobe), seoTitle/seoDescription, AVIF kart.
+export const PROJECT_LASTMOD = "2026-09-08";
 
 // Trailing slashes match the served URLs (next.config trailingSlash:true →
 // /uslugi/ etc.) and the per-page canonicals, so search engines see one

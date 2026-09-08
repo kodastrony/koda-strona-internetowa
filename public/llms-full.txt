@@ -77,6 +77,9 @@ Spotkanie na żywo jest możliwe w każdej z tych miejscowości, ale nie jest wy
 
 ## Realizacje (https://kodastrony.pl/realizacje/)
 
+- ELBIS (klient) — hurtownia AGD, chemii i artykułów dziecięcych z Bielska-Białej: strona firmowa w Next.js w trzech językach (PL/CZ/EN), animowane wejście i hero przechodzące przy przewijaniu w zdjęcie magazynu, Strefa B2B z formularzem hurtowym w dwóch krokach (NIP → dane kontaktowe), katalog 266 marek z wyszukiwarką. https://kodastrony.pl/realizacje/elbis/
+- AGD Prime (klient) — sklep internetowy AGD i chemii (PrestaShop z autorskimi modułami): interaktywne banery hero — światło wędrujące za kursorem, punkty na produktach odsłaniające karty z ceną, hover który zawsze dobiega końca — kafle promocji i przejrzysty układ prowadzący do koszyka. https://kodastrony.pl/realizacje/agdprime/
+- KSBSS (klient) — klub strzelecki z Bielska-Białej: strona statyczna (HTML/CSS/JS, bez frameworka) z interaktywnym trackerem „Droga do pozwolenia na broń” w 5 krokach (czas, koszt, dokumenty), kartą najbliższych terminów w hero i kalendarzem, który sam oznacza rozegrane rundy. https://kodastrony.pl/realizacje/ksbss/
 - JR Modular Systems (klient) — producent budynków modułowych: filmowe hero i konfigurator 3D „Kreator" do układania obiektu z kontenerów 20'/40' (okna, drzwi, panele PV, taras, metraż i liczba modułów na żywo). https://kodastrony.pl/realizacje/jr-modular/
 - DrBlocks (klient) — regulowane bloczki fundamentowe: interaktywny model 3D produktu (wariant Standard/Plus, regulacja 120–200 mm) i kalkulator doboru rozstawu podpór i nośności. https://kodastrony.pl/realizacje/drblocks/
 - RIKOSZET (projekt koncepcyjny KODA, nie realny klient) — bar i klub gier zwiedzany w 3D w przeglądarce: tryb nocny z neonami, rezerwacja konkretnego stołu na planie sali, godziny otwarcia liczone na żywo. https://kodastrony.pl/realizacje/rikoszet/
