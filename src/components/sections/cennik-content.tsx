@@ -30,7 +30,7 @@ export interface CennikFaq {
 export const CENNIK_FAQ: CennikFaq[] = [
   {
     q: "Ile kosztuje strona internetowa w KODA?",
-    a: "Landing page kosztuje w KODA od 2 900 zł netto, strona wizytówka (do 5 podstron) od 3 900 zł, strona firmowa (6–10 podstron) od 6 900 zł, a projekty premium z zaawansowanymi animacjami i 3D — od 12 900 zł. Cena „od” dotyczy minimalnego zakresu pakietu; konkretną wycenę dla Twojego projektu podajemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie.",
+    a: "Landing page kosztuje w KODA od 3 400 zł netto, strona wizytówka (do 5 podstron) od 4 900 zł, strona firmowa (6–10 podstron) od 7 900 zł, a projekty premium z zaawansowanymi animacjami i 3D — od 12 900 zł. Cena „od” dotyczy minimalnego zakresu pakietu; konkretną wycenę dla Twojego projektu podajemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie.",
   },
   {
     q: "Co jest w cenie każdej strony?",
@@ -88,7 +88,7 @@ const DODATKI: { name: string; price: string }[] = [
   { name: "Analityka rozszerzona (cele i zdarzenia)", price: "od 900 zł" },
   { name: "Logo przy okazji strony", price: "od 1 500 zł" },
   { name: "SEO start dla istniejącej strony (audyt + wdrożenie)", price: "od 1 200 zł" },
-  { name: "Redesign — odświeżenie istniejącej strony", price: "od 2 900 zł" },
+  { name: "Redesign — nowa wersja istniejącej strony", price: "od 4 900 zł" },
   { name: "Tryb ekspres — priorytet terminu", price: "+30%" },
 ];
 
@@ -260,8 +260,8 @@ export function CennikContent() {
               }}
             >
               Strona internetowa w KODA kosztuje{" "}
-              <strong>od 2 900 zł netto</strong> (landing page), wizytówka{" "}
-              <strong>od 3 900 zł</strong>, strona firmowa <strong>od 6 900 zł</strong>, a projekty
+              <strong>od 3 400 zł netto</strong> (landing page), wizytówka{" "}
+              <strong>od 4 900 zł</strong>, strona firmowa <strong>od 7 900 zł</strong>, a projekty
               premium z animacjami i 3D — <strong>od 12 900 zł</strong>. W każdej cenie: autorski
               kod, szybkość 100/100 i 14 dni gwarancji.
             </p>
@@ -395,7 +395,7 @@ export function CennikContent() {
             </FadeUp>
             <FadeUp inView delay={0.08}>
               <p className="mt-4" style={{ ...bodyStyle, maxWidth: "40ch" }}>
-                Duża część rynku dolicza to osobno. U nas to standard — w landingu za 2 900 zł tak
+                Duża część rynku dolicza to osobno. U nas to standard — w landingu za 3 400 zł tak
                 samo, jak w projekcie premium.
               </p>
             </FadeUp>

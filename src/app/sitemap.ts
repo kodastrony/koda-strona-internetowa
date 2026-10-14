@@ -22,16 +22,16 @@ export const dynamic = "force-static";
 // wpis FAQ, linia zaufania (Work), lead /uslugi i /strony-3d, blok „Jeden
 // standard" na /realizacje, poprawki polityki (Cloudflare, data), kotwice #id.
 export const LASTMOD: Record<string, string> = {
-  "/": "2026-08-27",
-  "/uslugi/": "2026-08-27",
+  "/": "2026-10-15",
+  "/uslugi/": "2026-10-15",
   "/uslugi/strony-3d/": "2026-08-27",
-  "/cennik/": "2026-08-27",
+  "/cennik/": "2026-10-15",
   "/realizacje/": "2026-08-27",
   "/o-nas/": "2026-08-27",
   "/kontakt/": "2026-08-27",
   "/polityka-prywatnosci/": "2026-09-03",
   // 2026-10-14: FAQ jako osobna podstrona (treść = dawna sekcja FAQ strony głównej, jedno źródło @/lib/faq).
-  "/faq/": "2026-10-14",
+  "/faq/": "2026-10-15",
 };
 
 // Realizacje (case studies) — 2026-09-08: trzy nowe realizacje dla realnych

@@ -66,7 +66,7 @@ export interface Location {
 /* Powtarzalne fakty o ofercie. Trzymane raz i wstawiane do treści miast —
    dzięki temu ceny i terminy nie rozjadą się między podstronami. */
 const CENY =
-  "od 2 900 zł netto za landing page, 3 900 zł za stronę wizytówkę, 6 900 zł za stronę firmową i 12 900 zł za projekt premium z animacjami i grafiką 3D";
+  "od 3 400 zł netto za landing page, 4 900 zł za stronę wizytówkę, 7 900 zł za stronę firmową i 13 400 zł za projekt premium z animacjami i grafiką 3D";
 const TERMINY =
   "landing powstaje w 1–2 tygodnie, wizytówka w 2–3, strona firmowa w 3–5, a projekt premium w 5–8 tygodni";
 
@@ -83,7 +83,7 @@ export const LOCATIONS: Location[] = [
     // ★14.10 audyt SEO: tytuł ≤ 46 zn. (szablon dokleja „ | KODA Studio" = 60), opis ≤ 160 — checkery i SERP ucinały dłuższe.
     title: "Strony internetowe Bielsko-Biała — kod od zera",
     description:
-      "Strony internetowe w Bielsku-Białej: autorski kod zamiast szablonu, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
+      "Strony internetowe w Bielsku-Białej: autorski kod zamiast szablonu, ceny od 3 400 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
     h1: "Strony internetowe Bielsko-Biała",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Bielska-Białej — ${CENY}. Zakres i termin zapisujemy w umowie przed startem, a na każde zapytanie odpowiadamy w ciągu 24 godzin. Pracujemy z Bielska-Białej, więc spotkanie na żywo nie wymaga niczyjego wyjazdu na drugi koniec województwa.`,
     intro: [
@@ -128,7 +128,7 @@ export const LOCATIONS: Location[] = [
     faq: [
       {
         q: "Ile kosztuje strona internetowa w Bielsku-Białej?",
-        a: "W KODA landing page kosztuje od 2 900 zł netto, strona wizytówka od 3 900 zł, strona firmowa od 6 900 zł, a projekt premium z animacjami i 3D od 12 900 zł. Cena „od” to minimalny zakres pakietu — konkret dla Twojej firmy podajemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie, więc później nie dochodzą do niej żadne niespodzianki. Pełne widełki są na podstronie Cennik.",
+        a: "W KODA landing page kosztuje od 3 400 zł netto, strona wizytówka od 4 900 zł, strona firmowa od 7 900 zł, a projekt premium z animacjami i 3D od 13 400 zł. Cena „od” to minimalny zakres pakietu — konkret dla Twojej firmy podajemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie, więc później nie dochodzą do niej żadne niespodzianki. Pełne widełki są na podstronie Cennik.",
       },
       {
         q: "Ile trwa zrobienie strony?",
@@ -169,7 +169,7 @@ export const LOCATIONS: Location[] = [
       "strony-internetowe-cieszyn",
       "strony-internetowe-katowice",
     ],
-    lastmod: "2026-09-01",
+    lastmod: "2026-10-15",
   },
 
   /* ───────────────────────────── KATOWICE ───────────────────────────────── */
@@ -181,7 +181,7 @@ export const LOCATIONS: Location[] = [
     region: "Górnośląsko-Zagłębiowska Metropolia",
     title: "Strony internetowe Katowice — projekt i kod",
     description:
-      "Strony internetowe dla firm z Katowic: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, godzina drogi od Katowic.",
+      "Strony internetowe dla firm z Katowic: autorski kod, ceny od 3 400 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, godzina drogi od Katowic.",
     h1: "Strony internetowe Katowice",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Katowic i całej metropolii — ${CENY}. Zakres i termin trafiają do umowy przed startem, a odpowiedź na zapytanie dostajesz w 24 godziny. Jesteśmy z Bielska-Białej, czyli godzinę drogi od centrum Katowic.`,
     intro: [
@@ -225,7 +225,7 @@ export const LOCATIONS: Location[] = [
     faq: [
       {
         q: "Ile kosztuje strona internetowa w Katowicach?",
-        a: "Ceny KODA są takie same niezależnie od miasta: landing page od 2 900 zł netto, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, projekt premium z animacjami i 3D od 12 900 zł. Konkretną wycenę dla Twojej firmy przygotowujemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie.",
+        a: "Ceny KODA są takie same niezależnie od miasta: landing page od 3 400 zł netto, wizytówka od 4 900 zł, strona firmowa od 7 900 zł, projekt premium z animacjami i 3D od 13 400 zł. Konkretną wycenę dla Twojej firmy przygotowujemy bezpłatnie w ciągu 24 godzin i zapisujemy w umowie.",
       },
       {
         q: "Czy pracujecie z firmami z Katowic zdalnie?",
@@ -253,7 +253,7 @@ export const LOCATIONS: Location[] = [
       },
     ],
     nearby: ["strony-internetowe-bielsko-biala", "strony-internetowe-czechowice-dziedzice"],
-    lastmod: "2026-09-01",
+    lastmod: "2026-10-15",
   },
 
   /* ────────────────────── CZECHOWICE-DZIEDZICE ──────────────────────────── */
@@ -265,7 +265,7 @@ export const LOCATIONS: Location[] = [
     region: "powiat bielski",
     title: "Strony internetowe Czechowice-Dziedzice",
     description:
-      "Strony internetowe dla firm z Czechowic-Dziedzic: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
+      "Strony internetowe dla firm z Czechowic-Dziedzic: autorski kod, ceny od 3 400 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
     h1: "Strony internetowe Czechowice-Dziedzice",
     lead: `KODA robi strony internetowe dla firm z Czechowic-Dziedzic — ${CENY}. Zakres i termin zapisujemy w umowie, odpowiadamy w 24 godziny, a dzieli nas kwadrans drogi: pracujemy z sąsiedniego Bielska-Białej.`,
     intro: [
@@ -309,7 +309,7 @@ export const LOCATIONS: Location[] = [
     faq: [
       {
         q: "Ile kosztuje strona internetowa w Czechowicach-Dziedzicach?",
-        a: "Tyle samo co wszędzie u nas: landing page od 2 900 zł netto, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium z animacjami i 3D od 12 900 zł. Wycenę pod Twoją firmę robimy bezpłatnie w 24 godziny i wpisujemy do umowy.",
+        a: "Tyle samo co wszędzie u nas: landing page od 3 400 zł netto, wizytówka od 4 900 zł, strona firmowa od 7 900 zł, premium z animacjami i 3D od 13 400 zł. Wycenę pod Twoją firmę robimy bezpłatnie w 24 godziny i wpisujemy do umowy.",
       },
       {
         q: "Czy przyjedziecie na spotkanie?",
@@ -325,7 +325,7 @@ export const LOCATIONS: Location[] = [
       },
       {
         q: "Prowadzę jednoosobową działalność. Czy to nie za duży wydatek?",
-        a: "Przy jednoosobowej działalności zwykle najsensowniej zacząć od strony wizytówki (od 3 900 zł netto) albo landing page pod jedną usługę (od 2 900 zł) — a nie od rozbudowanego serwisu, w którym połowa podstron świeci pustkami. Powiemy wprost, który wariant ma u Ciebie sens, także wtedy, gdy oznacza to mniejsze zlecenie dla nas.",
+        a: "Przy jednoosobowej działalności zwykle najsensowniej zacząć od strony wizytówki (od 4 900 zł netto) albo landing page pod jedną usługę (od 3 400 zł) — a nie od rozbudowanego serwisu, w którym połowa podstron świeci pustkami. Powiemy wprost, który wariant ma u Ciebie sens, także wtedy, gdy oznacza to mniejsze zlecenie dla nas.",
       },
       {
         q: "Czy będę mógł sam zmieniać treść na stronie?",
@@ -337,7 +337,7 @@ export const LOCATIONS: Location[] = [
       "strony-internetowe-zywiec",
       "strony-internetowe-cieszyn",
     ],
-    lastmod: "2026-09-01",
+    lastmod: "2026-10-15",
   },
 
   /* ────────────────────────────── ŻYWIEC ─────────────────────────────────── */
@@ -349,7 +349,7 @@ export const LOCATIONS: Location[] = [
     region: "Żywiecczyzna",
     title: "Strony internetowe Żywiec — projekt i kod",
     description:
-      "Strony internetowe dla firm z Żywca i Żywiecczyzny: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, pół godziny drogi.",
+      "Strony internetowe dla firm z Żywca i Żywiecczyzny: autorski kod, ceny od 3 400 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, pół godziny drogi.",
     h1: "Strony internetowe Żywiec",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Żywca i Żywiecczyzny — ${CENY}. Zakres i termin zapisujemy w umowie, a odpowiedź na zapytanie wysyłamy w ciągu 24 godzin. Z Bielska-Białej do Żywca jest pół godziny drogi.`,
     intro: [
@@ -393,7 +393,7 @@ export const LOCATIONS: Location[] = [
     faq: [
       {
         q: "Ile kosztuje strona internetowa w Żywcu?",
-        a: "Cennik jest ten sam niezależnie od miejscowości: landing page od 2 900 zł netto, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium z animacjami i 3D od 12 900 zł. Wycena pod konkretny obiekt lub firmę jest bezpłatna i wraca w 24 godziny.",
+        a: "Cennik jest ten sam niezależnie od miejscowości: landing page od 3 400 zł netto, wizytówka od 4 900 zł, strona firmowa od 7 900 zł, premium z animacjami i 3D od 13 400 zł. Wycena pod konkretny obiekt lub firmę jest bezpłatna i wraca w 24 godziny.",
       },
       {
         q: "Czy zrobicie stronę dla pensjonatu z rezerwacją?",
@@ -421,7 +421,7 @@ export const LOCATIONS: Location[] = [
       "strony-internetowe-cieszyn",
       "strony-internetowe-czechowice-dziedzice",
     ],
-    lastmod: "2026-09-01",
+    lastmod: "2026-10-15",
   },
 
   /* ────────────────────────────── CIESZYN ────────────────────────────────── */
@@ -433,7 +433,7 @@ export const LOCATIONS: Location[] = [
     region: "Śląsk Cieszyński",
     title: "Strony internetowe Cieszyn — projekt i kod",
     description:
-      "Strony internetowe dla firm z Cieszyna i Śląska Cieszyńskiego: autorski kod, wersje językowe zrobione poprawnie, ceny od 2 900 zł netto, odpowiedź w 24 h.",
+      "Strony internetowe dla firm z Cieszyna i Śląska Cieszyńskiego: autorski kod, wersje językowe zrobione poprawnie, ceny od 3 400 zł netto, odpowiedź w 24 h.",
     h1: "Strony internetowe Cieszyn",
     lead: `KODA projektuje i koduje strony internetowe dla firm ze Śląska Cieszyńskiego — ${CENY}. Zakres i termin trafiają do umowy przed startem, a na zapytanie odpowiadamy w 24 godziny. Z Bielska-Białej do Cieszyna jest niecałe pół godziny.`,
     intro: [
@@ -477,7 +477,7 @@ export const LOCATIONS: Location[] = [
     faq: [
       {
         q: "Ile kosztuje strona internetowa w Cieszynie?",
-        a: "Landing page od 2 900 zł netto, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, projekt premium z animacjami i 3D od 12 900 zł — ceny nie zależą od miejscowości. Konkretną wycenę przygotowujemy bezpłatnie w 24 godziny i zapisujemy w umowie.",
+        a: "Landing page od 3 400 zł netto, wizytówka od 4 900 zł, strona firmowa od 7 900 zł, projekt premium z animacjami i 3D od 13 400 zł — ceny nie zależą od miejscowości. Konkretną wycenę przygotowujemy bezpłatnie w 24 godziny i zapisujemy w umowie.",
       },
       {
         q: "Zrobicie stronę po polsku i po czesku?",
@@ -505,7 +505,7 @@ export const LOCATIONS: Location[] = [
       "strony-internetowe-zywiec",
       "strony-internetowe-czechowice-dziedzice",
     ],
-    lastmod: "2026-09-01",
+    lastmod: "2026-10-15",
   },
 ];
 

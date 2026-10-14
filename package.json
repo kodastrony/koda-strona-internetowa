@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/compose-robot.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

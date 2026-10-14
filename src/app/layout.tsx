@@ -66,9 +66,9 @@ const ORG_JSON_LD = {
       // telephone: REALNY numer (dodany 2026-08-26 na życzenie Natana) — domyka
       // NAP (nazwa+adres+telefon) i odblokowuje spójność z przyszłym GBP.
       telephone: CONTACT.phoneE164,
-      // priceRange: realne widełki z /cennik/ (landing od 2 900 zł → premium
+      // priceRange: realne widełki z /cennik/ (landing od 3 400 zł → premium
       // typowo do 25 000 zł netto) — właściwość LocalBusiness, wzmacnia local pack.
-      priceRange: "2900-25000 PLN",
+      priceRange: "3400-25000 PLN",
       image: [`${SITE_CONFIG.url}/icon.svg`, `${SITE_CONFIG.url}/opengraph-image`],
       parentOrganization: { "@id": `${SITE_CONFIG.url}/#organization` },
       description: SITE_CONFIG.tagline,

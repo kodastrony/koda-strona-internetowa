@@ -45,19 +45,19 @@ const h3Style: React.CSSProperties = {
 const PAKIETY: { name: string; price: string; time: string; desc: string }[] = [
   {
     name: "Landing page",
-    price: "od 2 900 zł",
+    price: "od 3 400 zł",
     time: "1–2 tygodnie",
     desc: "Jedna strona pod jeden cel: kampanię, nowy produkt albo pojedynczą usługę.",
   },
   {
     name: "Strona wizytówka",
-    price: "od 3 900 zł",
+    price: "od 4 900 zł",
     time: "2–3 tygodnie",
     desc: "Kilka podstron: oferta, o firmie, kontakt. Standard dla małej firmy usługowej.",
   },
   {
     name: "Strona firmowa",
-    price: "od 6 900 zł",
+    price: "od 7 900 zł",
     time: "3–5 tygodni",
     desc: "Rozbudowana oferta, realizacje, blog albo aktualności. Dla firm z szerszym zakresem.",
   },

@@ -1,0 +1,46 @@
+# ── kodastrony.pl — nagłówki Cloudflare Pages dla POŁĄCZONEJ strony (K.O.D.A pod / + strony treści z koda-site) ──
+# Generuje koda-bot/seo/generate.mjs (prod). Źródła: koda-site/public/_headers (bezpieczeństwo) + koda-bot (cache).
+# Google i Ads w CSP są dopuszczone Z GÓRY: skrypt gtag ładuje się dopiero po zgodzie i tylko gdy w config.js jest
+# identyfikator — sama lista domen niczego nie ładuje, a brak domeny w dniu startu reklam = cicha awaria pomiaru.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-site
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.pl https://www.googleadservices.com https://googleads.g.doubleclick.net; font-src 'self'; media-src 'self'; connect-src 'self' https://koda-leads.kodastrony.workers.dev https://formsubmit.co https://cloudflareinsights.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co
+
+# Pliki .txt = ładunki RSC statycznego eksportu Next (/index.txt, /__next.*.txt) + llms.txt. Nie mają być w indeksie
+# (crawlery AI czytają llms.txt niezależnie od tego nagłówka; Google go nie używa).
+/*.txt
+  X-Robots-Tag: noindex
+
+# Next: chunki z haszem — rok, immutable.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+# Media z public/ koda-site (nazwy bez hasza) — 30 dni.
+/*.mp4
+  Cache-Control: public, max-age=2592000
+/*.webp
+  Cache-Control: public, max-age=2592000
+/*.jpg
+  Cache-Control: public, max-age=2592000
+/*.avif
+  Cache-Control: public, max-age=2592000
+# OG image (ścieżka bez rozszerzenia) — wymuszony typ, inaczej octet-stream + nosniff = walidatory odrzucają obraz.
+/opengraph-image
+  Content-Type: image/png
+
+# Zasoby z haszem w nazwie (Vite) nie zmieniają się nigdy pod tym samym adresem — rok, bez rewalidacji.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+# Czcionki, zdjęcia kart portfolio i wideo (nazwy stałe) — miesiąc.
+/fonts/*
+  Cache-Control: public, max-age=2592000
+/portfolio/*
+  Cache-Control: public, max-age=2592000
+/screen/*
+  Cache-Control: public, max-age=2592000

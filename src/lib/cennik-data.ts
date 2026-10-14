@@ -33,8 +33,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     name: "Landing page",
     short: "Landing",
     desc: "Jedna strona, która sprzedaje jedną rzecz.",
-    from: 2900,
-    typical: "3 500 – 4 500 zł",
+    from: 3400,
+    typical: "3 400 – 4 900 zł",
     // LANDING = pełna baza premium: WSZYSTKO, co realnie dajemy w najniższym
     // tierze (rebrand 27.08: „robimy tylko strony premium"). Wyższe tiery
     // DZIEDZICZĄ ten zestaw (chip „Wszystko z…") i dodają swój rząd.
@@ -61,8 +61,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     name: "Strona wizytówka",
     short: "Wizytówka",
     desc: "Cała firma profesjonalnie pokazana w internecie.",
-    from: 3900,
-    typical: "4 500 – 6 000 zł",
+    from: 4900,
+    typical: "4 900 – 6 400 zł",
     // Buyer wizytówki: chce się PREZENTOWAĆ — duma z własnej strony.
     inherits: "Wszystko z Landing",
     chips: [
@@ -81,8 +81,8 @@ export const CENNIK_PAKIETY: CennikPakiet[] = [
     name: "Strona firmowa",
     short: "Firmowa",
     desc: "Rozbudowana strona, która sprzedaje i pozycjonuje.",
-    from: 6900,
-    typical: "8 000 – 12 000 zł",
+    from: 7900,
+    typical: "7 900 – 11 900 zł",
     // Buyer firmowej: obchodzi go KASA — strona ma przynosić klientów.
     inherits: "Wszystko z Wizytówki",
     chips: [

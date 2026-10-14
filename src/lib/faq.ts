@@ -21,7 +21,7 @@ export const FAQS: Faq[] = [
     // Answer-first: NASZE ceny „od" w PIERWSZYM zdaniu (te same, które
     // publikujemy na /cennik/; spójność = wiarygodność + cytowalność przez AI).
     q: "Ile kosztuje strona?",
-    a: "W KODA landing page kosztuje od 2 900 zł netto, strona wizytówka od 3 900 zł, strona firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Cena „od” to minimalny zakres pakietu; konkret dla Twojego projektu podajemy bezpłatnie w 24 godziny i zapisujemy w umowie — bez ukrytych kosztów później. Pełny cennik znajdziesz na podstronie Cennik.",
+    a: "W KODA landing page kosztuje od 3 400 zł netto, strona wizytówka od 4 900 zł, strona firmowa od 7 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Cena „od” to minimalny zakres pakietu; konkret dla Twojego projektu podajemy bezpłatnie w 24 godziny i zapisujemy w umowie — bez ukrytych kosztów później. Pełny cennik znajdziesz na podstronie Cennik.",
   },
   {
     // Answer-first: ramy czasowe w PIERWSZYM zdaniu (orientacyjne, rynkowe —
@@ -39,7 +39,7 @@ export const FAQS: Faq[] = [
     // Answer-first pod frazę „strony internetowe premium" (rebrand 2026-08:
     // to nasz najbardziej wygrywalny keyword; SXO 2026-08-27). Fakty z /cennik.
     q: "Czym różni się strona premium od zwykłej strony firmowej?",
-    a: "Strona premium w KODA to projekt w całości szyty na miarę: indywidualne animacje, często grafika 3D (WebGL/Three.js) i dopracowany każdy detal interakcji — od 12 900 zł netto, realizacja 5–8 tygodni. Zwykła strona firmowa (od 6 900 zł) opiera się na naszym sprawdzonym standardzie: autorski kod i szybkość te same, mniej indywidualnych animacji. W obu wypadkach zakres i termin są zapisane w umowie.",
+    a: "Strona premium w KODA to projekt w całości szyty na miarę: indywidualne animacje, często grafika 3D (WebGL/Three.js) i dopracowany każdy detal interakcji — od 12 900 zł netto, realizacja 5–8 tygodni. Zwykła strona firmowa (od 7 900 zł) opiera się na naszym sprawdzonym standardzie: autorski kod i szybkość te same, mniej indywidualnych animacji. W obu wypadkach zakres i termin są zapisane w umowie.",
   },
   {
     q: "Czy strona będzie dobrze widoczna w Google?",

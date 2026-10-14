@@ -9,7 +9,7 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Cennik stron internetowych 2026 — ceny KODA",
   description:
-    "Landing od 2 900 zł, wizytówka od 3 900 zł, firmowa od 6 900 zł, premium 3D od 12 900 zł. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
+    "Landing od 3 400 zł, wizytówka od 4 900 zł, firmowa od 7 900 zł, premium 3D od 12 900 zł. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
   path: "/cennik/",
 });
 
@@ -22,12 +22,12 @@ const ARTICLE_JSON_LD = {
   "@id": `${SITE_CONFIG.url}/cennik/#article`,
   headline: "Cennik stron internetowych 2026 — ceny KODA i widełki rynkowe",
   description:
-    "Realny cennik KODA (landing od 2 900 zł, wizytówka od 3 900 zł, firmowa od 6 900 zł, premium 3D od 12 900 zł netto, opieka od 149 zł/mc) oraz orientacyjne widełki rynku PL 2026 wg typu strony.",
+    "Realny cennik KODA (landing od 3 400 zł, wizytówka od 4 900 zł, firmowa od 7 900 zł, premium 3D od 12 900 zł netto, opieka od 149 zł/mc) oraz orientacyjne widełki rynku PL 2026 wg typu strony.",
   inLanguage: "pl-PL",
   datePublished: "2026-06-17",
   // dateModified = realna data ostatniej zmiany TREŚCI artykułu (2026-08-27:
   // publikacja realnego cennika KODA — pakiety, dodatki, opieka). Spójne z sitemap.
-  dateModified: "2026-08-27",
+  dateModified: "2026-10-15",
   author: { "@id": `${SITE_CONFIG.url}/#organization` },
   publisher: { "@id": `${SITE_CONFIG.url}/#organization` },
   isPartOf: { "@id": `${SITE_CONFIG.url}/#website` },
@@ -126,7 +126,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   path: "/cennik/",
   name: "Cennik stron internetowych 2026 — ceny KODA",
   description:
-    "Landing od 2 900 zł, wizytówka od 3 900 zł, strona firmowa od 6 900 zł, premium 3D od 12 900 zł netto. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
+    "Landing od 3 400 zł, wizytówka od 4 900 zł, strona firmowa od 7 900 zł, premium 3D od 12 900 zł netto. Opieka od 149 zł/mc. Pełny cennik KODA + widełki rynku 2026.",
   dateModified: LASTMOD["/cennik/"],
   mainEntityId: `${SITE_CONFIG.url}/cennik/#article`,
 });
