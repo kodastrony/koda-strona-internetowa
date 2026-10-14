@@ -34,7 +34,7 @@ Płatność: jednorazowo — 30% zaliczki na start, reszta przy oddaniu; strona,
 
 Rynek polski 2026 (dla porównania): wizytówka 2 000–4 000 zł, firmowa na WordPressie 3 000–8 000 zł, firmowa na autorskim kodzie (Next.js/React) 12 000–35 000 zł, kreatywne projekty premium 20 000–80 000 zł; średnia cena projektu strony u freelancera ok. 1 900 zł (Index Useme).
 
-## Najczęstsze pytania (FAQ)
+## Najczęstsze pytania (FAQ) (https://kodastrony.pl/faq/)
 
 ### Ile kosztuje strona?
 W KODA landing page kosztuje od 2 900 zł netto, strona wizytówka od 3 900 zł, strona firmowa od 6 900 zł, a projekty premium z animacjami i 3D — od 12 900 zł. Cena „od" to minimalny zakres pakietu; konkret dla Twojego projektu podajemy bezpłatnie w 24 godziny i zapisujemy w umowie — bez ukrytych kosztów później.

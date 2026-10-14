@@ -46,14 +46,15 @@ export function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-5">
             {/* Logo: white text + pink dot; hover → both become pink */}
-            <Link
+            {/* ★14.10: <a>, nie <Link> — `/` to osobna aplikacja (K.O.D.A); patrz header.tsx */}
+            <a
               href="/"
               aria-label={SITE_CONFIG.name}
               className="block text-[#eeeeee] hover:text-[#cf43b8]"
               style={{ transition: `color 500ms ${cssBezier(EASE.expo)}` }}
             >
               <KodaLogo width={100} height={26} />
-            </Link>
+            </a>
             <p className="max-w-xs text-sm leading-relaxed text-ink-muted">
               {SITE_CONFIG.description}
             </p>

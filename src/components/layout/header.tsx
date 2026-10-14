@@ -178,7 +178,10 @@ export function Header() {
                     pointerEvents: hideLogo ? "none" : "auto",
                   }}
                 >
-                  <Link
+                  {/* ★14.10: zwykły <a>, nie <Link> — strona główna `/` to osobna aplikacja (K.O.D.A), nie strona
+                      Next: Link prefetchowałby jej ładunek RSC (404 w konsoli na każdej podstronie), a klik robił
+                      miękką nawigację i renderował STARĄ stronę główną po stronie klienta. <a> = pełne przeładowanie. */}
+                  <a
                     href="/"
                     aria-label={SITE_CONFIG.name}
                     // Klik w logo (też w otwartym menu) wraca na stronę główną —
@@ -196,7 +199,7 @@ export function Header() {
                     style={{ transition: `color ${CLR_DUR} ${CLR_EASE}` }}
                   >
                     <KodaLogo width={124} height={32} dotColor={onPink ? "#ffffff" : "#cf43b8"} />
-                  </Link>
+                  </a>
                 </motion.div>
               </motion.div>
             </div>

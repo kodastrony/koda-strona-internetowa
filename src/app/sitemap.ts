@@ -30,6 +30,8 @@ export const LASTMOD: Record<string, string> = {
   "/o-nas/": "2026-08-27",
   "/kontakt/": "2026-08-27",
   "/polityka-prywatnosci/": "2026-09-03",
+  // 2026-10-14: FAQ jako osobna podstrona (treść = dawna sekcja FAQ strony głównej, jedno źródło @/lib/faq).
+  "/faq/": "2026-10-14",
 };
 
 // Realizacje (case studies) — 2026-09-08: trzy nowe realizacje dla realnych
@@ -79,6 +81,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: LASTMOD["/kontakt/"],
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${base}/faq/`,
+      lastModified: LASTMOD["/faq/"],
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     // ── Strony lokalne ────────────────────────────────────────────────────
     // 2026-09-01: nowe podstrony miejskie (research: zero wyświetleń na

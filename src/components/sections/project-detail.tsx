@@ -842,7 +842,8 @@ export function ProjectDetail({
               wyjście dla kogoś, kto naprawdę chce wrócić na stronę główną po
               przescrollowaniu całego case-study (logo chowa się przy zjeździe). */}
           <FadeUp inView delay={0.1} y={10} duration={0.6} className="mt-9 flex justify-center">
-            <Link
+            {/* ★14.10: <a>, nie <Link> — `/` to osobna aplikacja (K.O.D.A); patrz header.tsx */}
+            <a
               href="/"
               className="group inline-flex items-center gap-2 text-[13px] text-[var(--color-ink-faint)] transition-colors duration-300 hover:text-[var(--color-ink-muted)]"
             >
@@ -863,7 +864,7 @@ export function ProjectDetail({
                 />
               </svg>
               Wróć na stronę główną
-            </Link>
+            </a>
           </FadeUp>
         </div>
       </section>

@@ -30,8 +30,12 @@ export function PillLink({
   bg = "#1a1a1a",
   border = "rgba(255,255,255,0.07)",
 }: PillLinkProps) {
+  // ★14.10: strona główna `/` to osobna aplikacja (K.O.D.A), nie strona Next — zwykły <a> bez prefetchu
+  // i bez miękkiej nawigacji (Link prefetchowałby ładunek RSC, który nie istnieje = 404 w konsoli,
+  // a klik renderowałby starą stronę główną po stronie klienta).
+  const Tag = href === "/" ? "a" : Link;
   return (
-    <Link
+    <Tag
       href={href}
       className={cn(
         "group inline-flex items-center gap-5 rounded-full px-8 py-4",
@@ -53,6 +57,6 @@ export function PillLink({
       >
         +
       </span>
-    </Link>
+    </Tag>
   );
 }

@@ -12,7 +12,9 @@ export const NAV_LINKS = [
   { label: "Realizacje", href: "/realizacje" },
   { label: "Usługi", href: "/uslugi" },
   { label: "O nas", href: "/o-nas" },
-  { label: "FAQ", href: "/#faq" },
+  // ★14.10: FAQ ma własną podstronę — `/` to po przepięciu domeny rozmowa z K.O.D.A (kotwica #faq by tam nie istniała,
+  // a <Link> do `/` prefetchowałby nieistniejący ładunek RSC = 404 w konsoli na każdej podstronie).
+  { label: "FAQ", href: "/faq" },
 ] as const;
 
 export const CONTACT = {

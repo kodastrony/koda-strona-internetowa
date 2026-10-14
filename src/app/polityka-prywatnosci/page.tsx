@@ -7,7 +7,7 @@ import { breadcrumbLd, jsonLd, pageMetadata, webPageLd } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Polityka prywatności",
   description:
-    "Polityka prywatności KODA Studio — jakie dane zbiera formularz kontaktowy i rozmowa z asystentem K.O.D.A, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
+    "Polityka prywatności KODA Studio: jakie dane zbiera formularz i rozmowa z K.O.D.A, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
   path: "/polityka-prywatnosci/",
 });
 
@@ -21,7 +21,7 @@ const WEBPAGE_JSON_LD = webPageLd({
   path: "/polityka-prywatnosci/",
   name: "Polityka prywatności",
   description:
-    "Polityka prywatności KODA Studio — jakie dane zbiera formularz kontaktowy i rozmowa z asystentem K.O.D.A, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
+    "Polityka prywatności KODA Studio: jakie dane zbiera formularz i rozmowa z K.O.D.A, po co, na jak długo i jakie masz prawa (RODO). Bez cookies śledzących.",
   dateModified: LASTMOD["/polityka-prywatnosci/"],
 });
 
@@ -225,12 +225,13 @@ export default function PolitykaPrywatnosciPage() {
         </div>
 
         <div className="mt-14">
-          <Link
+          {/* ★14.10: <a>, nie <Link> — `/` to osobna aplikacja (K.O.D.A); patrz header.tsx */}
+          <a
             href="/"
             className="inline-flex items-center gap-2 font-body text-[14px] text-[var(--color-ink-muted)] transition-colors duration-300 hover:text-pink"
           >
             ← Wróć na stronę główną
-          </Link>
+          </a>
         </div>
       </div>
     </section>

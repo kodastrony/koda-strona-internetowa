@@ -80,9 +80,10 @@ export const LOCATIONS: Location[] = [
     inCity: "w Bielsku-Białej",
     fromCity: "z Bielska-Białej",
     region: "Podbeskidzie",
-    title: "Strony internetowe Bielsko-Biała — projektowanie i kodowanie",
+    // ★14.10 audyt SEO: tytuł ≤ 46 zn. (szablon dokleja „ | KODA Studio" = 60), opis ≤ 160 — checkery i SERP ucinały dłuższe.
+    title: "Strony internetowe Bielsko-Biała — kod od zera",
     description:
-      "Tworzenie stron internetowych w Bielsku-Białej: autorski kod zamiast szablonu, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA pracuje z Bielska-Białej dla firm z Podbeskidzia i całej Polski.",
+      "Strony internetowe w Bielsku-Białej: autorski kod zamiast szablonu, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
     h1: "Strony internetowe Bielsko-Biała",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Bielska-Białej — ${CENY}. Zakres i termin zapisujemy w umowie przed startem, a na każde zapytanie odpowiadamy w ciągu 24 godzin. Pracujemy z Bielska-Białej, więc spotkanie na żywo nie wymaga niczyjego wyjazdu na drugi koniec województwa.`,
     intro: [
@@ -178,9 +179,9 @@ export const LOCATIONS: Location[] = [
     inCity: "w Katowicach",
     fromCity: "z Katowic",
     region: "Górnośląsko-Zagłębiowska Metropolia",
-    title: "Strony internetowe Katowice — projektowanie i kodowanie",
+    title: "Strony internetowe Katowice — projekt i kod",
     description:
-      "Tworzenie stron internetowych dla firm z Katowic i metropolii: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA — studio z Bielska-Białej, godzina drogi od Katowic.",
+      "Strony internetowe dla firm z Katowic: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, godzina drogi od Katowic.",
     h1: "Strony internetowe Katowice",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Katowic i całej metropolii — ${CENY}. Zakres i termin trafiają do umowy przed startem, a odpowiedź na zapytanie dostajesz w 24 godziny. Jesteśmy z Bielska-Białej, czyli godzinę drogi od centrum Katowic.`,
     intro: [
@@ -262,9 +263,9 @@ export const LOCATIONS: Location[] = [
     inCity: "w Czechowicach-Dziedzicach",
     fromCity: "z Czechowic-Dziedzic",
     region: "powiat bielski",
-    title: "Strony internetowe Czechowice-Dziedzice — projekt i kod",
+    title: "Strony internetowe Czechowice-Dziedzice",
     description:
-      "Tworzenie stron internetowych dla firm z Czechowic-Dziedzic: autorski kod zamiast szablonu, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA — studio z sąsiedniego Bielska-Białej.",
+      "Strony internetowe dla firm z Czechowic-Dziedzic: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA z Bielska-Białej.",
     h1: "Strony internetowe Czechowice-Dziedzice",
     lead: `KODA robi strony internetowe dla firm z Czechowic-Dziedzic — ${CENY}. Zakres i termin zapisujemy w umowie, odpowiadamy w 24 godziny, a dzieli nas kwadrans drogi: pracujemy z sąsiedniego Bielska-Białej.`,
     intro: [
@@ -346,9 +347,9 @@ export const LOCATIONS: Location[] = [
     inCity: "w Żywcu",
     fromCity: "z Żywca",
     region: "Żywiecczyzna",
-    title: "Strony internetowe Żywiec — projektowanie i kodowanie",
+    title: "Strony internetowe Żywiec — projekt i kod",
     description:
-      "Strony internetowe dla firm i obiektów z Żywca i Żywiecczyzny: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA — studio z Bielska-Białej, pół godziny drogi.",
+      "Strony internetowe dla firm z Żywca i Żywiecczyzny: autorski kod, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h. KODA, pół godziny drogi.",
     h1: "Strony internetowe Żywiec",
     lead: `KODA projektuje i koduje strony internetowe dla firm z Żywca i Żywiecczyzny — ${CENY}. Zakres i termin zapisujemy w umowie, a odpowiedź na zapytanie wysyłamy w ciągu 24 godzin. Z Bielska-Białej do Żywca jest pół godziny drogi.`,
     intro: [
@@ -430,9 +431,9 @@ export const LOCATIONS: Location[] = [
     inCity: "w Cieszynie",
     fromCity: "z Cieszyna",
     region: "Śląsk Cieszyński",
-    title: "Strony internetowe Cieszyn — projektowanie i kodowanie",
+    title: "Strony internetowe Cieszyn — projekt i kod",
     description:
-      "Strony internetowe dla firm z Cieszyna i Śląska Cieszyńskiego: autorski kod, wersje językowe zrobione poprawnie, ceny od 2 900 zł netto, zakres i termin w umowie, odpowiedź w 24 h.",
+      "Strony internetowe dla firm z Cieszyna i Śląska Cieszyńskiego: autorski kod, wersje językowe zrobione poprawnie, ceny od 2 900 zł netto, odpowiedź w 24 h.",
     h1: "Strony internetowe Cieszyn",
     lead: `KODA projektuje i koduje strony internetowe dla firm ze Śląska Cieszyńskiego — ${CENY}. Zakres i termin trafiają do umowy przed startem, a na zapytanie odpowiadamy w 24 godziny. Z Bielska-Białej do Cieszyna jest niecałe pół godziny.`,
     intro: [
